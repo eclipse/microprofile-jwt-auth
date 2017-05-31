@@ -94,8 +94,8 @@ resource server or service.
 .Question
 [NOTE]
 Can you explain the difference between "resource_access" and "scope"?
-They are pretty much scopes, but in JEE people is used with the "role" terminology. I think that is what we are trying to
-achieve with this proposal, make it easier and usable for JEE devs. Besides, the idea is that a token may have multiple set of
+They are pretty much scopes, but in Java EE people is used with the "role" terminology. I think that is what we are trying to
+achieve with this proposal, make it easier and usable for Java EE devs. Besides, the idea is that a token may have multiple set of
 roles each one referencing a specific resource server. What will make easier to reuse the same token with different services in
 the same domain where each one is going to extract the "realm" roles and the "resource_access" for a particular service.
 

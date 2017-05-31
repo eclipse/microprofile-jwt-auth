@@ -100,7 +100,7 @@ There are few reasons why JWT is becoming so widely adopted:
 * Given its JSON nature, it is solely based on claims or attributes to carry authentication and authorization information about a subject.
 * Makes easier to support different types of access control mechanisms such as ABAC, RBAC, Context-Based Access Control, etc.
 * Message-level security using signature and encryption as defined by both JWS and JWE standards
-* Given its JSON nature, processing JWT tokens becomes trivial and lightweight. Especially if considering JEE standards such as JSON-P or the different third-party libraries out there such as Nimbus, Jackson, etc.
+* Given its JSON nature, processing JWT tokens becomes trivial and lightweight. Especially if considering Java EE standards such as JSON-P or the different third-party libraries out there such as Nimbus, Jackson, etc.
 * Parties can easily agree on a specific set of claims in order to exchange both authentication and authorization information
 * Widely adopted by different Single Sign-On solutions and well known standards such as OpenID Connect given its small overhead and ability to be used across different different security domains (federation)
 
