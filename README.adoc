@@ -1,0 +1,60 @@
+//
+// Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+//
+// See the NOTICES file(s) distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+# JWT RBAC for MicroProfile
+
+## Status
+
+MicroProfile JWT RBAC proposal in progress
+http://[]
+## Introduction
+This specification outlines a proposal for using http://openid.net/connect/[OpenID Connect(OIDC)] based
+https://tools.ietf.org/html/rfc7519[JSON Web Tokens(JWT)] for role based access control(RBAC) of microservice endpoints.
+
+
+## Motivation
+MicroProfile 1.1 is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes. While Java EE is a very feature rich platform and is like a toolbox that can be used to to address a wide variety of application architectures, MicroProfile focuses on defining a small and a minimum set of Java EE standards that can be used to deliver applications based on a microservice architecture, they are:
+
+* JAX-RS
+* CDI
+* JSON-P
+
+The security requirements that involve microservice architectures are strongly related with RESTful Security. In a RESTful
+architecture style, services are usually stateless and any security state associated with a client is sent to the target
+service on every request in order to allow services to re-create a security context for the caller and perform both
+authentication and authorization checks.
+
+One of the main strategies to propagate the security state from clients to services or even from services to services involves
+the use of security tokens. In fact, the main security protocols in use today are based on security tokens such as OAuth2,
+OpenID Connect, SAML, WS-Trust, WS-Federation and others. While some of these standards are more related with identity
+federation, they share a common concept regarding security tokens and token based authentication.
+
+For RESTful based microservices, security tokens offer a very lightweight and interoperable way to propagate identities across
+different services, where:
+
+* Services don’t need to store any state about clients or users
+* Services can verify the token validity if token follows a well known format. Otherwise, services may invoke a separated service.
+* Services can identify the caller by introspecting the token. If the token follows a well known format, services are capable to introspect the token by
+themselves, locally. Otherwise, services may invoke a separated service.
+* Services can enforce authorization policies based on
+any information within a security token
+* Support for both delegation and impersonation of identities
+
+Today, the most common solutions involving RESTful and microservices security are based on OAuth2, OpenID Connect and
+JSON Web Token (JWT) standards.

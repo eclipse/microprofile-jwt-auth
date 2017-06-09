@@ -1,0 +1,106 @@
+//
+// Copyright (c) 2016-2017 Eclipse Microprofile Contributors:
+// Red Hat
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+## Introduction
+This specification outlines a proposal for using http://openid.net/connect/[OpenID Connect(OIDC)] based
+https://tools.ietf.org/html/rfc7519[JSON Web Tokens(JWT)] for role based access control(RBAC) of microservice endpoints.
+
+
+## Motivation
+MicroProfile is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers
+application portability across multiple MicroProfile runtimes. While Java EE is a very feature rich platform and is like a
+toolbox that can be used to to address a wide variety of application architectures, MicroProfile focuses on defining a small
+and a minimum set of Java EE standards that can be used to deliver applications based on a microservice architecture, they are:
+
+* JAX-RS
+* CDI
+* JSON-P
+
+The security requirements that involve microservice architectures are strongly related with RESTful Security. In a RESTful
+architecture style, services are usually stateless and any security state associated with a client is sent to the target
+service on every request in order to allow services to re-create a security context for the caller and perform both
+authentication and authorization checks.
+
+One of the main strategies to propagate the security state from clients to services or even from services to services involves
+the use of security tokens. In fact, the main security protocols in use today are based on security tokens such as OAuth2,
+OpenID Connect, SAML, WS-Trust, WS-Federation and others. While some of these standards are more related with identity
+federation, they share a common concept regarding security tokens and token based authentication.
+
+For RESTful based microservices, security tokens offer a very lightweight and interoperable way to propagate identities across
+different services, where:
+
+* Services don’t need to store any state about clients or users
+* Services can verify the token validity if token follows a well known format. Otherwise, services may invoke a separated service.
+* Services can identify the caller by introspecting the token. If the token follows a well known format, services are capable to introspect the token by
+themselves, locally. Otherwise, services may invoke a separated service.
+* Services can enforce authorization policies based on
+any information within a security token
+* Support for both delegation and impersonation of identities
+
+Today, the most common solutions involving RESTful and microservices security are based on https://tools.ietf.org/html/rfc6749[OAuth2],
+http://openid.net/connect/[OpenID Connect(OIDC)] and
+https://tools.ietf.org/html/rfc7519[JSON Web Tokens(JWT)]  standards.
+
+### Token Based Authentication
+Token Based Authentication mechanisms allow systems to authenticate, authorize and verify identities based on a security token. Usually, the following entities are involved:
+
+* Issuer
+  ** Responsible for issuing security tokens as a result of successfully asserting an identity (authentication). Issuers are usually related with Identity Providers.
+* Client
+  ** Represented by an application to which the token was issued for. Clients are usually related with Service Providers. A client may also act as an intermediary between a subject and a target service (delegation).
+* Subject
+  ** The entity to which the information in a token refers to.
+* Resource Server
+  ** Represented by an application that is going to actually consume the token in order to check if a token gives access or not to a protected resource.
+
+Independent of the token format or protocol in use, from a service perspective, token based authentication is based on the following steps:
+
+* Extract security token from the request
+  ** For RESTful services, this is usually achieved by obtaining the token from the Authorization header.
+* Perform validation checks against the token
+  ** This step usually depends on the token format and security protocol in use. The objective is make sure the token is valid and can be consumed by the application. It may involve signature, encryption and expiration checks.
+* Introspect the token and extract information about the subject
+  ** This step usually depends on the token format and security protocol in use. The objective is to obtain all the necessary information about the subject from the token.
+* Create a security context for the subject
+  ** Based on the information extracted from the token, the application creates a security context for the subject in order to use the information wherever necessary when serving protected resources.
+
+## Using JWT Bearer Tokens to Protect Services
+For now, use cases are based on a scenario where services belong to the same security domain. This is an important note in order to avoid dealing with all complexities when you need to access services across different security domains. With that in mind, we assume that any information carried along with a token could be understood and processed (without any security breaches) by the different services involved.
+
+The use case can be described as follows:
+
+. Client sends a HTTP request to Service A including the JWT as a bearer token:
+----
+    GET /resource/1 HTTP/1.1
+    Host: example.com
+    Authorization: Bearer mF_9.B5f-4.1JqM
+----
+. Token-Based Authentication Mechanism in front of Service A perform all steps described on the Token-Based Authentication Section.
+. Token-Based Authentication Mechanism perform a role and group mapping based on the JWT claims. Where the role and group mapping is fully configurable by the application.
+
+https://tools.ietf.org/html/rfc7519[JWT] tokens follow a well defined and known standard that is becoming the most common token format to protect services. It not only provides a token format but additional security aspects like signature and encryption based on another set of standards like JWS, JWE and others.
+
+There are few reasons why JWT is becoming so widely adopted:
+
+* Token validation doesn’t require an additional trip and can be validated locally by each service
+* Given its JSON nature, it is solely based on claims or attributes to carry authentication and authorization information about a subject.
+* Makes easier to support different types of access control mechanisms such as ABAC, RBAC, Context-Based Access Control, etc.
+* Message-level security using signature and encryption as defined by both JWS and JWE standards
+* Given its JSON nature, processing JWT tokens becomes trivial and lightweight. Especially if considering Java EE standards such as JSON-P or the different third-party libraries out there such as Nimbus, Jackson, etc.
+* Parties can easily agree on a specific set of claims in order to exchange both authentication and authorization information
+* Widely adopted by different Single Sign-On solutions and well known standards such as OpenID Connect given its small overhead and ability to be used across different different security domains (federation)
+
