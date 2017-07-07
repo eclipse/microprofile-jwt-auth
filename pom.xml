@@ -58,6 +58,11 @@
                 <version>1.2</version>
             </dependency>
             <dependency>
+                <groupId>javax.security.enterprise</groupId>
+                <artifactId>javax.security.enterprise-api</artifactId>
+                <version>1.0-b06</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
                 <version>1.1.12.Final</version>
@@ -191,6 +196,7 @@
                     <excludes>
                         <exclude>.travis.yml.*</exclude>
                         <exclude>bnd.bnd</exclude>
+                        <exclude>**/*.json</exclude>
                         <exclude>*.log</exclude>
                         <exclude>.checkstyle</exclude>
                         <exclude>.factorypath</exclude>
