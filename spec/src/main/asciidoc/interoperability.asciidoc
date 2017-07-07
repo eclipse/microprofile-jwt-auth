@@ -1,6 +1,6 @@
 //
 // Copyright (c) 2016-2017 Eclipse Microprofile Contributors:
-// Red Hat
+// Red Hat, IBM
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,69 +17,93 @@
 
 ## Recommendations for Interoperability
 
-The decision about using JWT as token format also depends on the agreement between both identity providers and service providers. That means identity providers - responsible for issuing tokens - should be able to issue tokens using the JWT format in a way that service providers can understand in order to introspect the token and gather information about a subject.
+The decision about using JWT as token format also depends on the agreement between both identity providers and service providers.
+That means identity providers - responsible for issuing tokens - should be able to issue tokens using the JWT format in a
+way that service providers can understand in order to introspect the token and gather information about a subject.
 
-As a recommendation, JWT tokens should follow the standard claims defined by [OpenID Connect Specification](http://openid.net/specs/openid-connect-core-1_0.html) to carry authentication related information about a subject. This specification defines a special type of token called ID Token, which defines a small set of required claims that can be used to identify the subject.
+1. An authentication token, and
+2. An authorization token that contains J2EE role based authorization directly or indirectly granted with group
+3. Can be mapped to IdentityStore in JSR375,
+4. Can support standard claims in https://www.iana.org/assignments/jwt/jwt.xhtml
+
+To meet those requirements, we can introduce 3 new claims to define the JWT:
+
+* "unique_username" or "upn": Human readable claim that uniquely identify subject or user principal of token.
+* "groups": The subject's group membership.
+* "roles": The application roles that the subject has been granted directly and indirectly through groups claim.
+
+The "unique_username" or "upn" is user principal, and is the caller principal in IdentityStore. If this claim is ommitted, the "sub" itself is used as caller principal.
+
+The "groups" contains group membership of caller principal in IdentityStore.
+the "roles" contains granted application roles through "groups" or "unique_username" claims.
+
+The recommended minimum JWT would be
 ```json
-  {
-      "jti": "5a785440-8cb4-4500-a9fc-0c3aec1e62d5",
-   		"iss": "https://server.example.com",
-   		"sub": "24400320",
-   		"aud": "s6BhdRkqt3",
-   		"nonce": "n-0S6_WzA2Mj",
-   		"exp": 1311281970,
-   		"iat": 1311280970,
-   		"auth_time": 1311280969,
-	}
+{
+     "typ": "JWT",
+    "alg": "RS256",
+    "kid": "abc-1234567890"
+}
+{
+       "iss": "https://server.example.com",
+       "aud": "s6BhdRkqt3",
+       "exp": 1311281970,
+       "iat": 1311280970,
+       "sub": "24400320",
+        "unique_username <or "upn">": "jdoe@server.example.com",
+        "groups": ["red-group", "green-group", "admin-group"],
+       "roles": ["auditor", "administrator"]
+}
 ```
 
-Please, note that OpenID Connect specification also defines a few other standard claims that can be used to identity the subject
-and improve the security of a token. The snippet above is just the bare minimum necessary to represent a subject with basic
-information about how tokens should be validated. Also note that the ID Token is not meant to be used as a bearer/access token
-to gain access to resources protected by a resource server or service. Here we propose a bearer/access token format, based on
-some claims from ID Token.
-
-In addition to these standard claims, we also recommend a **preferred_username** claim to carry the username. For instance:
+The JWT can contains all other optional and standard claims:
 ```json
-  {
-      "jti": "5a785440-8cb4-4500-a9fc-0c3aec1e62d5",
-   		"iss": "https://server.example.com",
-   		"sub": "24400320",
-   		"aud": "s6BhdRkqt3",
-   		"nonce": "n-0S6_WzA2Mj",
-   		"exp": 1311281970,
-   		"iat": 1311280970,
-   		"auth_time": 1311280969,
-      "preferred_username": "jdoe",
-	  }
+{
+       "iss": "https://server.example.com",
+       "aud": "s6BhdRkqt3",
+       "exp": 1311281970,
+       "iat": 1311280970,
+       "sub": "24400320",
+
+        "unique_username <or "upn">": "jdoe@server.example.com",
+        "groups: ["red-group", "green-group", "admin-group"],
+    "roles": ["auditor", "administrator"],
+
+       "jti": "a-123",
+       "auth_time": 1311280969,
+        "preferred_username": "jdoe",
+        "acr": "phr",
+        "nbf":  1311288970
+        ....... <and all other claims defined by JWT spec and OIDC spec>
 ```
-.Discussion topic
-[NOTE]
-It has been suggested that preferred_username be shortened to something like upn
 
-[NOTE]
-It has also been proposed that we also add some unique user identifier as discussed in JSR-375 to uniquely identify credential.
-If JWT is issued with pairwise "sub" claim, it is not easy to use "sub" as credential, we do need some "unique identifier"
-claim in JWT. How about a new claim "unique_username" or "unique_identifier" or "uid"?
-
-From an authorization perspective, we recommend two specific claims to carry role information about a subject.
+An extended form of authorization on a per service basis
 ```json
 	{
    		"iss": "https://server.example.com",
    		"sub": "24400320",
      "preferred_username": "jdoe",
    		"aud": "s6BhdRkqt3",
-   		"nonce": "n-0S6_WzA2Mj",
    		"exp": 1311281970,
    		"iat": 1311280970,
    		"auth_time": 1311280969,
-      "realm_access": {
-          "roles": ["role-in-realm", "user", "manager"]
-      },
+      "roles": ["role-in-realm", "user", "manager"],
+      "groups": [],
       "resource_access": {
           "my-service": {
+            "groups": ["group1", ],
             "roles": [
               "role-in-my-service"
+            ]
+          },
+          "service-B": {
+            "roles": [
+              "role-in-B"
+            ]
+          },
+          "service-C": {
+            "groups": [
+              "groupC", "web-tier"
             ]
           }
         },
@@ -87,61 +111,37 @@ From an authorization perspective, we recommend two specific claims to carry rol
   }
 ```
 
-The **realm_access** claim can be used to define which roles were granted to a subject at the realm or security domain level.
-On the other hand, the **resource_access** claim allows to define a different set of roles which are associated with a specific
-resource server or service.
-
-.Question
-[NOTE]
-Can you explain the difference between "resource_access" and "scope"?
-They are pretty much scopes, but in Java EE people is used with the "role" terminology. I think that is what we are trying to
-achieve with this proposal, make it easier and usable for Java EE devs. Besides, the idea is that a token may have multiple set of
-roles each one referencing a specific resource server. What will make easier to reuse the same token with different services in
-the same domain where each one is going to extract the "realm" roles and the "resource_access" for a particular service.
-
-.Discussion
-[NOTE]
-It has been suggested that realm_access be named roles.
-
-[NOTE]
-It has been suggested there should also be a "groups" claim. Although "roles" claim represents service roles a subject has been
-granted, this requires existing service is re-written or packaged in order to use JWT. We believe that we should offer
-alternative option of "group" claim to allow existing service to map service role to "group". This also allows service to
-decouple authorization and authentication. This needs further discussion.
+The "roles" and "groups" claim can be used to define which roles/groups were granted to a subject at the realm or security domain level.
+On the other hand, the "resource_access" claim allows one to define a different set of roles/groups which are associated
+with a specific resource server or service.
 
 [NOTE]
 It has been suggested that there should be a scope claim.
 Do we want to bring OAuth2 concepts to the proposal? I think roles should cover most use cases.
 
-It is recommend that signature portion of the token should be signed using the RS256 algorithm using the RSA private key
-associated with the realm so that clients and services may verify the signature using the RSA realm public key. This corresponds
-to a JOSE header with the following **alg** and **typ** header fields:
-```
-{
-  "alg": "RS256",
-  "typ": "JWT",
-  "kid": "..."
-}
-```
-
 ## Mapping Tokens to Container APIs
 
-TODO
+The requirements of how a JWT should be exposed via the various container APIs is discussed in this section.
 
-.
-[NOTE]
-If the JWT format is going to be compatible with JSR-375, and support IdentityStore.getGroupsByCallerPrincipal(CallerPrincipal),
-should we recommend claim "group" instead of "realm_access" ? So JWT IdentityStore can build CredentialValidationResult that
-contains group for the credential. The servlet container itself already does the "role" to group mapping.
+### Set<String> IdentityStore#getCallerGroups(CredentialValidationResult)
+A JWT can contains both "roles" and "groups", or just "groups" or "roles". If JWT only contains "roles", the set
+of names returned by this method is the set from the array of role names. If a "groups" claim exists in the JWT,
+the set of names returned by this method is the set from the array of group names.
 
-###
+In the case of the existence of a "resource_access" claim, the role and group names must be prefixed with the name
+of the
 
-### getCallerPrincipal()/getUserPrincipal() Requirements
-
-### isCallerInRole(String)/isUserInRole(String) Requirements
+### SecurityContext#getCallerPrincipal()/HttpServletRequest#getUserPrincipal() Requirements
+The CallerPrincipal returned from these methods should be an instance of org.eclipse.microprofile.jwt.JWTCallerPrincipal.
 
 ### @Inject Principal Requirements
+The injected CallerPrincipal should be an instance of org.eclipse.microprofile.jwt.JWTCallerPrincipal.
+
+### isCallerInRole(String)/isUserInRole(String) Requirements
+TODO
 
 ### SecurityContext.isCallerInRole(String)/SecurityContext.getAllCallerRoles() Requirements
+TODO
 
 ### @RolesAllowed ?
+TODO
