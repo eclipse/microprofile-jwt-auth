@@ -46,6 +46,7 @@
 
     <modules>
         <module>api</module>
+        <module>ri</module>
         <module>tck</module>
         <module>spec</module>
     </modules>
@@ -191,6 +192,8 @@
                     <excludes>
                         <exclude>.travis.yml.*</exclude>
                         <exclude>bnd.bnd</exclude>
+                        <exclude>**/*.json</exclude>
+                        <exclude>**/META-INF/services/*</exclude>
                         <exclude>*.log</exclude>
                         <exclude>.checkstyle</exclude>
                         <exclude>.factorypath</exclude>

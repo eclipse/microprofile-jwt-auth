@@ -24,19 +24,60 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.eclipse.microprofile.apis</groupId>
-    <artifactId>microprofile-jwt-auth_1.0_api</artifactId>
+    <groupId>org.eclipse.microprofile.jwt.ri</groupId>
+    <artifactId>microprofile-jwt-auth-ri</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>MicroProfile JWT Auth API</name>
+    <name>MicroProfile JWT Auth Reference Implementation</name>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/javax.security.enterprise/javax.security.enterprise-api -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.apis</groupId>
+            <artifactId>microprofile-jwt-auth_1.0_api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>javax.security.enterprise</groupId>
             <artifactId>javax.security.enterprise-api</artifactId>
             <version>1.0-b07</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-core</artifactId>
+            <version>3.2.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.5.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.5.4</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-core</artifactId>
+            <version>2.4.3.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
+            <version>1.0.0.Final</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     
     <build>
@@ -71,8 +112,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <Bundle-SymbolicName>org.eclipse.microprofile.config</Bundle-SymbolicName>
-                    <Bundle-Name>MicroProfile config bundle</Bundle-Name>
+                    <Bundle-SymbolicName>org.eclipse.microprofile.jwt.ri</Bundle-SymbolicName>
+                    <Bundle-Name>MicroProfile JWT RBAC Auth Reference Implementation bundle</Bundle-Name>
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
