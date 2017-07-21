@@ -15,29 +15,8 @@
 // limitations under the License.
 //
 
-= Interoperable JWT RBAC for Microprofile
-:author: Scott Stark; Pedro Igor Silva
-:email: sstark@redhat.com
-:revnumber: 0.1 Draft
-:revdate: 2017-05-30
-:revremark: Proposal
-:version-label!:
-:sectanchors:
-:doctype: book
-:license: Apache License v2.0
-:source-highlighter: coderay
-:toc: left
-:toclevels: 4
-:sectnumlevels: 4
-ifdef::backend-pdf[]
-:pagenums:
-endif::[]
-
-
-include::license-alv2.asciidoc[]
-
-include::background.asciidoc[]
-
-include::interoperability.asciidoc[]
-
-include::refimpl.asciidoc[]
+## Reference Implementation
+A baseline reference implementation that is available under the ASLv2 license
+can be found at https://github.com/starksm64/microprofile-jwt-auth-ri. The purpose
+of this RI is to offering reusable code for integration of the JWT RBAC authenticaiton
+and authorization in various container environments.
