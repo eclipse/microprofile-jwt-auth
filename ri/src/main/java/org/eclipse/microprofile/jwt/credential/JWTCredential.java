@@ -28,9 +28,9 @@ public class JWTCredential implements Credential {
     private String token;
 
     /**
-     *
+     * Parse out the token porition of a HTTP "Authentication: Bearer {token}"
      * @param authorizationHeader - HTTP Authentication header with Bearer ... value
-     * @return
+     * @return a credential containing the token if the authorization header was for a bearer token, null otherwise
      */
     public static JWTCredential parse(String authorizationHeader) {
         JWTCredential credential = null;
