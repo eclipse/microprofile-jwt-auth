@@ -46,7 +46,6 @@
 
     <modules>
         <module>api</module>
-        <module>ri</module>
         <module>tck</module>
         <module>spec</module>
     </modules>
