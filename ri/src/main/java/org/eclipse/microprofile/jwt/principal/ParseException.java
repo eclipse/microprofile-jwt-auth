@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt;
+package org.eclipse.microprofile.jwt.principal;
 
 /**
  * The exception thrown when

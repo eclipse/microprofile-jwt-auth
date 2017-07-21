@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.impl;
 
-import org.eclipse.microprofile.jwt.JWTCallerPrincipal;
+import org.eclipse.microprofile.jwt.principal.JWTCallerPrincipal;
 
 import javax.security.auth.Subject;
 import java.util.Arrays;

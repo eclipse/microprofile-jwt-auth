@@ -29,16 +29,6 @@
     <version>1.0-SNAPSHOT</version>
     <name>MicroProfile JWT Auth API</name>
 
-    <dependencies>
-        <!-- https://mvnrepository.com/artifact/javax.security.enterprise/javax.security.enterprise-api -->
-        <dependency>
-            <groupId>javax.security.enterprise</groupId>
-            <artifactId>javax.security.enterprise-api</artifactId>
-            <version>1.0-b07</version>
-        </dependency>
-
-    </dependencies>
-    
     <build>
         <plugins>
             <plugin>
