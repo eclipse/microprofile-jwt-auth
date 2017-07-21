@@ -19,9 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.impl;
 
-import org.eclipse.microprofile.jwt.JWTCallerPrincipal;
-import org.eclipse.microprofile.jwt.JWTCallerPrincipalFactory;
-import org.eclipse.microprofile.jwt.ParseException;
+import org.eclipse.microprofile.jwt.principal.JWTCallerPrincipal;
+import org.eclipse.microprofile.jwt.principal.JWTCallerPrincipalFactory;
+import org.eclipse.microprofile.jwt.principal.ParseException;
 import org.eclipse.microprofile.jwt.identitystore.JWTAuthContextInfo;
 import org.keycloak.TokenVerifier;
 import org.keycloak.common.VerificationException;

@@ -17,7 +17,9 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt;
+package org.eclipse.microprofile.jwt.principal;
+
+import org.eclipse.microprofile.jwt.JWTPrincipal;
 
 import javax.security.enterprise.CallerPrincipal;
 

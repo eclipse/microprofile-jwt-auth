@@ -19,8 +19,8 @@
  */
 package org.eclipse.microprofile.jwt.test.format;
 
-import org.eclipse.microprofile.jwt.JWTCallerPrincipal;
-import org.eclipse.microprofile.jwt.JWTCallerPrincipalFactory;
+import org.eclipse.microprofile.jwt.principal.JWTCallerPrincipal;
+import org.eclipse.microprofile.jwt.principal.JWTCallerPrincipalFactory;
 import org.eclipse.microprofile.jwt.test.cdi.WeldJUnit4Runner;
 import org.junit.Assert;
 import org.junit.Test;
