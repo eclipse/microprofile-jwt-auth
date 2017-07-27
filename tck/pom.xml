@@ -64,7 +64,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
-            <artifactId>jwt-auth-ri</artifactId>
+            <artifactId>jwt-auth-principal-ri</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
