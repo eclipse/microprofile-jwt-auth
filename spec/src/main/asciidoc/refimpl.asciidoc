@@ -15,8 +15,23 @@
 // limitations under the License.
 //
 
-## Reference Implementation
+## Reference Implementations
+
+This sections references known reference implementations of the Eclise MicroProfile JWT RBAC authorization specification.
+
+### General Java EE/SE based Implementations
+
 A baseline reference implementation that is available under the ASLv2 license
 can be found at https://github.com/starksm64/microprofile-jwt-auth-ri. The purpose
-of this RI is to offering reusable code for integration of the JWT RBAC authenticaiton
-and authorization in various container environments.
+of this RI is to offer reusable code for integration of the JWT RBAC authenticaiton
+and authorization spec in various container environments. This particular implementation contains:
+
+* a default implementation of the JWTPrincipal interface
+* a JAX-RS ContainerRequestFilter prototype
+* JSR-375 IdentityStore and Credential prototypes
+* TODO: a JSR-196 ServerAuthModule
+
+### Wildfly Swarm Implementations
+
+A reference implementation for a custom auth-method of MP-JWT with the Wildfly/Wildfly-Swarm Undertow web container
+available under the ASLv2 license can be found at https://github.com/starksm64/microprofile-jwt-auth-wfswarm.
