@@ -107,4 +107,18 @@ public interface JWTPrincipal extends Principal {
      * @return a possibly empty array of group names.
      */
     public Set<String> getRoles();
+
+    /**
+     * Access the names of any other claims not in the explicitly supported MicroProfile mandated claims that
+     * are associated with this token.
+     * @return non-standard claim names in the token
+     */
+    public Set<String> getOtherClaimNames();
+
+    /**
+     * Access the value of a non-standard claim.
+     * @param claimName - the name of the claim
+     * @return the value of the indicated claim if it exists, null otherwise.
+     */
+    public Object getOtherClaim(String claimName);
 }
