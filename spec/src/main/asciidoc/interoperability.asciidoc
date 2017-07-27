@@ -22,7 +22,7 @@ That means identity providers - responsible for issuing tokens - should be able 
 way that service providers can understand in order to introspect the token and gather information about a subject.
 
 1. An authentication token, and
-2. An authorization token that contains Java EE role based authorization directly or indirectly granted with group
+2. An authorization token that contains Java EE role based authorization directly or indirectly granted via a group
 3. Can be mapped to IdentityStore in JSR375,
 4. Can support standard claims in https://www.iana.org/assignments/jwt/jwt.xhtml
 
@@ -34,11 +34,15 @@ To meet those requirements, we can introduce 3 new claims to define the JWT:
 
 The "unique_username" or "upn" is user principal, and is the caller principal in IdentityStore. If this claim is ommitted,
 the "sub" itself is used as caller principal.
+[NOTE]
+It has been suggested that a new unique_username/upn be used rather than the OIDC preferred_username due to the fact
+that the OIDC spec states that the Relying Party MUST NOT rely upon this value being unique, as discussed in Section 5.7.
+Can we not just impose the requirement of uniqueness rather than introducing another claim?
 
 The "groups" contains group membership of caller principal in IdentityStore.
 the "roles" contains granted application roles through "groups" or "unique_username" claims.
 
-The recommended minimum JWT would be
+The recommended minimum JWT would be:
 ```json
 {
      "typ": "JWT",
@@ -74,51 +78,12 @@ The JWT can contains all other optional and standard claims:
    "preferred_username": "jdoe",
    "acr": "phr",
    "nbf":  1311288970
-        ....... <and all other claims defined by JWT spec and OIDC spec>
+        ....... <and all other claims defined by JWT spec and OIDC spec, as well as custom claims>
 ```
 
-[NOTE]
-It has been suggested that a new unique_username/upn be used rather than the OIDC preferred_username due to the fact
-that the OIDC spec states that the Relying Party MUST NOT rely upon this value being unique, as discussed in Section 5.7.
-Can we not just impose the requirement of uniqueness rather than introducing another claim?
 
-An extended form of authorization on a per service basis
-```json
-	{
-   		"iss": "https://server.example.com",
-   		"sub": "24400320",
-       "preferred_username": "jdoe",
-   		"aud": "s6BhdRkqt3",
-   		"exp": 1311281970,
-   		"iat": 1311280970,
-   		"auth_time": 1311280969,
-      "roles": ["role-in-realm", "user", "manager"],
-      "groups": [],
-      "resource_access": {
-          "my-service": {
-            "groups": ["group1", ],
-            "roles": [
-              "role-in-my-service"
-            ]
-          },
-          "service-B": {
-            "roles": [
-              "role-in-B"
-            ]
-          },
-          "service-C": {
-            "groups": [
-              "groupC", "web-tier"
-            ]
-          }
-        },
-      }
-  }
-```
-
-The "roles" and "groups" claim can be used to define which roles/groups were granted to a subject at the realm or security domain level.
-On the other hand, the "resource_access" claim allows one to define a different set of roles/groups which are associated
-with a specific resource server or service.
+An extended form of authorization on a per service basis using a "resource_access" claim has been postponed to a future
+release. See <<resource_access,Future Directions>> for more information.
 
 [NOTE]
 It has been suggested that there should be a scope claim.
