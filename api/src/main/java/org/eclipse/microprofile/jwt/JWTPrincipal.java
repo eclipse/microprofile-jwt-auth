@@ -30,6 +30,12 @@ import java.util.Set;
  */
 public interface JWTPrincipal extends Principal {
     /**
+     * Get the raw bearer token string originally passed in the authentication header
+     * @return raw bear token string
+     */
+    public String getRawToken();
+
+    /**
      * The iss(Issuer) claim identifies the principal that issued the JWT
      * @return the iss claim.
      */
