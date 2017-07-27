@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.cdi;
 
-import org.eclipse.microprofile.jwt.identitystore.JWTAuthContextInfo;
+import org.eclipse.microprofile.jwt.principal.JWTAuthContextInfo;
 import org.keycloak.common.util.PemUtils;
 
 import javax.annotation.PostConstruct;
