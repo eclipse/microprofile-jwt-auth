@@ -23,12 +23,22 @@ import java.security.Principal;
 import java.util.Set;
 
 /**
- * A read-only interface for the the claims required by Microprofile conforming tokens. Additional information about
- * the claims defined by OIDC and RFC7519 can be found at https://www.iana.org/assignments/jwt/jwt.xhtml.
+ * A read-only interface for the the claims required by Eclipse MicroProfile conforming tokens. Additional information
+ * about the claims defined by OIDC and RFC7519 can be found at https://www.iana.org/assignments/jwt/jwt.xhtml.
  *
- * This is compatible with the pre-JSR 375 caller principal api.
+ * This is compatible with the pre-JSR 375 caller {@link Principal} api.
  */
 public interface JWTPrincipal extends Principal {
+
+    /**
+     * Returns the unique name of this principal. This either comes from the upn claim, or if that is missing, the
+     * preferred_username claim. Note that for guaranteed interoperability a upn claim should be used.
+     *
+     * @return the unique name of this principal.
+     */
+    @Override
+    public String getName();
+
     /**
      * Get the raw bearer token string originally passed in the authentication header
      * @return raw bear token string
@@ -48,21 +58,12 @@ public interface JWTPrincipal extends Principal {
     public String[] getAudience();
 
     /**
-     * The sub(Subject) claim identifies the principal that is the subject of the JWT. This may be used as the
-     * caller principal name if the {@link #getUniqueUsername()} value is null.
-     * @see #getUniqueUsername()
+     * The sub(Subject) claim identifies the principal that is the subject of the JWT. This is the token issuing
+     * IDP subject, not the
+     *
      * @return the sub claim.
      */
     public String getSubject();
-
-    /**
-     * The upn(Unique username) claim uniquely identifies the principal that is associated with the JWT. This value
-     * should be used as the caller principal name if non-null.
-     *
-     * This is a MicroProfile specific claim.
-     * @return the upn claim
-     */
-    public String getUniqueUsername();
 
     /**
      * The jti(JWT ID) claim provides a unique identifier for the JWT.
