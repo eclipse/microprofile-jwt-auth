@@ -27,12 +27,15 @@
     <groupId>org.eclipse.microprofile.jwt.tck</groupId>
     <artifactId>microprofile-jwt-auth-tck</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>MicroProfile JWT Auth TCK</name>
+    <name>MicroProfile JWT Auth TCK Harness</name>
 
     <properties>
         <arquillian.version>1.1.13.Final</arquillian.version>
+        <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
         <checkstyle.methodNameFormat>^_?[a-z][a-zA-Z0-9_]*$</checkstyle.methodNameFormat>
-        <version.wildfly.swarm>2017.7.0</version.wildfly.swarm>
+        <!-- TCK properties that must be overriden in the vendor profile -->
+        <tck.ITokenParserArtifact>INVALID</tck.ITokenParserArtifact>
+        <tck.includes>INVALID</tck.includes>
     </properties>
 
     <dependencyManagement>
@@ -44,13 +47,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>org.wildfly.swarm</groupId>
-                <artifactId>bom</artifactId>
-                <version>${version.wildfly.swarm}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -59,12 +55,6 @@
         <dependency>
             <groupId>org.eclipse.microprofile.apis</groupId>
             <artifactId>microprofile-jwt-auth_1.0_api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.microprofile.jwt</groupId>
-            <artifactId>jwt-auth-principal-ri</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -90,52 +80,107 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.extension</groupId>
-            <artifactId>arquillian-rest-client-impl-3x</artifactId>
-            <version>1.0.0.Alpha4</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.swarm</groupId>
-            <artifactId>jaxrs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.swarm</groupId>
-            <artifactId>jaxrs-cdi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.swarm</groupId>
-            <artifactId>cdi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.swarm</groupId>
-            <artifactId>logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.swarm</groupId>
-            <artifactId>security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-undertow</artifactId>
-            <version>10.1.0.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.swarm</groupId>
-            <artifactId>arquillian</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap</groupId>
             <artifactId>shrinkwrap-api</artifactId>
-            <scope>compile</scope>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-depchain</artifactId>
+            <version>${version.shrinkwrap.resolvers}</version>
+            <scope>test</scope>
+            <type>pom</type>
         </dependency>
     </dependencies>
-    
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.20</version>
+                    <configuration>
+                        <includes>
+                            <include>${tck.includes}</include>
+                        </includes>
+                        <systemPropertyVariables>
+                            <tck.ITokenParserArtifact>${tck.ITokenParserArtifact}</tck.ITokenParserArtifact>
+                            <buildDirectory>${project.build.directory}</buildDirectory>
+                        </systemPropertyVariables>
+
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>weld-se</id>
+            <properties>
+                <tck.includes>org.eclipse.microprofile.jwt.tck.format.TokenParsingTest</tck.includes>
+            </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.weld.se</groupId>
+                    <artifactId>weld-se-core</artifactId>
+                    <version>2.4.3.Final</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.container</groupId>
+                    <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
+                    <version>1.0.0.Final</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>wildfly-swarm</id>
+            <properties>
+                <version.wildfly.swarm>2017.7.0</version.wildfly.swarm>
+                <tck.ITokenParser>empty</tck.ITokenParser>
+                <tck.includes>org.eclipse.microprofile.jwt.tck.format.TokenParsingTest</tck.includes>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.wildfly.swarm</groupId>
+                        <artifactId>bom</artifactId>
+                        <version>${version.wildfly.swarm}</version>
+                        <scope>import</scope>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.microprofile.jwt</groupId>
+                    <artifactId>jwt-auth-wfswarm</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.wildfly.swarm</groupId>
+                    <artifactId>jwt-auth-tck</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                    <scope>runtime</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.wildfly.swarm</groupId>
+                    <artifactId>arquillian</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
