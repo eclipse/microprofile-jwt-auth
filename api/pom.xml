@@ -20,12 +20,11 @@
     <parent>
         <!-- This is just for now and will not work if the API has a separate release cycle than the rest. -->
         <groupId>org.eclipse.microprofile.jwt</groupId>
-        <artifactId>microprofile.jwt-auth.parent</artifactId>
+        <artifactId>microprofile-jwt-auth-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.eclipse.microprofile.apis</groupId>
-    <artifactId>microprofile-jwt-auth_1.0_api</artifactId>
+    <artifactId>microprofile-jwt-auth</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>MicroProfile JWT Auth API</name>
 
