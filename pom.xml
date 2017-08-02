@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.eclipse.microprofile.jwt</groupId>
-    <artifactId>microprofile.jwt-auth.parent</artifactId>
+    <artifactId>microprofile-jwt-auth-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>MicroProfile JWT Auth Parent</name>
     <packaging>pom</packaging>
