@@ -220,9 +220,7 @@ release. See <<resource_access,Future Directions>> for more information.
 The requirements of how a JWT should be exposed via the various Java EE container APIs is discussed in this section.
 
 ### javax.security.enterprise.identitystore.IdentityStore.getCallerGroups(CredentialValidationResult)
-A JWT can contain both "roles" and "groups", or just "groups" or "roles". If a JWT only contains "roles", the set
-of names returned by this method is the set from the array of role names. If a "groups" claim exists in the JWT,
-the set of names returned by this method is the set of role names that have been applied to the array of group names.
+This method should return the set of names found in the "groups" claim in the JWT if it exists, an empty set otherwise.
 
 ### javax.ejb.SessionContext.getCallerPrincipal()
 The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JWTPrincipal.
