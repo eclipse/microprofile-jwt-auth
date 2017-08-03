@@ -52,10 +52,24 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Not working for some reason
+            <dependency>
+              <groupId>io.microprofile</groupId>
+              <artifactId>microprofile</artifactId>
+              <version>1.0.0</version>
+              <type>pom</type>
+              <scope>import</scope>
+            </dependency>
+            -->
             <dependency>
                 <groupId>javax.enterprise</groupId>
                 <artifactId>cdi-api</artifactId>
                 <version>1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
@@ -69,18 +83,18 @@
 
     <build>
         <pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${checkstyle.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
-            </plugin>    
-        </plugins>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${checkstyle.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+            </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
@@ -113,7 +127,7 @@
                             <module name="FileTabCharacter" />
                             <module name="TreeWalker">
                                 <module name="FileContentsHolder" />
-                               <module name="ConstantName">
+                                <module name="ConstantName">
                                     <property name="format" value="^(([A-Z][A-Z0-9]*(_[A-Z0-9]+)*))$" />
                                 </module>
                                 <module name="LocalVariableName" />
@@ -124,7 +138,7 @@
                                 <module name="LocalFinalVariableName" />
                                 <module name="ParameterName" />
                                 <module name="StaticVariableName" />
-                                  
+
                                 <module name="TypeName">
                                     <property name="format" value="^_?[A-Z][a-zA-Z0-9]*$|packageinfo" />
                                 </module>
