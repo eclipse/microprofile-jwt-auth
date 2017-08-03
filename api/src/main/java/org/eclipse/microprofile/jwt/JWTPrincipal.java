@@ -91,8 +91,7 @@ public interface JWTPrincipal extends Principal {
     public long getIssuedAtTime();
 
     /**
-     * The groups claim provides the group names the JWT principal has been granted. This would need to
-     * be mapped to application roles using a container group to role mapping.
+     * The groups claim provides the group names the JWT principal has been granted.
      *
      * This is a MicroProfile specific claim.
      * @return a possibly empty set of group names.
