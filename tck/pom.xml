@@ -29,7 +29,6 @@
     <name>MicroProfile JWT Auth TCK Harness</name>
 
     <properties>
-        <arquillian.version>1.1.13.Final</arquillian.version>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
         <checkstyle.methodNameFormat>^_?[a-z][a-zA-Z0-9_]*$</checkstyle.methodNameFormat>
         <!-- TCK properties that must be overriden in the vendor profile -->
@@ -37,31 +36,20 @@
         <tck.includes>INVALID</tck.includes>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jboss.arquillian</groupId>
-                <artifactId>arquillian-bom</artifactId>
-                <version>${arquillian.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.microprofile.apis</groupId>
-            <artifactId>microprofile-jwt-auth_1.0_api</artifactId>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
-            <scope>provided</scope>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
 
         <dependency>
