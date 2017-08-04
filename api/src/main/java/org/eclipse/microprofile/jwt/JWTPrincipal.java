@@ -55,7 +55,7 @@ public interface JWTPrincipal extends Principal {
      * The aud(Audience) claim identifies the recipients that the JWT is intended for.
      * @return the aud claim.
      */
-    public String[] getAudience();
+    public Set<String> getAudience();
 
     /**
      * The sub(Subject) claim identifies the principal that is the subject of the JWT. This is the token issuing

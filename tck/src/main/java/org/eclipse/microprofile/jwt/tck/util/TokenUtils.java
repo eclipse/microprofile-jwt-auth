@@ -19,36 +19,38 @@
  */
 package org.eclipse.microprofile.jwt.tck.util;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import org.keycloak.common.util.PemUtils;
-import org.keycloak.jose.jws.JWSBuilder;
+import com.nimbusds.jose.JOSEObjectType;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Set;
+
+import static net.minidev.json.parser.JSONParser.DEFAULT_PERMISSIVE_MODE;
 
 /**
  * Utiltities for generating a JWT for testing
  */
 public class TokenUtils {
-    private TokenUtils(){}
-
-    /**
-     * Enums to indicate which claims should be set to invalid values for testing failure modes
-     */
-    public enum InvalidFields {
-        ISSUER, // Set an invalid issuer
-        EXP,    // Set an invalid expiration
-        SIGNER  // Sign the token with the incorrect private key
+    private TokenUtils() {
     }
+
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
      * test resource key.
@@ -65,13 +67,13 @@ public class TokenUtils {
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
      * test resource key.
      *
-     * @param jsonResName - name of test resources file
+     * @param jsonResName   - name of test resources file
      * @param invalidFields - the set of claims that should be added with invalid values to test failure modes
      * @return the JWT string
      * @throws Exception on parse failure
      */
     public static String generateTokenString(String jsonResName, Set<InvalidFields> invalidFields) throws Exception {
-        if(invalidFields == null) {
+        if (invalidFields == null) {
             invalidFields = Collections.emptySet();
         }
         InputStream contentIS = TokenUtils.class.getResourceAsStream(jsonResName);
@@ -80,43 +82,93 @@ public class TokenUtils {
         byte[] content = new byte[length];
         System.arraycopy(tmp, 0, content, 0, length);
 
-        JsonParser parser = new JsonParser();
-        JsonElement jsonElement = parser.parse(new StringReader(new String(content)));
-        JsonObject jwtContent = jsonElement.getAsJsonObject();
+        JSONParser parser = new JSONParser(DEFAULT_PERMISSIVE_MODE);
+        JSONObject jwtContent = (JSONObject) parser.parse(content);
         // Change the issuer to INVALID_ISSUER for failure testing if requested
-        if(invalidFields.contains(InvalidFields.ISSUER)) {
-            jwtContent.addProperty("iss", "INVALID_ISSUER");
+        if (invalidFields.contains(InvalidFields.ISSUER)) {
+            jwtContent.put("iss", "INVALID_ISSUER");
         }
-        jwtContent.addProperty("iat", currentTimeInSecs());
-        jwtContent.addProperty("auth_time", currentTimeInSecs());
+        jwtContent.put("iat", currentTimeInSecs());
+        jwtContent.put("auth_time", currentTimeInSecs());
         // If the exp claim is not updated, it will be an old value that should be seen as expired
-        if(!invalidFields.contains(InvalidFields.EXP)) {
-            jwtContent.addProperty("exp", currentTimeInSecs() + 300);
+        if (!invalidFields.contains(InvalidFields.EXP)) {
+            jwtContent.put("exp", currentTimeInSecs() + 300);
         }
-        System.out.println(jwtContent);
 
         PrivateKey pk;
-        if(invalidFields.contains(InvalidFields.SIGNER)) {
+        if (invalidFields.contains(InvalidFields.SIGNER)) {
             // Generate a new random private key to sign with to test invalid signatures
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(1024);
-            KeyPair keyPair = generator.generateKeyPair();
+            KeyPair keyPair = generateKeyPair(2048);
             pk = keyPair.getPrivate();
         }
         else {
             // Use the test private key associated with the test public key for a valid signature
-            InputStream pkIS = TokenUtils.class.getResourceAsStream("/privateKey.pem");
-            BufferedReader bis = new BufferedReader(new InputStreamReader(pkIS));
-            String privateKeyPem = bis.readLine();
-            pk = PemUtils.decodePrivateKey(privateKeyPem);
+            pk = readPrivateKey("/privateKey.pem");
         }
 
-        String jwt = new JWSBuilder()
-                .type("Bearer")
-                .kid("privateKey.pem")
-                .content(jwtContent.toString().getBytes())
-                .rsa256(pk);
+        // Create RSA-signer with the private key
+        JWSSigner signer = new RSASSASigner(pk);
+        JWTClaimsSet claimsSet = JWTClaimsSet.parse(jwtContent);
+        JWSHeader jwtHeader = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .keyID("/privateKey.pem")
+                .type(JOSEObjectType.JWT)
+                .build();
+        SignedJWT signedJWT = new SignedJWT(jwtHeader, claimsSet);
+        signedJWT.sign(signer);
+        String jwt = signedJWT.serialize();
         return jwt;
+    }
+
+    public static PrivateKey readPrivateKey(String pemResName) throws Exception {
+        InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
+        byte[] tmp = new byte[4096];
+        int length = contentIS.read(tmp);
+        PrivateKey privateKey = decodePrivateKey(new String(tmp, 0, length));
+        return privateKey;
+    }
+
+    public static PublicKey readPublicKey(String pemResName) throws Exception {
+        InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
+        byte[] tmp = new byte[4096];
+        int length = contentIS.read(tmp);
+        PublicKey publicKey = decodePublicKey(new String(tmp, 0, length));
+        return publicKey;
+    }
+
+    public static KeyPair generateKeyPair(int keySize) throws NoSuchAlgorithmException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(keySize);
+        KeyPair keyPair = keyPairGenerator.genKeyPair();
+        return keyPair;
+    }
+
+    public static PrivateKey decodePrivateKey(String pemEncoded) throws Exception {
+        pemEncoded = removeBeginEnd(pemEncoded);
+        byte[] pkcs8EncodedBytes = Base64.getDecoder().decode(pemEncoded);
+
+        // extract the private key
+
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(pkcs8EncodedBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        PrivateKey privKey = kf.generatePrivate(keySpec);
+        return privKey;
+    }
+
+    public static PublicKey decodePublicKey(String pemEncoded) throws Exception {
+        pemEncoded = removeBeginEnd(pemEncoded);
+        byte[] encodedBytes = Base64.getDecoder().decode(pemEncoded);
+
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePublic(spec);
+    }
+
+    private static String removeBeginEnd(String pem) {
+        pem = pem.replaceAll("-----BEGIN (.*)-----", "");
+        pem = pem.replaceAll("-----END (.*)----", "");
+        pem = pem.replaceAll("\r\n", "");
+        pem = pem.replaceAll("\n", "");
+        return pem.trim();
     }
 
     /**
@@ -128,8 +180,12 @@ public class TokenUtils {
         return currentTimeSec;
     }
 
-    public static void main(String[] args) throws Exception {
-        generateTokenString("/RolesEndpoint.json");
+    /**
+     * Enums to indicate which claims should be set to invalid values for testing failure modes
+     */
+    public enum InvalidFields {
+        ISSUER, // Set an invalid issuer
+        EXP,    // Set an invalid expiration
+        SIGNER  // Sign the token with the incorrect private key
     }
-
 }
