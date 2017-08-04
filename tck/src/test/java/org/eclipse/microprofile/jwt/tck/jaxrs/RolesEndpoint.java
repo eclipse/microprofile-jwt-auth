@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt.tck.roles;
+package org.eclipse.microprofile.jwt.tck.jaxrs;
 
 
 import javax.annotation.security.PermitAll;
