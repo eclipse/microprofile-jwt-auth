@@ -61,23 +61,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.ejb</groupId>
-            <artifactId>javax.ejb-api</artifactId>
-            <version>3.2</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>4.23</version>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap</groupId>
+            <artifactId>shrinkwrap-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -85,13 +77,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-spi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.shrinkwrap</groupId>
-            <artifactId>shrinkwrap-api</artifactId>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-test-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -127,6 +122,8 @@
 
     <profiles>
         <profile>
+            <!-- The weld-se profile is a base profile used to test the basics of a JWTPrincipal implementation
+            -->
             <id>weld-se</id>
             <properties>
                 <tck.includes>org.eclipse.microprofile.jwt.tck.format.TokenParsingTest</tck.includes>
@@ -146,40 +143,20 @@
             </dependencies>
         </profile>
         <profile>
-            <id>wildfly-swarm</id>
+            <id>container</id>
             <properties>
-                <version.wildfly.swarm>2017.7.0</version.wildfly.swarm>
-                <tck.ITokenParser>empty</tck.ITokenParser>
-                <tck.includes>org.eclipse.microprofile.jwt.tck.format.TokenParsingTest</tck.includes>
+                <tck.includes>**/container/**/*Test.java</tck.includes>
             </properties>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.wildfly.swarm</groupId>
-                        <artifactId>bom</artifactId>
-                        <version>${version.wildfly.swarm}</version>
-                        <scope>import</scope>
-                        <type>pom</type>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-
             <dependencies>
                 <dependency>
-                    <groupId>org.eclipse.microprofile.jwt</groupId>
-                    <artifactId>jwt-auth-wfswarm</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.wildfly.swarm</groupId>
-                    <artifactId>jwt-auth-tck</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                    <scope>runtime</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.wildfly.swarm</groupId>
-                    <artifactId>arquillian</artifactId>
+                    <!--
+                    These need to be specified as system properties on mvn command line:
+                    mvn -Pcontainer -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck \
+                    -Dtck.container.version=1.0-SNAPSHOT test
+                    -->
+                    <groupId>${tck.container.groupId}</groupId>
+                    <artifactId>${tck.container.artifactId}</artifactId>
+                    <version>${tck.container.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

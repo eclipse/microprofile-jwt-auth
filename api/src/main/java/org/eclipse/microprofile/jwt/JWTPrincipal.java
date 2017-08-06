@@ -30,6 +30,23 @@ import java.util.Set;
  */
 public interface JWTPrincipal extends Principal {
 
+    /** {@link #getIssuer()} */
+    public static final String ISSUER="iss";
+    /** {@link #getGroups()} */
+    public static final String GROUPS="groups";
+    /** {@link #getAudience()} */
+    public static final String AUDIENCE="aud";
+    /** {@link #getExpirationTime()} ()} */
+    public static final String  EXPIRY ="exp";
+    /** {@link #getIssuedAtTime()} */
+    public static final String ISSURE_TIME="iat";
+    /** {@link #getSubject()} */
+    public static final String SUBJECT="sub";
+    /** {@link #getName()}  */
+    public static final String PRINCIPAL_NAME="upn";
+    /** {@link #getTokenID()} */
+    public static final String TOKEN_ID = "jti";
+
     /**
      * Returns the unique name of this principal. This either comes from the upn claim, or if that is missing, the
      * preferred_username claim. Note that for guaranteed interoperability a upn claim should be used.
@@ -78,8 +95,8 @@ public interface JWTPrincipal extends Principal {
     public String getTokenID();
 
     /**
-     * The exp (Expiration time) claim identifies the expiration time on
-     * or after which the JWT MUST NOT be accepted for processing in seconds since 1970-01-01T00:00:00Z UTC
+     * The exp (Expiration time) claim identifies the expiration time on or after which the JWT MUST NOT be accepted
+     * for processing in seconds since 1970-01-01T00:00:00Z UTC
      * @return the exp claim.
      */
     public long getExpirationTime();
@@ -98,27 +115,16 @@ public interface JWTPrincipal extends Principal {
      */
     public Set<String> getGroups();
 
-
     /**
-     * The roles claim provides the role names the JWT principal has been granted. These are application domain
-     * level roles that should map directly to deployment @RolesAllowed specifications.
-     *
-     * This is a MicroProfile specific claim.
-     * @return a possibly empty array of group names.
-     */
-    public Set<String> getRoles();
-
-    /**
-     * Access the names of any other claims not in the explicitly supported MicroProfile mandated claims that
-     * are associated with this token.
+     * Access the names of all claims are associated with this token.
      * @return non-standard claim names in the token
      */
-    public Set<String> getOtherClaimNames();
+    public Set<String> getClaimNames();
 
     /**
-     * Access the value of a non-standard claim.
+     * Access the value of the indicated claim.
      * @param claimName - the name of the claim
      * @return the value of the indicated claim if it exists, null otherwise.
      */
-    public Object getOtherClaim(String claimName);
+    public Object getClaim(String claimName);
 }
