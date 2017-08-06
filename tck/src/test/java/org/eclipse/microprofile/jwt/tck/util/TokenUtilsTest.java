@@ -136,7 +136,8 @@ public class TokenUtilsTest {
     @Ignore("Test initial key validation")
     @Test
     public void testReadPublicKey() throws Exception {
-        PublicKey publicKey = TokenUtils.readPublicKey("/publicKey.pem");
+        RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");
         System.out.println(publicKey);
+        System.out.printf("RSAPublicKey.bitLength: %s\n", publicKey.getModulus().bitLength());
     }
 }

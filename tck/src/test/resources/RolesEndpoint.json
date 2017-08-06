@@ -2,7 +2,7 @@
   "iss": "https://server.example.com",
   "jti": "a-123",
   "sub": "24400320",
-  "unique_username": "jdoe@example.com",
+  "upn": "jdoe@example.com",
   "preferred_username": "jdoe",
   "aud": "s6BhdRkqt3",
   "exp": 1311281970,
@@ -11,7 +11,7 @@
   "roles": [
     "Echoer"
   ],
-  "groups": ["group1", "group2"],
+  "groups": ["Echoer", "Tester", "group1", "group2"],
   "resource_access": {
     "my-service": {
       "groups": [

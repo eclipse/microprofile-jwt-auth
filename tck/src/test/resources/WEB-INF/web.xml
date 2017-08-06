@@ -22,6 +22,11 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
 
+    <!-- This defines the requirement for the custom MP-JWT authentication mechanism -->
+    <login-config>
+        <auth-method>MP-JWT</auth-method>
+    </login-config>
+
     <security-constraint>
         <display-name>echo restriction</display-name>
         <web-resource-collection>
@@ -42,8 +47,4 @@
             <role-name>NoSuchRole</role-name>
         </auth-constraint>
     </security-constraint>
-    <context-param>
-        <param-name>resteasy.role.based.security</param-name>
-        <param-value>true</param-value>
-    </context-param>
 </web-app>
