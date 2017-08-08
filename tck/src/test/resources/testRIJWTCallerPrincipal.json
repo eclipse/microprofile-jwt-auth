@@ -8,32 +8,25 @@
   "exp": 1311281970,
   "iat": 1311280970,
   "auth_time": 1311280969,
-  "roles": [
-    "role-in-realm",
-    "user",
-    "manager"
-  ],
-  "groups": ["group1", "group2"],
+  "groups": ["group1", "group2", "role-in-realm", "user", "manager"],
   "resource_access": {
-    "my-service": {
-      "groups": [
-        "group1",
-        "group2"
-      ],
-      "roles": [
-        "role-in-my-service"
-      ]
-    },
-    "service-B": {
-      "roles": [
-        "role-in-B"
-      ]
-    },
-    "service-C": {
-      "groups": [
-        "groupC",
-        "web-tier"
-      ]
-    }
+      "my-service": {
+          "groups": [
+              "group1",
+              "group2",
+              "role-in-my-service"
+          ],
+          "service-B": {
+              "groups": [
+                  "role-in-B"
+              ]
+          },
+          "service-C": {
+              "groups": [
+                  "groupC",
+                  "web-tier"
+              ]
+          }
+      }
   }
 }
