@@ -20,6 +20,7 @@
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 
+import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 @Path("/endp")
+@DenyAll
 public class RolesEndpoint {
 
     @GET
