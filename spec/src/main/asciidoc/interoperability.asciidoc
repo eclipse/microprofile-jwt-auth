@@ -218,29 +218,69 @@ release. See <<resource_access,Future Directions>> for more information.
 ## Mapping MP-JWT Tokens to Java EE Container APIs
 
 The requirements of how a JWT should be exposed via the various Java EE container APIs is discussed in this section.
+For the 1.0 release, the only manadatory container integration is with the JAX-RS container, and injection of
+the MP-JWT types.
 
-### javax.security.enterprise.identitystore.IdentityStore.getCallerGroups(CredentialValidationResult)
+### CDI Injection Requirements
+
+#### Injection of JWTPrincipal
+An MP-JWT implementation must support the injection of the currently authenticated caller as a JWTPrincipal with
+@RequestScoped:
+
+```java
+@Path("/endp")
+@DenyAll
+public class RolesEndpoint {
+
+    @Inject
+    private JWTPrincipal callerPrincipal;
+
+```
+
+#### Injection of JWTClaimPrincipal
+
+```java
+@Path("/endp")
+@DenyAll
+public class RolesEndpoint {
+
+...
+
+    @JWTClaim("raw_token")
+    private String token;;
+```
+
+#### javax.ws.rs.core.SecurityContext.getUserPrincipal()
+The Principal returned from these methods MUST be an instance of org.eclipse.microprofile.jwt.JWTPrincipal.
+
+#### javax.ws.rs.core.SecurityContext#isUserInRole(String)
+This method MUST return true for any role name that is included in the MP-JWT "groups" claim, as well as for any
+role name that has been mapped to a group name in the MP-JWT "group" claim.
+
+### Mapping from @RolesAllowed
+Any role names used in @RolesAllowed or equivalent security constraint metadata that match role names in either
+the MP-JWT "roles" claim, or role names that have been mapped to group names in the MP-JWT "group" claim, MUST result
+in an allowing authorization decision wherever the security constraint has been applied.
+
+### Recommendations for Optional Container Integration
+This section describes the expected behaviors
+
+#### javax.security.enterprise.identitystore.IdentityStore.getCallerGroups(CredentialValidationResult)
 This method should return the set of names found in the "groups" claim in the JWT if it exists, an empty set otherwise.
 
-### javax.ejb.SessionContext.getCallerPrincipal()
+#### javax.ejb.SessionContext.getCallerPrincipal()
 The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JWTPrincipal.
-### javax.ejb.SessionContext#isCallerInRole(String)
+#### javax.ejb.SessionContext#isCallerInRole(String)
 This method MUST return true for any role name that is included in the MP-JWT "roles" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "group" claim.
 
-### javax.servlet.http.HttpServletRequest.getUserPrincipal()
+#### javax.servlet.http.HttpServletRequest.getUserPrincipal()
 The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JWTPrincipal.
-### javax.servlet.http.HttpServletRequest#isUserInRole(String)
+#### javax.servlet.http.HttpServletRequest#isUserInRole(String)
 This method MUST return true for any role name that is included in the MP-JWT "roles" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "group" claim.
 
-### javax.ws.rs.core.SecurityContext.getUserPrincipal()
-The Principal returned from these methods MUST be an instance of org.eclipse.microprofile.jwt.JWTPrincipal.
-### javax.ws.rs.core.SecurityContext#isUserInRole(String)
-This method MUST return true for any role name that is included in the MP-JWT "roles" claim, as well as for any
-role name that has been mapped to a group name in the MP-JWT "group" claim.
-
-### javax.security.jacc.PolicyContext.getContext("javax.security.auth.Subject.container")
+#### javax.security.jacc.PolicyContext.getContext("javax.security.auth.Subject.container")
 The javax.security.auth.Subject returned by the PolicyContext.getContext(String key) method with the standard
 "javax.security.auth.Subject.container" key, MUST return a Subject that has a java.security.Principal of type
 org.eclipse.microprofile.jwt.JWTPrincipal amongst it's set of Principals returned by getPrincipals(). Similarly,
@@ -252,11 +292,6 @@ snipet must not throw an AssertionError:
     Set<? extends Principal> principalSet = subject.getPrincipals(JWTPrincipal.class);
     assert principalSet.size() > 0;
 ```
-
-### Mapping from @RolesAllowed ?
-Any role names used in @RolesAllowed or equivalent security constraint metadata that match role names in either
-the MP-JWT "roles" claim, or role names that have been mapped to group names in the MP-JWT "group" claim, MUST result
-in an allowing authorization decision wherever the security constraint has been applied.
 
 ## Mapping MP-JWT Token to Other Container APIs
 For non-Java EE containers that provide access to some form of java.security.Principal representation of an authenticated

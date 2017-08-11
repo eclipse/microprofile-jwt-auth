@@ -20,9 +20,13 @@
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 
+import org.eclipse.microprofile.jwt.JWTClaim;
+import org.eclipse.microprofile.jwt.JWTPrincipal;
+
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -35,6 +39,12 @@ import java.util.HashSet;
 @Path("/endp")
 @DenyAll
 public class RolesEndpoint {
+
+    @Inject
+    private JWTPrincipal callerPrincipal;
+
+    @JWTClaim("raw_token")
+    private String token;;
 
     @GET
     @Path("/echo")
