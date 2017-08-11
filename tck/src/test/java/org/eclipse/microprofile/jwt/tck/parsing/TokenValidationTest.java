@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.parsing;
 
-import org.eclipse.microprofile.jwt.JWTPrincipal;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.util.ITokenParser;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.junit.Arquillian;
@@ -74,7 +74,7 @@ public class TokenValidationTest {
         long nowInSeconds = System.currentTimeMillis() / 1000;
         String jwt = TokenUtils.generateTokenString("/testRIJWTCallerPrincipal.json");
         System.out.printf("jwt: %s\n", jwt);
-        JWTPrincipal jwtPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+        JsonWebToken jwtPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
         System.out.printf("Parsed caller principal: %s\n", jwtPrincipal);
 
         // Validate the required claims
@@ -118,7 +118,7 @@ public class TokenValidationTest {
     @Ignore("Internal test to validate the behavior of TokenUtils.generateTokenString")
     public void testUtilsToken() throws Exception {
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json");
-        JWTPrincipal callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+        JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
         System.out.println(callerPrincipal);
         long nowSec = System.currentTimeMillis() / 1000;
         long iss = callerPrincipal.getIssuedAtTime();
@@ -137,7 +137,7 @@ public class TokenValidationTest {
         invalidFields.add(TokenUtils.InvalidFields.EXP);
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         try {
-            JWTPrincipal callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
             Assert.fail("Was able to parse the token: " + callerPrincipal);
         }
         catch (Exception e) {
@@ -158,7 +158,7 @@ public class TokenValidationTest {
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         PublicKey publicKey = TokenUtils.readPublicKey("/publicKey.pem");
         try {
-            JWTPrincipal callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
             Assert.fail("Was able to parse the token: " + callerPrincipal);
         }
         catch (Exception e) {
@@ -173,7 +173,7 @@ public class TokenValidationTest {
         invalidFields.add(TokenUtils.InvalidFields.SIGNER);
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         try {
-            JWTPrincipal callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
             Assert.fail("Was able to parse the token: " + callerPrincipal);
         }
         catch (Exception e) {

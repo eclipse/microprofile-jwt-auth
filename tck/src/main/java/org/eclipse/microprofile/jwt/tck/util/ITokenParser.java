@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.util;
 
-import org.eclipse.microprofile.jwt.JWTPrincipal;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.security.PublicKey;
 
@@ -36,5 +36,5 @@ public interface ITokenParser {
      * @return the parsed JWTPrincipal representation
      * @throws Exception thrown on parse or validation failure
      */
-    public JWTPrincipal parse(String bearerToken, String issuer, PublicKey signedBy) throws Exception;
+    public JsonWebToken parse(String bearerToken, String issuer, PublicKey signedBy) throws Exception;
 }

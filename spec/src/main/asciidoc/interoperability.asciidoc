@@ -251,7 +251,7 @@ public class RolesEndpoint {
 ```
 
 #### javax.ws.rs.core.SecurityContext.getUserPrincipal()
-The Principal returned from these methods MUST be an instance of org.eclipse.microprofile.jwt.JWTPrincipal.
+The Principal returned from these methods MUST be an instance of org.eclipse.microprofile.jwt.JsonWebToken.
 
 #### javax.ws.rs.core.SecurityContext#isUserInRole(String)
 This method MUST return true for any role name that is included in the MP-JWT "groups" claim, as well as for any
@@ -269,13 +269,13 @@ This section describes the expected behaviors
 This method should return the set of names found in the "groups" claim in the JWT if it exists, an empty set otherwise.
 
 #### javax.ejb.SessionContext.getCallerPrincipal()
-The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JWTPrincipal.
+The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JsonWebToken.
 #### javax.ejb.SessionContext#isCallerInRole(String)
 This method MUST return true for any role name that is included in the MP-JWT "roles" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "group" claim.
 
 #### javax.servlet.http.HttpServletRequest.getUserPrincipal()
-The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JWTPrincipal.
+The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JsonWebToken.
 #### javax.servlet.http.HttpServletRequest#isUserInRole(String)
 This method MUST return true for any role name that is included in the MP-JWT "roles" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "group" claim.
@@ -283,7 +283,7 @@ role name that has been mapped to a group name in the MP-JWT "group" claim.
 #### javax.security.jacc.PolicyContext.getContext("javax.security.auth.Subject.container")
 The javax.security.auth.Subject returned by the PolicyContext.getContext(String key) method with the standard
 "javax.security.auth.Subject.container" key, MUST return a Subject that has a java.security.Principal of type
-org.eclipse.microprofile.jwt.JWTPrincipal amongst it's set of Principals returned by getPrincipals(). Similarly,
+org.eclipse.microprofile.jwt.JsonWebToken amongst it's set of Principals returned by getPrincipals(). Similarly,
 Subject#getPrincipals(JWTPrincipal.class) must return a set with at least one value. This means that following code
 snipet must not throw an AssertionError:
 
@@ -295,4 +295,4 @@ snipet must not throw an AssertionError:
 
 ## Mapping MP-JWT Token to Other Container APIs
 For non-Java EE containers that provide access to some form of java.security.Principal representation of an authenticated
-caller, the caller principal MUST be compatible with the org.eclipse.microprofile.jwt.JWTPrincipal interface.
+caller, the caller principal MUST be compatible with the org.eclipse.microprofile.jwt.JsonWebToken interface.

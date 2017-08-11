@@ -25,7 +25,7 @@ import java.security.Principal;
  * A representation of a claim in a JWTPrincipal
  * @param <T>
  */
-public interface JWTClaimPrincipal<T> extends Principal {
+public interface ClaimValue<T> extends Principal {
 
     @Override
     public String getName();

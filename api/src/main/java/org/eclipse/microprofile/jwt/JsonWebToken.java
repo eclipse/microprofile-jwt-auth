@@ -29,7 +29,7 @@ import java.util.Set;
  *
  * This is compatible with the pre-JSR 375 caller {@link Principal} api.
  */
-public interface JWTPrincipal extends Principal {
+public interface JsonWebToken extends Principal {
 
     /**
      * Returns the unique name of this principal. This either comes from the upn claim, or if that is missing, the
@@ -45,7 +45,7 @@ public interface JWTPrincipal extends Principal {
      * @return raw bear token string
      */
     default String getRawToken() {
-        return getClaim(JWTClaimType.RAW_TOKEN.getName());
+        return getClaim(Claims.RAW_TOKEN.getName());
     }
 
     /**
@@ -53,7 +53,7 @@ public interface JWTPrincipal extends Principal {
      * @return the iss claim.
      */
     default String getIssuer() {
-        return getClaim(JWTClaimType.ISS.getName());
+        return getClaim(Claims.ISS.getName());
     }
 
     /**
@@ -61,7 +61,7 @@ public interface JWTPrincipal extends Principal {
      * @return the aud claim.
      */
     default Set<String> getAudience() {
-        return getClaim(JWTClaimType.AUD.getName());
+        return getClaim(Claims.AUD.getName());
     }
 
     /**
@@ -71,7 +71,7 @@ public interface JWTPrincipal extends Principal {
      * @return the sub claim.
      */
     default String getSubject() {
-        return getClaim(JWTClaimType.SUB.getName());
+        return getClaim(Claims.SUB.getName());
     }
 
     /**
@@ -85,7 +85,7 @@ public interface JWTPrincipal extends Principal {
      * @return the jti claim.
      */
     default String getTokenID() {
-        return getClaim(JWTClaimType.JTI.getName());
+        return getClaim(Claims.JTI.getName());
     }
 
     /**
@@ -94,7 +94,7 @@ public interface JWTPrincipal extends Principal {
      * @return the exp claim.
      */
     default long getExpirationTime() {
-        return getClaim(JWTClaimType.EXP.getName());
+        return getClaim(Claims.EXP.getName());
     }
 
     /**
@@ -102,7 +102,7 @@ public interface JWTPrincipal extends Principal {
      * @return the iat claim
      */
     default long getIssuedAtTime() {
-        return getClaim(JWTClaimType.IAT.getName());
+        return getClaim(Claims.IAT.getName());
     }
 
     /**
@@ -112,7 +112,7 @@ public interface JWTPrincipal extends Principal {
      * @return a possibly empty set of group names.
      */
     default Set<String> getGroups() {
-        return getClaim(JWTClaimType.GROUPS.getName());
+        return getClaim(Claims.GROUPS.getName());
     }
 
     /**

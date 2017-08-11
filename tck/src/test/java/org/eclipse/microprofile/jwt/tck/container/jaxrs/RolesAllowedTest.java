@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.JWTPrincipal;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -183,7 +183,7 @@ public class RolesAllowedTest {
         String[] ifaces = reply.split(",");
         boolean hasJWTPrincipal = false;
         for(String iface : ifaces) {
-            hasJWTPrincipal |= iface.equals(JWTPrincipal.class.getTypeName());
+            hasJWTPrincipal |= iface.equals(JsonWebToken.class.getTypeName());
         }
         Assert.assertTrue("PrincipalClass has JWTPrincipal interface", hasJWTPrincipal);
     }

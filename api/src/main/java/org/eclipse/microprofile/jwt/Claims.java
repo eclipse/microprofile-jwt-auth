@@ -25,13 +25,13 @@ import javax.json.JsonObject;
 /**
  * This enum represents the standardized claims that the MP-JWT specification allows for in terms of interoperability.
  * For every claim in this enum, an MP-JWT implementation must return a value of the indicated type from
- * {@link org.eclipse.microprofile.jwt.JWTPrincipal#getClaim(String)} method. An implementation is free to inclue
+ * {@link JsonWebToken#getClaim(String)} method. An implementation is free to inclue
  * any additional claims, but users of JWTPrincipal can expect no consistency of type for claims not included in
  * this enum.
  *
  * The set of included claims is defined by IANA, see https://www.iana.org/assignments/jwt/jwt.xhtml
  */
-public enum JWTClaimType {
+public enum Claims {
     ISS("iss", "Issuer", String.class),
     SUB("sub", "Subject", String.class),
     AUD("aud", "Audience", String[].class),
@@ -67,7 +67,7 @@ public enum JWTClaimType {
     private String name;
     private String description;
     private Class<?> type;
-    private JWTClaimType(String name, String description, Class<?> type) {
+    private Claims(String name, String description, Class<?> type) {
         this.name = name;
         this.description = description;
         this.type = type;

@@ -20,8 +20,9 @@
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 
-import org.eclipse.microprofile.jwt.JWTClaim;
-import org.eclipse.microprofile.jwt.JWTPrincipal;
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.ClaimValue;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -41,10 +42,15 @@ import java.util.HashSet;
 public class RolesEndpoint {
 
     @Inject
-    private JWTPrincipal callerPrincipal;
+    private JsonWebToken callerPrincipal;
 
-    @JWTClaim("raw_token")
-    private String token;;
+    @Claim("raw_token")
+    @Inject
+    private ClaimValue<String> token;
+
+    @Claim("iss")
+    @Inject
+    private ClaimValue<String> issuer;
 
     @GET
     @Path("/echo")
