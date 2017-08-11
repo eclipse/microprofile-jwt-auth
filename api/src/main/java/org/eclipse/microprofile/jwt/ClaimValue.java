@@ -22,7 +22,7 @@ package org.eclipse.microprofile.jwt;
 import java.security.Principal;
 
 /**
- * A representation of a claim in a JWTPrincipal
+ * A representation of a claim in a {@link JsonWebToken}
  * @param <T>
  */
 public interface ClaimValue<T> extends Principal {

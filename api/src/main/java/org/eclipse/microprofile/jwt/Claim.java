@@ -25,10 +25,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation used to signify and injection point for a {@link ClaimValue} from a {@link JsonWebToken}
+ */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Claim {
-
+    /**
+     * The value specifies the id name the claim to inject
+     * @return the claim name
+     * @see JsonWebToken#getClaim(String)
+     */
     String value();
 }

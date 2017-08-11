@@ -87,12 +87,12 @@ An example minimal MP-JWT in JSON would be:
        "roles": ["auditor", "administrator"]
 }
 ```
-This specification defines a JWTPrincipal java.security.Principal interface extension that makes this set of required
-claims available via get style accessors. The JWTPrincipal interface definition is:
+This specification defines a JsonWebToken java.security.Principal interface extension that makes this set of required
+claims available via get style accessors. The JsonWebToken interface definition is:
 
 ```java
 package org.eclipse.microprofile.jwt;
-public interface JWTPrincipal extends Principal {
+public interface JsonWebToken extends Principal {
 
     /**
      * Returns the unique name of this principal. This either comes from the upn claim, or if that is missing, the
@@ -101,25 +101,31 @@ public interface JWTPrincipal extends Principal {
      * @return the unique name of this principal.
      */
     @Override
-    public String getName();
+    String getName();
 
     /**
      * Get the raw bearer token string originally passed in the authentication header
      * @return raw bear token string
      */
-    public String getRawToken();
+    default String getRawToken() {
+        return getClaim(Claims.raw_token.name());
+    }
 
     /**
      * The iss(Issuer) claim identifies the principal that issued the JWT
      * @return the iss claim.
      */
-    public String getIssuer();
+    default String getIssuer() {
+        return getClaim(Claims.iss.name());
+    }
 
     /**
      * The aud(Audience) claim identifies the recipients that the JWT is intended for.
      * @return the aud claim.
      */
-    public String[] getAudience();
+    default Set<String> getAudience() {
+        return getClaim(Claims.aud.name());
+    }
 
     /**
      * The sub(Subject) claim identifies the principal that is the subject of the JWT. This is the token issuing
@@ -127,64 +133,81 @@ public interface JWTPrincipal extends Principal {
      *
      * @return the sub claim.
      */
-    public String getSubject();
+    default String getSubject() {
+        return getClaim(Claims.sub.name());
+    }
 
     /**
      * The jti(JWT ID) claim provides a unique identifier for the JWT.
+     The identifier value MUST be assigned in a manner that ensures that
+     there is a negligible probability that the same value will be
+     accidentally assigned to a different data object; if the application
+     uses multiple issuers, collisions MUST be prevented among values
+     produced by different issuers as well.  The "jti" claim can be used
+     to prevent the JWT from being replayed.
      * @return the jti claim.
      */
-    public String getTokenID();
+    default String getTokenID() {
+        return getClaim(Claims.jti.name());
+    }
 
     /**
-     * The exp (Expiration time) claim identifies the expiration time on
-     * or after which the JWT MUST NOT be accepted for processing in seconds since 1970-01-01T00:00:00Z UTC
+     * The exp (Expiration time) claim identifies the expiration time on or after which the JWT MUST NOT be accepted
+     * for processing in seconds since 1970-01-01T00:00:00Z UTC
      * @return the exp claim.
      */
-    public long getExpirationTime();
+    default long getExpirationTime() {
+        return getClaim(Claims.exp.name());
+    }
 
     /**
      * The iat(Issued at time) claim identifies the time at which the JWT was issued in seconds since 1970-01-01T00:00:00Z UTC
      * @return the iat claim
      */
-    public long getIssuedAtTime();
+    default long getIssuedAtTime() {
+        return getClaim(Claims.iat.name());
+    }
 
     /**
-     * The groups claim provides the group names the JWT principal has been granted. This would need to
-     * be mapped to application roles using a container group to role mapping.
+     * The groups claim provides the group names the JWT principal has been granted.
      *
      * This is a MicroProfile specific claim.
      * @return a possibly empty set of group names.
      */
-    public Set<String> getGroups();
-
-
-    /**
-     * The roles claim provides the role names the JWT principal has been granted. These are application domain
-     * level roles that should map directly to deployment @RolesAllowed specifications.
-     *
-     * This is a MicroProfile specific claim.
-     * @return a possibly empty array of group names.
-     */
-    public Set<String> getRoles();
+    default Set<String> getGroups() {
+        return getClaim(Claims.groups.name());
+    }
 
     /**
-     * Access the names of any other claims not in the explicitly supported MicroProfile mandated claims that
-     * are associated with this token.
+     * Access the names of all claims are associated with this token.
      * @return non-standard claim names in the token
      */
-    public Set<String> getOtherClaimNames();
+    Set<String> getClaimNames();
 
     /**
-     * Access the value of a non-standard claim.
+     * Verify is a given claim exists
+     * @param claimName
+     * @return
+     */
+    default boolean containsClaim(String claimName) {
+        return claim(claimName).isPresent();
+    }
+
+    /**
+     * Access the value of the indicated claim.
      * @param claimName - the name of the claim
      * @return the value of the indicated claim if it exists, null otherwise.
      */
-    public Object getOtherClaim(String claimName);
+    <T> T getClaim(String claimName);
+
+    default <T> Optional<T> claim(String claimName) {
+        return Optional.ofNullable(getClaim(claimName));
+    }
 }
 ```
 
 ### Additional Claims
-The JWT can contain any number of other custom and standard claims, and these are made available from the JWTPrincipal
+The JWT can contain any number of other custom and standard claims, and these are made available from the JsonWebToken
 getOtherClaim(String) method. An example MP-JWT that contains additional "auth_time", "preferred_username",
 "acr", and "nbf" claims is:
 
@@ -223,8 +246,8 @@ the MP-JWT types.
 
 ### CDI Injection Requirements
 
-#### Injection of JWTPrincipal
-An MP-JWT implementation must support the injection of the currently authenticated caller as a JWTPrincipal with
+#### Injection of JsonWebToken
+An MP-JWT implementation must support the injection of the currently authenticated caller as a JsonWebToken with
 @RequestScoped:
 
 ```java
@@ -233,7 +256,7 @@ An MP-JWT implementation must support the injection of the currently authenticat
 public class RolesEndpoint {
 
     @Inject
-    private JWTPrincipal callerPrincipal;
+    private JsonWebToken callerPrincipal;
 
 ```
 
@@ -284,12 +307,12 @@ role name that has been mapped to a group name in the MP-JWT "group" claim.
 The javax.security.auth.Subject returned by the PolicyContext.getContext(String key) method with the standard
 "javax.security.auth.Subject.container" key, MUST return a Subject that has a java.security.Principal of type
 org.eclipse.microprofile.jwt.JsonWebToken amongst it's set of Principals returned by getPrincipals(). Similarly,
-Subject#getPrincipals(JWTPrincipal.class) must return a set with at least one value. This means that following code
+Subject#getPrincipals(JsonWebToken.class) must return a set with at least one value. This means that following code
 snipet must not throw an AssertionError:
 
 ```java
     Subject subject = (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
-    Set<? extends Principal> principalSet = subject.getPrincipals(JWTPrincipal.class);
+    Set<? extends Principal> principalSet = subject.getPrincipals(JsonWebToken.class);
     assert principalSet.size() > 0;
 ```
 

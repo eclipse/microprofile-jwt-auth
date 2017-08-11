@@ -45,7 +45,7 @@ public interface JsonWebToken extends Principal {
      * @return raw bear token string
      */
     default String getRawToken() {
-        return getClaim(Claims.RAW_TOKEN.getName());
+        return getClaim(Claims.raw_token.name());
     }
 
     /**
@@ -53,7 +53,7 @@ public interface JsonWebToken extends Principal {
      * @return the iss claim.
      */
     default String getIssuer() {
-        return getClaim(Claims.ISS.getName());
+        return getClaim(Claims.iss.name());
     }
 
     /**
@@ -61,7 +61,7 @@ public interface JsonWebToken extends Principal {
      * @return the aud claim.
      */
     default Set<String> getAudience() {
-        return getClaim(Claims.AUD.getName());
+        return getClaim(Claims.aud.name());
     }
 
     /**
@@ -71,7 +71,7 @@ public interface JsonWebToken extends Principal {
      * @return the sub claim.
      */
     default String getSubject() {
-        return getClaim(Claims.SUB.getName());
+        return getClaim(Claims.sub.name());
     }
 
     /**
@@ -85,7 +85,7 @@ public interface JsonWebToken extends Principal {
      * @return the jti claim.
      */
     default String getTokenID() {
-        return getClaim(Claims.JTI.getName());
+        return getClaim(Claims.jti.name());
     }
 
     /**
@@ -94,7 +94,7 @@ public interface JsonWebToken extends Principal {
      * @return the exp claim.
      */
     default long getExpirationTime() {
-        return getClaim(Claims.EXP.getName());
+        return getClaim(Claims.exp.name());
     }
 
     /**
@@ -102,7 +102,7 @@ public interface JsonWebToken extends Principal {
      * @return the iat claim
      */
     default long getIssuedAtTime() {
-        return getClaim(Claims.IAT.getName());
+        return getClaim(Claims.iat.name());
     }
 
     /**
@@ -112,7 +112,7 @@ public interface JsonWebToken extends Principal {
      * @return a possibly empty set of group names.
      */
     default Set<String> getGroups() {
-        return getClaim(Claims.GROUPS.getName());
+        return getClaim(Claims.groups.name());
     }
 
     /**
