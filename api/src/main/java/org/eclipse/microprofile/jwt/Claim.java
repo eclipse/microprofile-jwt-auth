@@ -19,7 +19,6 @@
  */
 package org.eclipse.microprofile.jwt;
 
-import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -38,5 +37,5 @@ public @interface Claim {
      * @return the claim name
      * @see JsonWebToken#getClaim(String)
      */
-    @Nonbinding String value();
+    String value();
 }
