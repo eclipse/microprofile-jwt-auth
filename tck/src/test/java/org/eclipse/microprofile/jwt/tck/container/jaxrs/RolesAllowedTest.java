@@ -101,8 +101,8 @@ public class RolesAllowedTest {
     @RunAsClient
     @Test
     public void callEchoExpiredToken() throws Exception {
-        HashSet<TokenUtils.InvalidFields> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidFields.EXP);
+        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        invalidFields.add(TokenUtils.InvalidClaims.EXP);
         String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 

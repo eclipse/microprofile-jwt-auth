@@ -133,8 +133,8 @@ public class TokenValidationTest {
      */
     @Test()
     public void testExpiredValidation() throws Exception {
-        HashSet<TokenUtils.InvalidFields> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidFields.EXP);
+        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        invalidFields.add(TokenUtils.InvalidClaims.EXP);
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         try {
             JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
@@ -153,8 +153,8 @@ public class TokenValidationTest {
     @Test
     public void testBadIssuer() throws Exception {
         // Indicate that TokenUtils should overwrite the issuer with "INVALID_ISSUER"
-        HashSet<TokenUtils.InvalidFields> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidFields.ISSUER);
+        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         PublicKey publicKey = TokenUtils.readPublicKey("/publicKey.pem");
         try {
@@ -169,8 +169,8 @@ public class TokenValidationTest {
 
     @Test
     public void testBadSigner() throws Exception {
-        HashSet<TokenUtils.InvalidFields> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidFields.SIGNER);
+        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         try {
             JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
