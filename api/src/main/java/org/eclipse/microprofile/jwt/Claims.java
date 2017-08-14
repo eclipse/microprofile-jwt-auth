@@ -21,6 +21,7 @@ package org.eclipse.microprofile.jwt;
 
 
 import javax.json.JsonObject;
+import java.util.Set;
 
 /**
  * This enum represents the standardized claims that the MP-JWT specification allows for in terms of interoperability.
@@ -35,11 +36,12 @@ public enum Claims {
     // The base set of required claims that MUST have non-null values in the JsonWebToken
     iss("Issuer", String.class),
     sub("Subject", String.class),
-    aud("Audience", String[].class),
+    aud("Audience", Set.class),
     exp("Expiration Time", Long.class),
     iat("Issued At Time", Long.class),
     jti("JWT ID", String.class),
-    groups("MP-JWT specific groups permission grant", String[].class),
+    upn("MP-JWT specific unique principal name", String.class),
+    groups("MP-JWT specific groups permission grant", Set.class),
     raw_token("MP-JWT specific original bearer token", String.class),
 
     // The IANA registered, but MP-JWT optional claims
