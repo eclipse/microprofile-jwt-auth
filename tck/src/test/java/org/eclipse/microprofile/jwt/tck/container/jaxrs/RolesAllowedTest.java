@@ -25,7 +25,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -75,7 +74,8 @@ public class RolesAllowedTest {
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "RolesAllowedTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
-            .addPackages(true, Filters.exclude(".*Test.*"), RolesEndpoint.class.getPackage())
+            .addClass(RolesEndpoint.class)
+            .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
             ;
