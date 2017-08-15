@@ -153,8 +153,48 @@ The
 
 == Running Your Implementation With the TCK
 Once you have built and installed your TCK harness artifact, you can run the
-TCK tests against it by using the container profile via the following command
+TCK tests against it by using either the tokens-se or container profiles.
+
+=== tokens-se Profile
+The tokens-se profile is a basic unit test for validation of your JWTPrincipal implementation. This does not require
+any special test container runner. This test does require that your TCK harness artifact provide an implementation of
+the `org.eclipse.microprofile.jwt.tck.util.ITokenParser` interface using a service provider via the
+`java.util.ServiceLoader` pattern, that is, there should be a META-INF/services/org.eclipse.microprofile.jwt.tck.util.ITokenParser
+file in your TCK harness artifact that points to your ITokenParser implementation.
+
+To run the unit tests associated with the tokens-se profile, run the following command
 from within the microprofile-jwt-auth/tck directory:
+
+`mvn -Ptokens-se -Dtck.container.groupId={MY_GROUP} -Dtck.container.artifactId={MY_ARTIFACT} -Dtck.container.version={MY_VERSION} test`
+
+where you would replace the `{MY_GROUP}`, `{MY_ARTIFACT}` and `{MY_VERSION}` with
+the `<groupId>...<groupId>`, `<artifactId>...</artifactId>`, and `<version>...</version>`
+respectively from your TCK harness artifact.
+
+A concrete example is for running with the TCK harness artifiact from the
+https://github.com/MicroProfileJWT/wfswarm-jwt-auth-tck project is:
+
+`mvn -Ptokens-se -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck -Dtck.container.version=1.0-SNAPSHOT test`
+
+=== container Profile
+The container profile is a test of JAX-RS client tests that validate a JAX-RS endpoint bundled in a WebArchive deployment
+via your implementation. These tests require Arquillian container runtime integration to properly deploy and start
+your container. You typically provide this via a dependency on an arquillian container artificat, for example,
+Tomcat based containers might include a dependency like:
+
+```
+<dependency>
+  <groupId>org.jboss.arquillian.container</groupId>
+  <artifactId>arquillian-tomcat-embedded-7</artifactId>
+  <version>1.0.0</version>
+  <scope>test</scope>
+</dependency>
+```
+
+This test of tests also require the  `org.jboss.arquillian.core.spi.LoadableExtension` and `org.jboss.arquillian.container.test.spi.client.deployment.ApplicationArchiveProcessor`
+implementations as discussed above.
+
+To run this set of tests, issue the following command from within the microprofile-jwt-auth/tck directory:
 
 `mvn -Pcontainer -Dtck.container.groupId={MY_GROUP} -Dtck.container.artifactId={MY_ARTIFACT} -Dtck.container.version={MY_VERSION} test`
 
