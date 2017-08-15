@@ -19,8 +19,10 @@
  */
 package org.eclipse.microprofile.jwt;
 
+import java.io.Serializable;
 import java.security.Principal;
-import java.util.Set;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * A read-only interface for the the claims required by Eclipse MicroProfile conforming tokens. Additional information
@@ -31,21 +33,28 @@ import java.util.Set;
 public interface JWTPrincipal extends Principal {
 
     /** {@link #getIssuer()} */
-    public static final String ISSUER="iss";
+    String ISSUER="iss";
+
     /** {@link #getGroups()} */
-    public static final String GROUPS="groups";
+    String GROUPS="groups";
+
     /** {@link #getAudience()} */
-    public static final String AUDIENCE="aud";
+    String AUDIENCE="aud";
+
     /** {@link #getExpirationTime()} ()} */
-    public static final String  EXPIRY ="exp";
+    String  EXPIRY ="exp";
+
     /** {@link #getIssuedAtTime()} */
-    public static final String ISSURE_TIME="iat";
+    String ISSURE_TIME="iat";
+
     /** {@link #getSubject()} */
-    public static final String SUBJECT="sub";
+    String SUBJECT="sub";
+
     /** {@link #getName()}  */
-    public static final String PRINCIPAL_NAME="upn";
+    String PRINCIPAL_NAME="upn";
+
     /** {@link #getTokenID()} */
-    public static final String TOKEN_ID = "jti";
+    String TOKEN_ID = "jti";
 
     /**
      * Returns the unique name of this principal. This either comes from the upn claim, or if that is missing, the
@@ -54,25 +63,29 @@ public interface JWTPrincipal extends Principal {
      * @return the unique name of this principal.
      */
     @Override
-    public String getName();
+    String getName();
 
     /**
      * Get the raw bearer token string originally passed in the authentication header
      * @return raw bear token string
      */
-    public String getRawToken();
+    String getRawToken();
 
     /**
      * The iss(Issuer) claim identifies the principal that issued the JWT
      * @return the iss claim.
      */
-    public String getIssuer();
+    default String getIssuer() {
+        return getClaim(ISSUER);
+    }
 
     /**
      * The aud(Audience) claim identifies the recipients that the JWT is intended for.
      * @return the aud claim.
      */
-    public Set<String> getAudience();
+    default Stream<String> getAudience() {
+        return getClaim(AUDIENCE);
+    }
 
     /**
      * The sub(Subject) claim identifies the principal that is the subject of the JWT. This is the token issuing
@@ -80,7 +93,9 @@ public interface JWTPrincipal extends Principal {
      *
      * @return the sub claim.
      */
-    public String getSubject();
+    default String getSubject() {
+        return getClaim(SUBJECT);
+    }
 
     /**
      * The jti(JWT ID) claim provides a unique identifier for the JWT.
@@ -92,20 +107,26 @@ public interface JWTPrincipal extends Principal {
      to prevent the JWT from being replayed.
      * @return the jti claim.
      */
-    public String getTokenID();
+    default String getTokenID() {
+        return getClaim(TOKEN_ID);
+    }
 
     /**
      * The exp (Expiration time) claim identifies the expiration time on or after which the JWT MUST NOT be accepted
      * for processing in seconds since 1970-01-01T00:00:00Z UTC
      * @return the exp claim.
      */
-    public long getExpirationTime();
+    default Long getExpirationTime() {
+        return getClaim(EXPIRY);
+    }
 
     /**
      * The iat(Issued at time) claim identifies the time at which the JWT was issued in seconds since 1970-01-01T00:00:00Z UTC
      * @return the iat claim
      */
-    public long getIssuedAtTime();
+    default Long getIssuedAtTime() {
+        return getClaim(ISSURE_TIME);
+    }
 
     /**
      * The groups claim provides the group names the JWT principal has been granted.
@@ -113,18 +134,26 @@ public interface JWTPrincipal extends Principal {
      * This is a MicroProfile specific claim.
      * @return a possibly empty set of group names.
      */
-    public Set<String> getGroups();
+    default Stream<String> getGroups() {
+        return getClaim(GROUPS);
+    }
 
     /**
      * Access the names of all claims are associated with this token.
      * @return non-standard claim names in the token
      */
-    public Set<String> getClaimNames();
+    Stream<String> getClaimNames();
+
+    boolean containsClaim(String claimName);
 
     /**
      * Access the value of the indicated claim.
      * @param claimName - the name of the claim
      * @return the value of the indicated claim if it exists, null otherwise.
      */
-    public Object getClaim(String claimName);
+    <T extends Serializable> T getClaim(String claimName);
+
+    default <T extends Serializable> Optional<T> claim(String claimName) {
+        return Optional.ofNullable(getClaim(claimName));
+    }
 }
