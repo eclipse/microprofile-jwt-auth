@@ -153,7 +153,7 @@ The
 
 == Running Your Implementation With the TCK
 Once you have built and installed your TCK harness artifact, you can run the
-TCK tests against it by using either the tokens-se or container profiles.
+TCK tests against it by using either the `tokens-se` or `container` profiles.
 
 === tokens-se Profile
 The tokens-se profile is a basic unit test for validation of your JWTPrincipal implementation. This does not require
