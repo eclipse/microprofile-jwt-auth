@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.annotation;
+package org.eclipse.microprofile.jwt;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
