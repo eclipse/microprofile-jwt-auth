@@ -43,6 +43,47 @@
         </license>
     </licenses>
 
+    <organization>
+        <name>Eclipse Foundation</name>
+        <url>http://www.eclipse.org/</url>
+    </organization>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/eclipse/microprofile-jwt-auth/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <name>Scott M Stark</name>
+            <url>https://github.com/starksm64</url>
+            <organization>Red Hat</organization>
+            <organizationUrl>https://www.jboss.org</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/eclipse/microprofile-jwt-auth.git</connection>
+        <developerConnection>scm:git:https://github.com/eclipse/microprofile-jwt-auth.git</developerConnection>
+        <url>https://github.com/eclipse/microprofile-jwt-auth</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>repo.eclipse.org</id>
+            <name>Eclipse MicroProfile Repository - Releases</name>
+            <url>https://repo.eclipse.org/content/repositories/microprofile-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>repo.eclipse.org</id>
+            <name>Eclipse MicroProfile Repository - Snapshots</name>
+            <url>https://repo.eclipse.org/content/repositories/microprofile-snapshots/</url>
+
+            <uniqueVersion>true</uniqueVersion>  <!-- for keeping multipe snapshot versions - maybe for staging a final version besides nightly versions -->
+
+        </snapshotRepository>
+    </distributionManagement>
 
     <modules>
         <module>api</module>

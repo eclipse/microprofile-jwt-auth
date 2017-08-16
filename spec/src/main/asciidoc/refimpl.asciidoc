@@ -26,7 +26,7 @@ can be found at https://github.com/starksm64/microprofile-jwt-auth-ri. The purpo
 of this RI is to offer reusable code for integration of the JWT RBAC authenticaiton
 and authorization spec in various container environments. This particular implementation contains:
 
-* a default implementation of the JWTPrincipal interface
+* a default implementation of the JsonWebToken interface
 * a JAX-RS ContainerRequestFilter prototype
 * JSR-375 IdentityStore and Credential prototypes
 * TODO: a JSR-196 ServerAuthModule

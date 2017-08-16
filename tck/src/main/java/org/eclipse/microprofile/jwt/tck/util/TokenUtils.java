@@ -28,6 +28,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
+import org.eclipse.microprofile.jwt.Claims;
 
 import java.io.InputStream;
 import java.security.KeyFactory;
@@ -40,6 +41,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import static net.minidev.json.parser.JSONParser.DEFAULT_PERMISSIVE_MODE;
@@ -65,16 +67,30 @@ public class TokenUtils {
 
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
-     * test resource key.
+     * test resource key, possibly with invalid fields.
      *
      * @param jsonResName   - name of test resources file
-     * @param invalidFields - the set of claims that should be added with invalid values to test failure modes
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
      * @return the JWT string
      * @throws Exception on parse failure
      */
-    public static String generateTokenString(String jsonResName, Set<InvalidFields> invalidFields) throws Exception {
-        if (invalidFields == null) {
-            invalidFields = Collections.emptySet();
+    public static String generateTokenString(String jsonResName, Set<InvalidClaims> invalidClaims) throws Exception {
+        return generateTokenString(jsonResName, invalidClaims, null);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
+     * test resource key, possibly with invalid fields.
+     *
+     * @param jsonResName   - name of test resources file
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
+     * @param timeClaims - used to return the exp, iat, auth_time claims
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String generateTokenString(String jsonResName, Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
+        if (invalidClaims == null) {
+            invalidClaims = Collections.emptySet();
         }
         InputStream contentIS = TokenUtils.class.getResourceAsStream(jsonResName);
         byte[] tmp = new byte[4096];
@@ -85,18 +101,25 @@ public class TokenUtils {
         JSONParser parser = new JSONParser(DEFAULT_PERMISSIVE_MODE);
         JSONObject jwtContent = (JSONObject) parser.parse(content);
         // Change the issuer to INVALID_ISSUER for failure testing if requested
-        if (invalidFields.contains(InvalidFields.ISSUER)) {
-            jwtContent.put("iss", "INVALID_ISSUER");
+        if (invalidClaims.contains(InvalidClaims.ISSUER)) {
+            jwtContent.put(Claims.iss.name(), "INVALID_ISSUER");
         }
-        jwtContent.put("iat", currentTimeInSecs());
-        jwtContent.put("auth_time", currentTimeInSecs());
+        long currentTimeInSecs = currentTimeInSecs();
+        long exp = currentTimeInSecs + 300;
+        jwtContent.put(Claims.iat.name(), currentTimeInSecs);
+        jwtContent.put(Claims.auth_time.name(), currentTimeInSecs);
         // If the exp claim is not updated, it will be an old value that should be seen as expired
-        if (!invalidFields.contains(InvalidFields.EXP)) {
-            jwtContent.put("exp", currentTimeInSecs() + 300);
+        if (!invalidClaims.contains(InvalidClaims.EXP)) {
+            jwtContent.put(Claims.exp.name(), exp);
+        }
+        if(timeClaims != null) {
+            timeClaims.put(Claims.iat.name(), currentTimeInSecs);
+            timeClaims.put(Claims.auth_time.name(), currentTimeInSecs);
+            timeClaims.put(Claims.exp.name(), exp);
         }
 
         PrivateKey pk;
-        if (invalidFields.contains(InvalidFields.SIGNER)) {
+        if (invalidClaims.contains(InvalidClaims.SIGNER)) {
             // Generate a new random private key to sign with to test invalid signatures
             KeyPair keyPair = generateKeyPair(2048);
             pk = keyPair.getPrivate();
@@ -119,6 +142,12 @@ public class TokenUtils {
         return jwt;
     }
 
+    /**
+     * Read a PEM encoded private key from the classpath
+     * @param pemResName - key file resource name
+     * @return PrivateKey
+     * @throws Exception on decode failure
+     */
     public static PrivateKey readPrivateKey(String pemResName) throws Exception {
         InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
         byte[] tmp = new byte[4096];
@@ -126,7 +155,12 @@ public class TokenUtils {
         PrivateKey privateKey = decodePrivateKey(new String(tmp, 0, length));
         return privateKey;
     }
-
+    /**
+     * Read a PEM encoded public key from the classpath
+     * @param pemResName - key file resource name
+     * @return PublicKey
+     * @throws Exception on decode failure
+     */
     public static PublicKey readPublicKey(String pemResName) throws Exception {
         InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
         byte[] tmp = new byte[4096];
@@ -135,6 +169,12 @@ public class TokenUtils {
         return publicKey;
     }
 
+    /**
+     * Generate a new RSA keypair.
+     * @param keySize - the size of the key
+     * @return KeyPair
+     * @throws NoSuchAlgorithmException on failure to load RSA key generator
+     */
     public static KeyPair generateKeyPair(int keySize) throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(keySize);
@@ -142,6 +182,12 @@ public class TokenUtils {
         return keyPair;
     }
 
+    /**
+     * Decode a PEM encoded private key string to an RSA PrivateKey
+     * @param pemEncoded - PEM string for private key
+     * @return PrivateKey
+     * @throws Exception on decode failure
+     */
     public static PrivateKey decodePrivateKey(String pemEncoded) throws Exception {
         pemEncoded = removeBeginEnd(pemEncoded);
         byte[] pkcs8EncodedBytes = Base64.getDecoder().decode(pemEncoded);
@@ -154,6 +200,12 @@ public class TokenUtils {
         return privKey;
     }
 
+    /**
+     * Decode a PEM encoded public key string to an RSA PublicKey
+     * @param pemEncoded - PEM string for private key
+     * @return PublicKey
+     * @throws Exception on decode failure
+     */
     public static PublicKey decodePublicKey(String pemEncoded) throws Exception {
         pemEncoded = removeBeginEnd(pemEncoded);
         byte[] encodedBytes = Base64.getDecoder().decode(pemEncoded);
@@ -183,7 +235,7 @@ public class TokenUtils {
     /**
      * Enums to indicate which claims should be set to invalid values for testing failure modes
      */
-    public enum InvalidFields {
+    public enum InvalidClaims {
         ISSUER, // Set an invalid issuer
         EXP,    // Set an invalid expiration
         SIGNER  // Sign the token with the incorrect private key

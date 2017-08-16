@@ -19,13 +19,12 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.JWTPrincipal;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -75,7 +74,8 @@ public class RolesAllowedTest {
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "RolesAllowedTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
-            .addPackages(true, Filters.exclude(".*Test.*"), RolesEndpoint.class.getPackage())
+            .addClass(RolesEndpoint.class)
+            .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
             ;
@@ -101,8 +101,8 @@ public class RolesAllowedTest {
     @RunAsClient
     @Test
     public void callEchoExpiredToken() throws Exception {
-        HashSet<TokenUtils.InvalidFields> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidFields.EXP);
+        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        invalidFields.add(TokenUtils.InvalidClaims.EXP);
         String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
@@ -183,7 +183,7 @@ public class RolesAllowedTest {
         String[] ifaces = reply.split(",");
         boolean hasJWTPrincipal = false;
         for(String iface : ifaces) {
-            hasJWTPrincipal |= iface.equals(JWTPrincipal.class.getTypeName());
+            hasJWTPrincipal |= iface.equals(JsonWebToken.class.getTypeName());
         }
         Assert.assertTrue("PrincipalClass has JWTPrincipal interface", hasJWTPrincipal);
     }

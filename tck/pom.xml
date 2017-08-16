@@ -44,9 +44,15 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>1.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -109,6 +115,7 @@
                         <includes>
                             <include>${tck.includes}</include>
                         </includes>
+                        <forkCount>1</forkCount>
                         <systemPropertyVariables>
                             <tck.ITokenParserArtifact>${tck.ITokenParserArtifact}</tck.ITokenParserArtifact>
                             <buildDirectory>${project.build.directory}</buildDirectory>
@@ -122,29 +129,33 @@
 
     <profiles>
         <profile>
-            <!-- The weld-se profile is a base profile used to test the basics of a JWTPrincipal implementation
+            <!-- The tokens profile is a base profile used to test the basics of a JWTPrincipal implementation
+            using an implementation provided org.eclipse.microprofile.jwt.tck.util.ITokenParser via a service provider
+            using the ServiceLoader pattern.
             -->
-            <id>weld-se</id>
+            <id>tokens-se</id>
             <properties>
-                <tck.includes>org.eclipse.microprofile.jwt.tck.format.TokenParsingTest</tck.includes>
+                <tck.includes>org.eclipse.microprofile.jwt.tck.parsing.TokenValidationTest</tck.includes>
             </properties>
 
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss.weld.se</groupId>
-                    <artifactId>weld-se-core</artifactId>
-                    <version>2.4.3.Final</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
-                    <version>1.0.0.Final</version>
+                    <!--
+                    These need to be specified as system properties on mvn command line:
+                    mvn -Pcontainer -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck \
+                    -Dtck.container.version=1.0-SNAPSHOT test
+                    -->
+                    <groupId>${tck.container.groupId}</groupId>
+                    <artifactId>${tck.container.artifactId}</artifactId>
+                    <version>${tck.container.version}</version>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
         <profile>
             <id>container</id>
             <properties>
+                <!-- Include all tests under the org.eclipse.microprofile.jwt.tck.container package -->
                 <tck.includes>**/container/**/*Test.java</tck.includes>
             </properties>
             <dependencies>

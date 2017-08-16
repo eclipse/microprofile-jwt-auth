@@ -17,24 +17,20 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt.tck.util;
+package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.JsonWebToken;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 
-import java.security.PublicKey;
-
-/**
- * The TCK requires test harness integration code to bridge between the unit tests and vendor implementations.
- * An implementation ITokenParser interface
- */
-public interface ITokenParser {
-    /**
-     *
-     * @param bearerToken
-     * @param issuer
-     * @param signedBy
-     * @return the parsed JWTPrincipal representation
-     * @throws Exception thrown on parse or validation failure
-     */
-    public JsonWebToken parse(String bearerToken, String issuer, PublicKey signedBy) throws Exception;
+@Path("/ping")
+public class PingEndpoint {
+    @GET
+    @Path("/echo")
+    public String echoInput(@Context SecurityContext sec, @QueryParam("input") String input) {
+        return "pinged, input="+input;
+    }
 }
+

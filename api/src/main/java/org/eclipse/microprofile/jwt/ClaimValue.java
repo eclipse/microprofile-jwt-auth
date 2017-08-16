@@ -17,24 +17,26 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt.tck.util;
+package org.eclipse.microprofile.jwt;
 
-import org.eclipse.microprofile.jwt.JsonWebToken;
-
-import java.security.PublicKey;
+import java.security.Principal;
 
 /**
- * The TCK requires test harness integration code to bridge between the unit tests and vendor implementations.
- * An implementation ITokenParser interface
+ * A representation of a claim in a {@link JsonWebToken}
+ * @param <T> the expected type of the claim
  */
-public interface ITokenParser {
+public interface ClaimValue<T> extends Principal {
+
     /**
-     *
-     * @param bearerToken
-     * @param issuer
-     * @param signedBy
-     * @return the parsed JWTPrincipal representation
-     * @throws Exception thrown on parse or validation failure
+     * Access the name of the claim.
+     * @return The name of the claim as seen in the JsonWebToken content
      */
-    public JsonWebToken parse(String bearerToken, String issuer, PublicKey signedBy) throws Exception;
+    @Override
+    public String getName();
+
+    /**
+     * Access the value of the claim.
+     * @return the value of the claim.
+     */
+    public T getValue();
 }
