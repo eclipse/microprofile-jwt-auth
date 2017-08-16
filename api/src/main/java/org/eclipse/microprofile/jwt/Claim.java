@@ -26,7 +26,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to signify and injection point for a {@link ClaimValue} from a {@link JsonWebToken}
+ * Annotation used to signify and injection point for a {@link ClaimValue} from
+ * a {@link JsonWebToken}
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
@@ -37,5 +38,13 @@ public @interface Claim {
      * @return the claim name
      * @see JsonWebToken#getClaim(String)
      */
-    String value();
+    String value() default "";
+
+    /**
+     * An alternate way of specifying a claim name using the {@linkplain Claims}
+     * enum
+     * @return the claim enum
+     */
+    Claims standard() default Claims.UNKNOWN;
+
 }
