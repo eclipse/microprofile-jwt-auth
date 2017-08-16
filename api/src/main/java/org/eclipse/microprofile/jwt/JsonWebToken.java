@@ -24,16 +24,18 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * A read-only interface for the the claims required by Eclipse MicroProfile conforming tokens. Additional information
- * about the claims defined by OIDC and RFC7519 can be found at https://www.iana.org/assignments/jwt/jwt.xhtml.
+ * A read-only interface for the the claims required by Eclipse MicroProfile
+ * conforming tokens. Additional information about the claims defined by OIDC
+ * and RFC7519 can be found at https://www.iana.org/assignments/jwt/jwt.xhtml.
  *
  * This is compatible with the pre-JSR 375 caller {@link Principal} api.
  */
 public interface JsonWebToken extends Principal {
 
     /**
-     * Returns the unique name of this principal. This either comes from the upn claim, or if that is missing, the
-     * preferred_username claim. Note that for guaranteed interoperability a upn claim should be used.
+     * Returns the unique name of this principal. This either comes from the upn
+     * claim, or if that is missing, the preferred_username claim. Note that for
+     * guaranteed interoperability a upn claim should be used.
      *
      * @return the unique name of this principal.
      */
@@ -41,7 +43,8 @@ public interface JsonWebToken extends Principal {
     String getName();
 
     /**
-     * Get the raw bearer token string originally passed in the authentication header
+     * Get the raw bearer token string originally passed in the authentication
+     * header
      * @return raw bear token string
      */
     default String getRawToken() {
@@ -57,7 +60,8 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The aud(Audience) claim identifies the recipients that the JWT is intended for.
+     * The aud(Audience) claim identifies the recipients that the JWT is
+     * intended for.
      * @return the aud claim.
      */
     default Set<String> getAudience() {
@@ -65,7 +69,8 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The sub(Subject) claim identifies the principal that is the subject of the JWT. This is the token issuing
+     * The sub(Subject) claim identifies the principal that is the subject of
+     * the JWT. This is the token issuing
      * IDP subject, not the
      *
      * @return the sub claim.
@@ -89,7 +94,8 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The exp (Expiration time) claim identifies the expiration time on or after which the JWT MUST NOT be accepted
+     * The exp (Expiration time) claim identifies the expiration time on or
+     * after which the JWT MUST NOT be accepted
      * for processing in seconds since 1970-01-01T00:00:00Z UTC
      * @return the exp claim.
      */
@@ -98,7 +104,8 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The iat(Issued at time) claim identifies the time at which the JWT was issued in seconds since 1970-01-01T00:00:00Z UTC
+     * The iat(Issued at time) claim identifies the time at which the JWT was
+     * issued in seconds since 1970-01-01T00:00:00Z UTC
      * @return the iat claim
      */
     default long getIssuedAtTime() {
@@ -106,7 +113,8 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The groups claim provides the group names the JWT principal has been granted.
+     * The groups claim provides the group names the JWT principal has been
+     * granted.
      *
      * This is a MicroProfile specific claim.
      * @return a possibly empty set of group names.
@@ -123,8 +131,8 @@ public interface JsonWebToken extends Principal {
 
     /**
      * Verify is a given claim exists
-     * @param claimName
-     * @return
+     * @param claimName - the name of the claim
+     * @return true if the JsonWebToken contains the claim, false otherwise
      */
     default boolean containsClaim(String claimName) {
         return claim(claimName).isPresent();
@@ -137,6 +145,13 @@ public interface JsonWebToken extends Principal {
      */
     <T> T getClaim(String claimName);
 
+    /**
+     * A utility method to access a claim value in an {@linkplain Optional}
+     * wrapper
+     * @param claimName - the name of the claim
+     * @param <T> - the type of the claim value to return
+     * @return an Optional wrapper of the claim value
+     */
     default <T> Optional<T> claim(String claimName) {
         return Optional.ofNullable(getClaim(claimName));
     }
