@@ -26,7 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to signify and injection point for a {@link ClaimValue} from
+ * Annotation used to signify an injection point for a {@link ClaimValue} from
  * a {@link JsonWebToken}
  */
 @Qualifier
