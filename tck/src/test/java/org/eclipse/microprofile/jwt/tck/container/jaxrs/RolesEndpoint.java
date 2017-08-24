@@ -70,6 +70,9 @@ public class RolesEndpoint {
     @Inject
     @Claim("auth_time")
     private ClaimValue<Optional<Long>> authTime;
+    @Inject
+    @Claim("custom-missing")
+    private ClaimValue<Optional<Long>> custom;
 
     @GET
     @Path("/echo")
@@ -186,7 +189,7 @@ public class RolesEndpoint {
         // iss
         String issValue = issuer.getValue();
         if(issValue == null || issValue.length() == 0) {
-            tmp.append(Claims.iss.name()+"value is null or empty\n");
+            tmp.append(Claims.iss.name()+"value is null or empty, FAIL\n");
         }
         else if(issValue.equals(iss)) {
             tmp.append(Claims.iss.name()+" PASS\n");
@@ -197,7 +200,7 @@ public class RolesEndpoint {
         // raw_token
         String rawTokenValue = rawToken.getValue();
         if(rawTokenValue == null || rawTokenValue.length() == 0) {
-            tmp.append(Claims.raw_token.name()+" value is null or empty\n");
+            tmp.append(Claims.raw_token.name()+" value is null or empty, FAIL\n");
         }
         else if(rawTokenValue.equals(rt)) {
             tmp.append(Claims.raw_token.name()+" PASS\n");
@@ -208,7 +211,7 @@ public class RolesEndpoint {
         // jti
         String jtiValue = jti.getValue();
         if(jtiValue == null || jtiValue.length() == 0) {
-            tmp.append(Claims.jti.name()+" value is null or empty\n");
+            tmp.append(Claims.jti.name()+" value is null or empty, FAIL\n");
         }
         else if(jtiValue.equals(jwtID)) {
             tmp.append(Claims.jti.name()+" PASS\n");
@@ -219,7 +222,7 @@ public class RolesEndpoint {
         // aud
         Set<String> audValue = aud.getValue();
         if(audValue == null || audValue.size() == 0) {
-            tmp.append(Claims.aud.name()+" value is null or empty\n");
+            tmp.append(Claims.aud.name()+" value is null or empty, FAIL\n");
         }
         else if(audValue.contains(audience)) {
             tmp.append(Claims.aud.name()+" PASS\n");
@@ -230,7 +233,7 @@ public class RolesEndpoint {
         // iat
         Long iatValue = issuedAt.getValue();
         if(iatValue == null || iatValue.intValue() == 0) {
-            tmp.append(Claims.iat.name()+" value is null or zero\n");
+            tmp.append(Claims.iat.name()+" value is null or zero, FAIL\n");
         }
         else if(iatValue.equals(iat)) {
             tmp.append(Claims.iat.name()+" PASS\n");
@@ -241,7 +244,7 @@ public class RolesEndpoint {
         // sub
         Optional<String> optSubValue = optSubject.getValue();
         if(optSubValue == null || !optSubValue.isPresent()) {
-            tmp.append(Claims.sub.name()+" value is null or missing\n");
+            tmp.append(Claims.sub.name()+" value is null or missing, FAIL\n");
         }
         else if(optSubValue.get().equals(subject)) {
             tmp.append(Claims.sub.name()+" PASS\n");
@@ -252,7 +255,7 @@ public class RolesEndpoint {
         // auth_time
         Optional<Long> optAuthTimeValue = this.authTime.getValue();
         if(optAuthTimeValue == null || !optAuthTimeValue.isPresent()) {
-            tmp.append(Claims.auth_time.name()+" value is null or missing\n");
+            tmp.append(Claims.auth_time.name()+" value is null or missing, FAIL\n");
         }
         else if(optAuthTimeValue.get().equals(authTime)) {
             tmp.append(Claims.auth_time.name()+" PASS\n");
@@ -260,7 +263,17 @@ public class RolesEndpoint {
         else {
             tmp.append(Claims.auth_time.name()+" FAIL\n");
         }
-
+        // custom-missing
+        Optional<Long> customValue = custom.getValue();
+        if(customValue == null) {
+            tmp.append("custom-missing value is null, FAIL\n");
+        }
+        else if(!customValue.isPresent()) {
+            tmp.append("custom-missing PASS\n");
+        }
+        else {
+            tmp.append("custom-missing FAIL\n");
+        }
         return tmp.toString();
     }
 
