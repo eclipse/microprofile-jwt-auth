@@ -17,25 +17,25 @@
 
 ## Recommendations for Interoperability
 
-The decision about using MicroProfile JWT(MP-JWT) as a token format depends on the agreement between both identity
+The maximum utility of the MicroProfile JWT(MP-JWT) as a token format depends on the agreement between both identity
 providers and service providers. This means identity providers - responsible for issuing tokens - should be able to
-issue tokens using the JWT format in a way that service providers can understand in order to introspect the token and
+issue tokens using the MP-JWT format in a way that service providers can understand in order to introspect the token and
 gather information about a subject. To that end, the requirements for the MicroProfile JWT are:
 
-1. An authentication token.
-2. An authorization token that contains Java EE application level roles indirectly granted via groups.
+1. Be usable as an authentication token.
+2. Be usable as an authorization token that contains Java EE application level roles indirectly granted via a groups claim.
 3. Can be mapped to IdentityStore in JSR375.
 4. Can support additional standard claims described in https://www.iana.org/assignments/jwt/jwt.xhtml as
 well as non-standard claims.
 
 To meet those requirements, we introduce 2 new claims to the MP-JWT:
 
-* "upn": A human readable claim that uniquely identifies the subject or user principal of token, across
+* "upn": A human readable claim that uniquely identifies the subject or user principal of the token, across
 the MicroProfile services the token will be accessed with.
-* "groups": The token subject's group membership that will be mapped to Java EE application
-level roles.
+* "groups": The token subject's group memberships that will be mapped to Java EE style application
+level roles in the MicroProfile service container.
 
-### Required Claims
+### Minimum MMP-JWT Required Claims
 The required minimum set of MP-JWT claims is then:
 
 typ:: This JOSE header parameter identifies the token as an RFC7519 and must be "JWT" https://tools.ietf.org/html/rfc7519#section-5.1[RFC7519, Section 5.1]
@@ -373,7 +373,7 @@ integration is with the JAX-RS container, and injection of the MP-JWT types.
 
 #### Injection of `JsonWebToken`
 An MP-JWT implementation must support the injection of the currently authenticated
-caller as a JsonWebToken with @RequestScoped:
+caller as a JsonWebToken with @RequestScoped scope:
 
 ```java
 @Path("/endp")
@@ -388,12 +388,65 @@ public class RolesEndpoint {
 #### Injection of `ClaimValue`
 
 This specification requires support for injection of claims from the current
-`JsonWebToken` using the `org.eclipse.microprofile.jwt.@Claim` qualifier and
-`org.eclipse.microprofile.jwt.ClaimValue` interface with with @RequestScoped scoping.
-The following example code fragment illustrates various examples of injecting
-different types of claims using a range of generic forms of the `ClaimValue`:
+`JsonWebToken` using the `org.eclipse.microprofile.jwt.Claim` qualifier:
 
-```java
+[source,java]
+----
+/**
+ * Annotation used to signify an injection point for a {@link ClaimValue} from
+ * a {@link JsonWebToken}
+ */
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
+public @interface Claim {
+    /**
+     * The value specifies the id name the claim to inject
+     * @return the claim name
+     * @see JsonWebToken#getClaim(String)
+     */
+    String value() default "";
+
+    /**
+     * An alternate way of specifying a claim name using the {@linkplain Claims}
+     * enum
+     * @return the claim enum
+     */
+    Claims standard() default Claims.UNKNOWN;
+
+}
+----
+
+and `org.eclipse.microprofile.jwt.ClaimValue` interface:
+[source,java]
+----
+/**
+ * A representation of a claim in a {@link JsonWebToken}
+ * @param <T> the expected type of the claim
+ */
+public interface ClaimValue<T> extends Principal {
+
+    /**
+     * Access the name of the claim.
+     * @return The name of the claim as seen in the JsonWebToken content
+     */
+    @Override
+    public String getName();
+
+    /**
+     * Access the value of the claim.
+     * @return the value of the claim.
+     */
+    public T getValue();
+}
+----
+
+with @RequestScoped scoping. The following example code fragment illustrates various
+examples of injecting different types of claims using a range of generic forms of
+the `ClaimValue`:
+
+[source,java]
+----
 import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.ClaimValue;
 import org.eclipse.microprofile.jwt.Claims;
@@ -403,7 +456,7 @@ import org.eclipse.microprofile.jwt.Claims;
 public class RolesEndpoint {
 ...
 
-    @Inject
+    @Inject // <1>
     @Claim(standard = Claims.raw_token)
     private ClaimValue<String> rawToken;
     @Inject
@@ -412,20 +465,20 @@ public class RolesEndpoint {
     @Inject
     @Claim(standard = Claims.jti)
     private ClaimValue<String> jti;
-    @Inject
+    @Inject // <2>
     @Claim("jti")
     private ClaimValue<Optional<String>> optJTI;
     @Inject
     @Claim("jti")
     private ClaimValue objJTI;
-    @Inject
+    @Inject // <3>
     @Claim("aud")
     private ClaimValue<Set<String>> aud;
     @Inject
     @Claim("groups")
     private ClaimValue<Set<String>> groups;
-    @Inject
-    @Claim("iat")
+    @Inject // <4>
+    @Claim(standard=Claims.iat)
     private ClaimValue<Long> issuedAt;
     @Inject
     @Claim("iat")
@@ -436,22 +489,57 @@ public class RolesEndpoint {
     @Inject
     @Claim("auth_time")
     private ClaimValue<Optional<Long>> authTime;
-    @Inject
+    @Inject // <5>
     @Claim("custom-missing")
     private ClaimValue<Optional<Long>> custom;
-```
+----
+<1> Injection of the raw MP-JWT token string.
+<2> Injection of the jti token id as an `Optional<String>` wapper.
+<3> Injection of the aud audience claim as a Set<String>. This is the required
+type as seen by looking at the Claims.aud enum value's Java type member.
+<4> Injection of the issued at time claim using an @Claim that references the
+claim name using the Claims.iat enum value.
+<5> Injection of a custom claim that does exist will result in an Optional<Long>
+value for which isPresent() will return false.
 
 The example shows that one may specify the name of the claim using with a
-string or a Claims enum value. The string form would allow for specifying non-standard
-claims while the Claims enum approach guards against typos and misspellings.
+string or a `Claims` enum value. The string form would allow for specifying non-standard
+claims while the `Claims` enum approach guards against typos and mis-spellings.
 
 The `@RequestScoped` requirement does introduce some additional complexity for
 a CDI extension as a producer method cannot have the
 `javax.enterprise.inject.spi.InjectionPoint` provided as a parameter to allow
 for distinguishing type. This requires that the CDI extension collect the `ClaimValue`
-injection sites by @Claim value and `ClaimValue` type. An example of one way
+injection sites by `@Claim` value and `ClaimValue` type. An example of one way
 to accomplish this via dynamic producer methods is shown in this prototype
 extension: https://github.com/MicroProfileJWT/microprofile-jwt-auth-wfswarm/blob/master/src/main/java/org/eclipse/microprofile/jwt/wfswarm/cdi/MPJWTExtension.java[MPJWTExtension].
+
+#### Injection of Claim Values using `javax.inject.Provider<?>`
+An MP-JWT implementation is required to support injection of the currently
+authenticated `JsonWebToken` claim values using the `javax.inject.Provider<?>`
+wrapper as the injection site type as shown in this code fragment:
+
+[source,java]
+----
+@Path("/endp")
+@ApplicationScoped
+public class RolesEndpoint {
+...
+
+    @Inject
+    @Claim(standard = Claims.jti)
+    private Provider<String> providerJTI;
+    @Inject
+    @Claim(standard = Claims.iat)
+    private Provider<Long> providerIAT;
+    @Inject
+    @Claim("groups")
+    private Provider<Set<String>> providerGroups;
+----
+
+### JAX-RS Container API Integration
+The behavior of the following JAX-RS security related methods is required for
+MP-JWT implementations.
 
 #### `javax.ws.rs.core.SecurityContext.getUserPrincipal()`
 The `java.security.Principal` returned from these methods MUST be an instance of `org.eclipse.microprofile.jwt.JsonWebToken`.
