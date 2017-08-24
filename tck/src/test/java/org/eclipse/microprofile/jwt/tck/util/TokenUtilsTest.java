@@ -24,9 +24,8 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.io.InputStream;
 import java.security.KeyPair;
@@ -36,6 +35,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 
 import static net.minidev.json.parser.JSONParser.DEFAULT_PERMISSIVE_MODE;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_UTILS;
 
 /**
  * Validation of the TokenUtils methods
@@ -45,7 +45,7 @@ public class TokenUtilsTest {
      * Verify the underlying JSONParser used by TokenUtils
      * @throws Exception
      */
-    @Test
+    @Test(groups = TEST_GROUP_UTILS)
     public void testParseRolesEndpoint() throws Exception {
         JSONParser parser = new JSONParser(DEFAULT_PERMISSIVE_MODE);
         InputStream contentIS = TokenUtils.class.getResourceAsStream("/RolesEndpoint.json");
@@ -67,7 +67,7 @@ public class TokenUtilsTest {
         // Transform the JSON content into a signed JWT
         String jwt = TokenUtils.generateTokenString("/RolesEndpoint.json");
         System.out.println(jwt);
-        /* Note that is you try to validate this token string via jwt.io debugger, you need to take the
+        /* Note that if you try to validate this token string via jwt.io debugger, you need to take the
         /publicKey.pem contents, and use
         -----BEGIN PUBLIC KEY-----
         ...
@@ -84,13 +84,12 @@ public class TokenUtilsTest {
         // Validate the string via Nimbus
         SignedJWT signedJWT = SignedJWT.parse(jwt);
         PublicKey publicKey = TokenUtils.readPublicKey("/publicKey.pem");
-        Assert.assertTrue("", publicKey instanceof RSAPublicKey);
+        Assert.assertTrue(publicKey instanceof RSAPublicKey, "publicKey isa RSAPublicKey");
         JWSVerifier verifier = new RSASSAVerifier((RSAPublicKey)publicKey);
         Assert.assertTrue(signedJWT.verify(verifier));
     }
 
-    @Ignore("Used to generate initial key testing pair")
-    @Test
+    @Test(groups = TEST_GROUP_UTILS, description = "Used to generate initial key testing pair")
     public void testKeyPairGeneration() throws Exception {
         KeyPair keyPair = TokenUtils.generateKeyPair(2048);
         PrivateKey privateKey = keyPair.getPrivate();
@@ -127,14 +126,12 @@ public class TokenUtilsTest {
         System.out.println("\n-----END RSA PUBLIC KEY-----");
     }
 
-    @Ignore("Test initial key validation")
-    @Test
+    @Test(groups = TEST_GROUP_UTILS, description = "Test initial key validation")
     public void testReadPrivateKey() throws Exception {
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey.pem");
         System.out.println(privateKey);
     }
-    @Ignore("Test initial key validation")
-    @Test
+    @Test(groups = TEST_GROUP_UTILS, description = "Test initial key validation")
     public void testReadPublicKey() throws Exception {
         RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");
         System.out.println(publicKey);

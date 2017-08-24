@@ -17,32 +17,41 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt.tck.container.jaxrs;
+package org.eclipse.microprofile.jwt.tck.container.jacc;
 
+import org.eclipse.microprofile.jwt.tck.TCKConstants;
+import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
+import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
 
 /**
- * A basic test of an unsecured JAX-RS endpoint to validate the test harness
- * without including JWT authentication.
+ *
  */
-public class PingTest extends Arquillian {
+public class SubjectTest  extends Arquillian {
+
+    /**
+     * The test generated JWT token string
+     */
+    private static String token;
     /**
      * The base URL for the container under test
      */
@@ -56,25 +65,34 @@ public class PingTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL publicKey = SubjectTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PingTest.war")
+            .create(WebArchive.class, "SubjectTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(PingEndpoint.class)
+            .addClass(SubjectEndpoint.class)
+            .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
-    @Test(groups = TEST_GROUP_JAXRS, description = "Basic test of an unsecured JAX-RS endpoint")
-    public void callEchoNoAuth() throws Exception {
-        String uri = baseURL.toExternalForm() + "/ping/echo";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("input", "hello")
-            ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+
+    @BeforeClass(alwaysRun = true)
+    public static void generateToken() throws Exception {
+        token = TokenUtils.generateTokenString("/RolesEndpoint.json");
     }
 
+    @RunAsClient
+    @Test(groups = TCKConstants.TEST_GROUP_JACC,
+        description = "Validate a request with MP-JWT PolicyContext.getContext(javax.security.auth.Subject.containe) has a JsonWebToken")
+    public void getSubjectClass() throws Exception {
+        String uri = baseURL.toExternalForm() + "/endp/getSubjectClass";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            ;
+        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        String reply = response.readEntity(String.class);
+        System.out.println(reply);
+    }
 }

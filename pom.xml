@@ -95,7 +95,7 @@
         <dependencies>
             <dependency>
                 <groupId>javax</groupId>
-                <artifactId>javaee-web-api</artifactId>
+                <artifactId>javaee-api</artifactId>
                 <type>pom</type>
                 <version>7.0</version>
                 <scope>import</scope>
@@ -122,6 +122,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.0.2</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -30,10 +30,12 @@
 
     <properties>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
+        <version.testng>6.10</version.testng>
         <checkstyle.methodNameFormat>^_?[a-z][a-zA-Z0-9_]*$</checkstyle.methodNameFormat>
         <!-- TCK properties that must be overriden in the vendor profile -->
         <tck.ITokenParserArtifact>INVALID</tck.ITokenParserArtifact>
         <tck.includes>INVALID</tck.includes>
+        <tck.testSuite>tck-null-suite.xml</tck.testSuite>
     </properties>
 
     <dependencies>
@@ -67,6 +69,19 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.security.jacc</groupId>
+            <artifactId>javax.security.jacc-api</artifactId>
+            <version>1.5</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>ejb-api</artifactId>
+            <version>3.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>4.23</version>
@@ -77,10 +92,9 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${version.testng}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
@@ -91,15 +105,13 @@
             <artifactId>arquillian-container-test-spi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
+            <groupId>org.jboss.arquillian.testng</groupId>
+            <artifactId>arquillian-testng-container</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-depchain</artifactId>
             <version>${version.shrinkwrap.resolvers}</version>
-            <scope>test</scope>
             <type>pom</type>
         </dependency>
     </dependencies>
@@ -112,15 +124,17 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.20</version>
                     <configuration>
-                        <includes>
-                            <include>${tck.includes}</include>
-                        </includes>
-                        <forkCount>1</forkCount>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <suiteXmlFiles>
+                            <suiteXmlFile>${tck.testSuite}</suiteXmlFile>
+                        </suiteXmlFiles>
+                        <environmentVariables>
+                        </environmentVariables>
                         <systemPropertyVariables>
-                            <tck.ITokenParserArtifact>${tck.ITokenParserArtifact}</tck.ITokenParserArtifact>
-                            <buildDirectory>${project.build.directory}</buildDirectory>
                         </systemPropertyVariables>
-
+                        <forkCount>1</forkCount>
+                        <reuseForks>true</reuseForks>
+                        <trimStackTrace>false</trimStackTrace>
                     </configuration>
                 </plugin>
             </plugins>
@@ -155,8 +169,26 @@
         <profile>
             <id>container</id>
             <properties>
-                <!-- Include all tests under the org.eclipse.microprofile.jwt.tck.container package -->
-                <tck.includes>**/container/**/*Test.java</tck.includes>
+                <tck.testSuite>tck-base-suite.xml</tck.testSuite>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <!--
+                    These need to be specified as system properties on mvn command line:
+                    mvn -Pcontainer -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck \
+                    -Dtck.container.version=1.0-SNAPSHOT test
+                    -->
+                    <groupId>${tck.container.groupId}</groupId>
+                    <artifactId>${tck.container.artifactId}</artifactId>
+                    <version>${tck.container.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>container-full</id>
+            <properties>
+                <tck.testSuite>tck-full-suite.xml</tck.testSuite>
             </properties>
             <dependencies>
                 <dependency>

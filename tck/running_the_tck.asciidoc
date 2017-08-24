@@ -25,7 +25,7 @@ to augment the base `org.jboss.shrinkwrap.api.spec.WebArchive` with the
 implementation specific artifacts, descriptors, libraries, etc. needed for
 the implementation to properly deploy the test web archive.
 
-There are base implementations of the LoadableExtension and ApplicationArchiveProcessor
+There are base implementations of the `LoadableExtension` and `ApplicationArchiveProcessor`
 that can be used for strait-forward augmentation scenarios, but you can always
 provide your own implementations. An example of the former is:
 https://github.com/MicroProfileJWT/wfswarm-jwt-auth-tck-viabase
@@ -35,14 +35,15 @@ https://github.com/MicroProfileJWT/wfswarm-jwt-auth-tck
 
 == Creating Your Implementation TCK Harness Artifact
 As described, you need to create an artifact that bundles a LoadableExtension
-as Java ServiceProvider that installs an ApplicationArchiveProcessor that
+using a Java ServiceProvider that installs an ApplicationArchiveProcessor that
 augments the base TCK test web application archive with the implementation specific
 configuration and dependencies needed to successfully deploy and test the web
 application with MP-JWT authentication enabled.
 
-The
+An example skeleton pom.xml is shown here:
 
-```maven
+[source,maven]
+----
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     Licensed under the Apache License, Version 2.0 (the
@@ -86,13 +87,13 @@ The
     </dependencyManagement>
 
     <dependencies>
-        <!-- This is the MP-JWT TCK base extension and utility classes -->
+        <!-- This is the MP-JWT TCK base extension and utility classes --><1>
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-tck</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!-- Arquillian extension SPI -->
+        <!-- Arquillian extension SPI --><2>
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
             <artifactId>arquillian-container-spi</artifactId>
@@ -103,7 +104,7 @@ The
         </dependency>
         <!-- You need to specify a JAX-RS client implementation as the unit
         tests make use of that API, but do not specify and implementation.
-        -->
+        --><3>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-client</artifactId>
@@ -111,45 +112,30 @@ The
         </dependency>
 
         <!-- Specify your container runtime arquillian integration and dependencies -->
-        <dependency>
+        <dependency><4>
             <groupId>MY_GROUP</groupId>
             <artifactId>arquillian-container</artifactId>
             <version>${container-version}</version>
         </dependency>
+        ...
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+...
 
 </project>
-```
+----
+<1> org.eclipse.microprofile.jwt:microprofile-jwt-auth-tck is the MP-JWT artifact
+that contains the base `LoadableExtension` and `ApplicationArchiveProcessor` classes,
+as well as the `ITokenParser` harness factory interface and `TokenUtils` class.
+<2> The 2 indicated Arquillian extension SPI dependencies provide the
+`LoadableExtension` and `ApplicationArchiveProcessor` interfaces and dependent
+classes.
+<3> The TCK unit tests make use of the JAX-RS client API, but do not provide an
+implementation, so your TCK harness artifact must specify what implementation to use.
+Here the Resteasy implementation is being specified.
+<4> Lastly, you must specify the property Arquillian container runtime that is
+approriate for you MP-JWT implementation, along with whatever container
+runtime dependencies are required.
 
 == Running Your Implementation With the TCK
 Once you have built and installed your TCK harness artifact, you can run the
@@ -182,7 +168,7 @@ via your implementation. These tests require Arquillian container runtime integr
 your container. You typically provide this via a dependency on an arquillian container artificat, for example,
 Tomcat based containers might include a dependency like:
 
-```
+```maven
 <dependency>
   <groupId>org.jboss.arquillian.container</groupId>
   <artifactId>arquillian-tomcat-embedded-7</artifactId>
@@ -206,3 +192,130 @@ A concrete example is for running with the TCK harness artifiact from the
 https://github.com/MicroProfileJWT/wfswarm-jwt-auth-tck project is:
 
 `mvn -Pcontainer -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck -Dtck.container.version=1.0-SNAPSHOT`
+
+== Running the TCK Tests in Your Build
+You can run the TCK tests from within your TCK harness build by including the
+following in your pom.xml:
+
+```maven
+    </dependencies>
+    ...
+        <!-- Include the MP-JWT TCK dependencies -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth-tck</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth-tck</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+        ...
+            <!-- Run the TCK tests aginst the tck-base-suite.xml -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.20</version>
+                <configuration>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>tck-base-suite.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <forkCount>1</forkCount>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+```
+
+and then either copy the tck-base-suite.xml file from the TCK source tree into your
+build root, or copy the following and paste if into a tck-base-suite.xml file in
+your build root:
+
+```maven
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="microprofile-jwt-auth-BaseTCK" verbose="1" preserve-order="true" configfailurepolicy="continue" >
+
+    <!-- The required base JAX-RS and CDI based tests that all MP-JWT implementations
+    must pass.
+    -->
+    <test name="base-tests">
+        <groups>
+            <run>
+                <include name="arquillian" />
+                <include name="jwt" />
+                <include name="utils" />
+                <include name="jaxrs" />
+                <include name="cdi" />
+                <exclude name="debug" />
+                <exclude name="ejb-optional" />
+                <exclude name="servlet-optional" />
+                <exclude name="jacc-optional" />
+            </run>
+        </groups>
+        <classes>
+            <class name="org.eclipse.microprofile.jwt.tck.parsing.TokenValidationTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PingTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
+        </classes>
+    </test>
+
+</suite>
+```
+
+You then simply run `mvn test` to run the TCK tests. An example of using this approach
+can be found in the https://github.com/MicroProfileJWT/wfswarm-jwt-auth-tck repo.
+Running
+
+```bash
+[wfswarm-jwt-auth-tck 1316]$ mvn -Dswarm.resolver.offline=true test
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building MicroProfile JWT Auth TCK Harness WFSwarm Implementation 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ jwt-auth-tck ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 6 resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ jwt-auth-tck ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ jwt-auth-tck ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /Users/starksm/Dev/JBoss/Microprofile/wfswarm-jwt-auth-tck/src/test/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ jwt-auth-tck ---
+[INFO] No sources to compile
+[INFO]
+[INFO] --- maven-surefire-plugin:2.20:test (default-test) @ jwt-auth-tck ---
+[INFO] No tests to run.
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running TestSuite
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 49.95 s - in TestSuite
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 52.805 s
+[INFO] Finished at: 2017-08-23T17:23:41-07:00
+[INFO] Final Memory: 30M/619M
+[INFO] ------------------------------------------------------------------------
+```
