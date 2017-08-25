@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt;
+package org.eclipse.microprofile.auth;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -30,7 +30,6 @@ import java.lang.annotation.Target;
  * A security annotation describing the authentication method, and the associated realm name that
  * should be used for this application.
  *
- * TODO: maybe should be in a common microprofile-annotations project
  */
 @Inherited
 @Documented
@@ -38,10 +37,20 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LoginConfig {
     /**
-     * The authMethod is used to configure the authentication mechanism for the JAX-RS application. As a prerequisite
-     * to gaining access to any web resources which are protected by an authorization constraint, a user must have
-     * authenticated using the configured mechanism. Legal values are "BASIC", "DIGEST", "FORM", "CLIENT-CERT",
-     * "MP-JWT", or a vendor-specific authentication scheme.
+     * Soften the requirements here:
+     *
+     * The authMethod is used to configure the authentication mechanism for the
+     * JAX-RS application. As a prerequisite to gaining access to any web resources
+     * which are protected by an authorization constraint, a user must have
+     * authenticated using the configured mechanism. Supported values include
+     * "BASIC", "DIGEST", "FORM", "CLIENT-CERT", "MP-JWT", or a vendor-specific
+     * authentication scheme.
+     *
+     * Note the the MP-JWT TCK currently only validates that a deployment with
+     * MP-JWT authentication follows the specification, but in the future,
+     * we MAY look to combine the use of MP-JWT tokens with other authentication
+     * mechanisms.
+     *
      * @return the configured auth-method
      */
     public String authMethod();
