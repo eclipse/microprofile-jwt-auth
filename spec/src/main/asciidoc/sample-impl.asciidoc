@@ -15,15 +15,15 @@
 // limitations under the License.
 //
 
-## Reference Implementations
+## Sample Implementations
 
-This sections references known reference implementations of the Eclise MicroProfile JWT RBAC authorization specification.
+This sections references known sample implementations of the Eclise MicroProfile JWT RBAC authorization specification.
 
 ### General Java EE/SE based Implementations
 
-A baseline reference implementation that is available under the Apache License, Version 2.0
-can be found at https://github.com/starksm64/microprofile-jwt-auth-ri. The purpose
-of this RI is to offer reusable code for integration of the JWT RBAC authenticaiton
+A baseline sample implementation that is available under the Apache License, Version 2.0
+can be found at https://github.com/MicroProfileJWT/microprofile-jwt-auth-prototype. The purpose
+of this prototype is to offer reusable code for integration of the JWT RBAC authenticaiton
 and authorization spec in various container environments. This particular implementation contains:
 
 * a default implementation of the JsonWebToken interface
@@ -33,5 +33,6 @@ and authorization spec in various container environments. This particular implem
 
 ### Wildfly Swarm Implementations
 
-A reference implementation for a custom auth-method of MP-JWT with the Wildfly/Wildfly-Swarm Undertow web container
-available under the Apache License, Version 2.0 can be found at https://github.com/starksm64/microprofile-jwt-auth-wfswarm.
+A sample implementation for a custom auth-method of MP-JWT with the Wildfly/Wildfly-Swarm Undertow web container, as a
+Wildfly-Swarm fraction, available under the Apache License, Version 2.0 can be found at:
+https://github.com/MicroProfileJWT/wfswarm-jwt-auth-fraction.

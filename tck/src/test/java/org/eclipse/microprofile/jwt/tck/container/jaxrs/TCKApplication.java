@@ -19,10 +19,11 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.LoginConfig;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+
+import org.eclipse.microprofile.auth.LoginConfig;
 
 @LoginConfig(authMethod = "MP-JWT", realmName = "TCK-MP-JWT")
 @ApplicationPath("/")

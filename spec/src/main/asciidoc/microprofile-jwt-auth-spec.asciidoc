@@ -42,4 +42,4 @@ include::interoperability.asciidoc[]
 
 include::future-directions.asciidoc[]
 
-include::refimpl.asciidoc[]
+include::sample-impl.asciidoc[]
