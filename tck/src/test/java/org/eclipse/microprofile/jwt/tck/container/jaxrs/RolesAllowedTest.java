@@ -31,6 +31,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -98,8 +99,9 @@ public class RolesAllowedTest extends Arquillian {
         expClaim = timeClaims.get(Claims.exp.name());
     }
 
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with no token fails with 403")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with no token fails with HTTP_UNAUTHORIZED")
     public void callEchoNoAuth() throws Exception {
+        Reporter.log("callEchoNoAuth, expect HTTP_UNAUTHORIZED");
         String uri = baseURL.toExternalForm() + "/endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
@@ -109,13 +111,11 @@ public class RolesAllowedTest extends Arquillian {
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
-    /**
-     * Used to test how a standard auth-method works with the authorization layer.
-     * @throws Exception
-     */
     @RunAsClient
-    @Test(groups = TCKConstants.TEST_GROUP_DEBUG, description = "Internal debugging test to test BASIC auth behavior")
+    @Test(groups = TCKConstants.TEST_GROUP_JAXRS,
+        description = "Attempting access with BASIC auth header should fail with HTTP_UNAUTHORIZED")
     public void callEchoBASIC() throws Exception {
+        Reporter.log("callEchoBASIC, expect HTTP_UNAUTHORIZED");
         byte[] tokenb = Base64.getEncoder().encode("jdoe@example.com:password".getBytes());
         String token = new String(tokenb);
         System.out.printf("basic: %s\n", token);
@@ -126,15 +126,16 @@ public class RolesAllowedTest extends Arquillian {
             .queryParam("input", "hello")
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "BASIC "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
         String reply = response.readEntity(String.class);
-        Assert.assertEquals(reply, "hello, user=jdoe@example.com");
+        System.out.println(reply);
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT succeeds")
+    @Test(groups = TEST_GROUP_JAXRS,
+        description = "Validate a request with MP-JWT succeeds with HTTP_OK, and replies with hello, user={token upn claim}")
     public void callEcho() throws Exception {
-        System.out.printf("jwt: %s\n", token);
+        Reporter.log("callEcho, expect HTTP_OK");
 
         String uri = baseURL.toExternalForm() + "/endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
@@ -144,13 +145,14 @@ public class RolesAllowedTest extends Arquillian {
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
         String reply = response.readEntity(String.class);
+        // Must return hello, user={token upn claim}
         Assert.assertEquals(reply, "hello, user=jdoe@example.com");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT but no associated role fails with 403")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT but no associated role fails with HTTP_FORBIDDEN")
     public void callEcho2() throws Exception {
-        System.out.printf("jwt: %s\n", token);
+        Reporter.log("callEcho2, expect HTTP_FORBIDDEN");
 
         String uri = baseURL.toExternalForm() + "/endp/echo2";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
@@ -166,6 +168,7 @@ public class RolesAllowedTest extends Arquillian {
     @Test(groups = TEST_GROUP_JAXRS,
         description = "Validate a request with MP-JWT SecurityContext.getUserPrincipal() is a JsonWebToken")
     public void getPrincipalClass() throws Exception {
+        Reporter.log("getPrincipalClass, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "/endp/getPrincipalClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
@@ -173,12 +176,7 @@ public class RolesAllowedTest extends Arquillian {
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
-        String[] ifaces = reply.split(",");
-        boolean hasJsonWebToken = false;
-        for(String iface : ifaces) {
-            hasJsonWebToken |= iface.equals(JsonWebToken.class.getTypeName());
-        }
-        Assert.assertTrue(hasJsonWebToken, "PrincipalClass has JsonWebToken interface");
+        Assert.assertEquals(reply, "isJsonWebToken:true");
     }
 
     /**
@@ -189,6 +187,7 @@ public class RolesAllowedTest extends Arquillian {
     @Test(groups = TEST_GROUP_JAXRS,
         description = "Validate a request without an MP-JWT to endpoint requiring role mapping has HTTP_OK")
     public void testNeedsGroup1Mapping() {
+        Reporter.log("testNeedsGroup1Mapping, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "/endp/needsGroup1Mapping";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
@@ -200,8 +199,9 @@ public class RolesAllowedTest extends Arquillian {
     }
 
     @Test(groups = TEST_GROUP_CDI,
-        description = "")
+        description = "Validate that accessing secured method has HTTP_OK and injected JsonWebToken principal")
     public void getInjectedPrincipal() throws Exception {
+        Reporter.log("getInjectedPrincipal, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "/endp/getInjectedPrincipal";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
@@ -209,80 +209,14 @@ public class RolesAllowedTest extends Arquillian {
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
         String reply = response.readEntity(String.class);
-        String[] ifaces = reply.split(",");
-        boolean hasJsonWebToken = false;
-        for(String iface : ifaces) {
-            hasJsonWebToken |= iface.equals(JsonWebToken.class.getTypeName());
-        }
-        Assert.assertTrue(hasJsonWebToken, "PrincipalClass has JsonWebToken interface");
-    }
-
-    @Test(groups = TEST_GROUP_CDI,
-        description = "")
-    public void getInjectedClaims() throws Exception {
-        String uri = baseURL.toExternalForm() + "/endp/getInjectedClaims";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam(Claims.iss.name(), "https://server.example.com")
-            .queryParam(Claims.jti.name(), "a-123")
-            .queryParam(Claims.aud.name(), "s6BhdRkqt3")
-            .queryParam(Claims.sub.name(), "24400320")
-            .queryParam(Claims.raw_token.name(), token)
-            .queryParam(Claims.iat.name(), iatClaim)
-            .queryParam(Claims.auth_time.name(), authTimeClaim)
-            ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
-        String reply = response.readEntity(String.class);
-        System.out.println(reply);
-        // Validate the expected injection tests
-        Assert.assertTrue(reply.contains("iss PASS"));
-        Assert.assertTrue(reply.contains("jti PASS"));
-        Assert.assertTrue(reply.contains("jti-Optional PASS"));
-        Assert.assertTrue(reply.contains("jti-Provider PASS"));
-        Assert.assertTrue(reply.contains("aud PASS"));
-        Assert.assertTrue(reply.contains("iat PASS"));
-        Assert.assertTrue(reply.contains("iat-Dupe PASS"));
-        Assert.assertTrue(reply.contains("sub-Optional PASS"));
-        Assert.assertTrue(reply.contains("auth_time PASS"));
-        Assert.assertTrue(reply.contains("raw_token PASS"));
-        Assert.assertTrue(reply.contains("custom-missing PASS"));
-
-        // A second request to validate the request scope of injected values
-        HashMap<String, Long> timeClaims = new HashMap<>();
-        String token2 = TokenUtils.generateTokenString("/RolesEndpoint2.json", null, timeClaims);
-        Long iatClaim2 = timeClaims.get(Claims.iat.name());
-        Long authTimeClaim2 = timeClaims.get(Claims.auth_time.name());
-        WebTarget echoEndpointTarget2 = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam(Claims.iss.name(), "https://server.example.com")
-            .queryParam(Claims.jti.name(), "a-123.2")
-            .queryParam(Claims.aud.name(), "s6BhdRkqt3")
-            .queryParam(Claims.sub.name(), "24400320#2")
-            .queryParam(Claims.raw_token.name(), token2)
-            .queryParam(Claims.iat.name(), iatClaim2)
-            .queryParam(Claims.auth_time.name(), authTimeClaim2)
-            ;
-        Response response2 = echoEndpointTarget2.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token2).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response2.getStatus());
-        reply = response2.readEntity(String.class);
-        System.out.println(reply);
-        Assert.assertTrue(reply.contains("iss PASS"));
-        Assert.assertTrue(reply.contains("jti PASS"));
-        Assert.assertTrue(reply.contains("jti-Optional PASS"));
-        Assert.assertTrue(reply.contains("jti-Provider PASS"));
-        Assert.assertTrue(reply.contains("aud PASS"));
-        Assert.assertTrue(reply.contains("iat PASS"));
-        Assert.assertTrue(reply.contains("iat-Dupe PASS"));
-        Assert.assertTrue(reply.contains("sub-Optional PASS"));
-        Assert.assertTrue(reply.contains("auth_time PASS"));
-        Assert.assertTrue(reply.contains("raw_token PASS"));
-        Assert.assertTrue(reply.contains("custom-missing PASS"));
+        Assert.assertEquals(reply, "isJsonWebToken:true");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request without an MP-JWT to unsecured endpoint has HTTP_OK")
+    @Test(groups = TEST_GROUP_JAXRS,
+        description = "Validate a request without an MP-JWT to unsecured endpoint has HTTP_OK with expected response")
     public void callHeartbeat() throws Exception {
+        Reporter.log("callHeartbeat, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "/endp/heartbeat";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
@@ -290,6 +224,7 @@ public class RolesAllowedTest extends Arquillian {
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        Assert.assertTrue(response.readEntity(String.class).startsWith("Heartbeat:"), "Saw Heartbeat: ...");
+        String reply = response.readEntity(String.class);
+        Assert.assertTrue(reply.startsWith("Heartbeat:"), "Saw Heartbeat: ...");
     }
 }
