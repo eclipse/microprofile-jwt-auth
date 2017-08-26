@@ -110,7 +110,7 @@ public class TestTokenClaimTypesTest {
         description = "validate the jti claim")
     public void validateTokenID() {
         Assert.assertEquals("a-123", jwt.getTokenID());
-        Assert.assertEquals("24400320", jwt.getClaim(Claims.jti.name()));
+        Assert.assertEquals("a-123", jwt.getClaim(Claims.jti.name()));
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate the aud claim")
