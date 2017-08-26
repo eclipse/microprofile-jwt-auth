@@ -18,7 +18,7 @@
     <!-- The required base JAX-RS and CDI based tests that all MP-JWT implementations
     must pass.
     -->
-    <test name="base-tests">
+    <test name="base-tests" verbose="10">
         <groups>
             <define name="base-groups">
                 <include name="arquillian" description=""/>
@@ -27,14 +27,13 @@
                 <include name="jaxrs" description=""/>
                 <include name="cdi" description=""/>
             </define>
+            <define name="excludes">
+                <include name="debug" description="" />
+            </define>
             <run>
                 <include name="base-groups" />
+                <exclude name="excludes" />
             </run>
-            <dependencies>
-                <group name="jwt" depends-on="utils" />
-                <group name="jaxrs" depends-on="jwt" />
-                <group name="cdi" depends-on="jaxrs" />
-            </dependencies>
         </groups>
         <classes>
             <class name="org.eclipse.microprofile.jwt.tck.parsing.TokenValidationTest" />
