@@ -20,7 +20,6 @@
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 import org.eclipse.microprofile.jwt.Claims;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
