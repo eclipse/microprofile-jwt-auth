@@ -42,7 +42,7 @@ import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
  * A basic test of an unsecured JAX-RS endpoint to validate the test harness
  * without including JWT authentication.
  */
-public class PingTest extends Arquillian {
+public class UnsecuredPingTest extends Arquillian {
     /**
      * The base URL for the container under test
      */
@@ -60,7 +60,7 @@ public class PingTest extends Arquillian {
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "PingTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(PingEndpoint.class)
+            .addClass(UnsecuredPingEndpoint.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));

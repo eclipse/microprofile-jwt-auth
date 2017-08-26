@@ -19,10 +19,8 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-
 import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.ClaimValue;
-import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import javax.annotation.security.DenyAll;
@@ -169,111 +167,6 @@ public class RolesEndpoint {
             tmp.append(',');
         }
         tmp.setLength(tmp.length()-1);
-        return tmp.toString();
-    }
-
-    /**
-     * Verify that values exist and that types match the corresponding Claims enum
-     * @return a series of pass/fail statements regarding the check for each injected claim
-     */
-    @GET
-    @Path("/getInjectedClaims")
-    public String getInjectedIssuer(@QueryParam("iss") String iss,
-                                    @QueryParam("raw_token") String rt,
-                                    @QueryParam("jti") String jwtID,
-                                    @QueryParam("aud") String audience,
-                                    @QueryParam("iat") Long iat,
-                                    @QueryParam("sub") String subject,
-                                    @QueryParam("auth_time") Long authTime) {
-        StringBuilder tmp = new StringBuilder("getInjectedClaims\n");
-        // iss
-        String issValue = issuer.getValue();
-        if(issValue == null || issValue.length() == 0) {
-            tmp.append(Claims.iss.name()+"value is null or empty, FAIL\n");
-        }
-        else if(issValue.equals(iss)) {
-            tmp.append(Claims.iss.name()+" PASS\n");
-        }
-        else {
-            tmp.append(Claims.iss.name()+" FAIL\n");
-        }
-        // raw_token
-        String rawTokenValue = rawToken.getValue();
-        if(rawTokenValue == null || rawTokenValue.length() == 0) {
-            tmp.append(Claims.raw_token.name()+" value is null or empty, FAIL\n");
-        }
-        else if(rawTokenValue.equals(rt)) {
-            tmp.append(Claims.raw_token.name()+" PASS\n");
-        }
-        else {
-            tmp.append(Claims.raw_token.name()+" FAIL\n");
-        }
-        // jti
-        String jtiValue = jti.getValue();
-        if(jtiValue == null || jtiValue.length() == 0) {
-            tmp.append(Claims.jti.name()+" value is null or empty, FAIL\n");
-        }
-        else if(jtiValue.equals(jwtID)) {
-            tmp.append(Claims.jti.name()+" PASS\n");
-        }
-        else {
-            tmp.append(Claims.jti.name()+" FAIL\n");
-        }
-        // aud
-        Set<String> audValue = aud.getValue();
-        if(audValue == null || audValue.size() == 0) {
-            tmp.append(Claims.aud.name()+" value is null or empty, FAIL\n");
-        }
-        else if(audValue.contains(audience)) {
-            tmp.append(Claims.aud.name()+" PASS\n");
-        }
-        else {
-            tmp.append(Claims.aud.name()+" FAIL\n");
-        }
-        // iat
-        Long iatValue = issuedAt.getValue();
-        if(iatValue == null || iatValue.intValue() == 0) {
-            tmp.append(Claims.iat.name()+" value is null or zero, FAIL\n");
-        }
-        else if(iatValue.equals(iat)) {
-            tmp.append(Claims.iat.name()+" PASS\n");
-        }
-        else {
-            tmp.append(Claims.iat.name()+" FAIL\n");
-        }
-        // sub
-        Optional<String> optSubValue = optSubject.getValue();
-        if(optSubValue == null || !optSubValue.isPresent()) {
-            tmp.append(Claims.sub.name()+" value is null or missing, FAIL\n");
-        }
-        else if(optSubValue.get().equals(subject)) {
-            tmp.append(Claims.sub.name()+" PASS\n");
-        }
-        else {
-            tmp.append(Claims.sub.name()+" FAIL\n");
-        }
-        // auth_time
-        Optional<Long> optAuthTimeValue = this.authTime.getValue();
-        if(optAuthTimeValue == null || !optAuthTimeValue.isPresent()) {
-            tmp.append(Claims.auth_time.name()+" value is null or missing, FAIL\n");
-        }
-        else if(optAuthTimeValue.get().equals(authTime)) {
-            tmp.append(Claims.auth_time.name()+" PASS\n");
-        }
-        else {
-            tmp.append(Claims.auth_time.name()+" FAIL\n");
-        }
-        // custom-missing
-        Optional<Long> customValue = custom.getValue();
-        if(customValue == null) {
-            tmp.append("custom-missing value is null, FAIL\n");
-        }
-        else if(!customValue.isPresent()) {
-            tmp.append("custom-missing PASS\n");
-        }
-        else {
-            tmp.append("custom-missing FAIL\n");
-        }
         return tmp.toString();
     }
 

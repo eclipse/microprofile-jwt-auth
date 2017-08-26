@@ -1,15 +1,33 @@
+/*
+ * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+ *
+ *  See the NOTICE file(s) distributed with this work for additional
+ *  information regarding copyright ownership.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  You may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.client.ClientBuilder;
@@ -19,24 +37,15 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
 
 /**
- *
+ * These set of tests validate the validation expectations for JWTs
  */
-public class InvalidTokenTest {
-    /**
-     * The test generated JWT token string
-     */
-    private static String token;
-    // Time claims in the token
-    private static Long iatClaim;
-    private static Long authTimeClaim;
-    private static Long expClaim;
+public class InvalidTokenTest extends Arquillian {
     /**
      * The base URL for the container under test
      */
@@ -52,7 +61,7 @@ public class InvalidTokenTest {
     public static WebArchive createDeployment() throws IOException {
         URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "RolesAllowedTest.war")
+            .create(WebArchive.class, "InvalidTokenTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(RolesEndpoint.class)
             .addClass(TCKApplication.class)
@@ -62,17 +71,10 @@ public class InvalidTokenTest {
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
-    @BeforeClass(alwaysRun=true)
-    public static void generateToken() throws Exception {
-        HashMap<String, Long> timeClaims = new HashMap<>();
-        token = TokenUtils.generateTokenString("/RolesEndpoint.json", null, timeClaims);
-        iatClaim = timeClaims.get(Claims.iat.name());
-        authTimeClaim = timeClaims.get(Claims.auth_time.name());
-        expClaim = timeClaims.get(Claims.exp.name());
-    }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with expired token fails with 403")
+    @Test(groups = TEST_GROUP_JAXRS,
+        description = "Validate a request with expired token fails with HTTP_UNAUTHORIZED")
     public void callEchoExpiredToken() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
@@ -87,5 +89,67 @@ public class InvalidTokenTest {
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
         String reply = response.readEntity(String.class);
+        System.out.printf("Reply: %s\n", reply);
     }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JAXRS,
+        description = "Validate a request with an non-matching issuer fails with HTTP_UNAUTHORIZED")
+    public void callEchoBadIssuer() throws Exception {
+        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
+        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        System.out.printf("jwt: %s\n", token);
+
+        String uri = baseURL.toExternalForm() + "/endp/echo";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam("input", "hello")
+            ;
+        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
+        String reply = response.readEntity(String.class);
+        System.out.printf("Reply: %s\n", reply);
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JAXRS,
+        description = "Validate a request with an incorrect signer fails with HTTP_UNAUTHORIZED")
+    public void callEchoBadSigner() throws Exception {
+        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
+        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        System.out.printf("jwt: %s\n", token);
+
+        String uri = baseURL.toExternalForm() + "/endp/echo";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam("input", "hello")
+            ;
+        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
+        String reply = response.readEntity(String.class);
+        System.out.printf("Reply: %s\n", reply);
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JAXRS,
+        description = "Validate a request with an incorrect signature algorithm fails with HTTP_UNAUTHORIZED")
+    public void callEchoBadSignerAlg() throws Exception {
+        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        invalidFields.add(TokenUtils.InvalidClaims.ALG);
+        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        System.out.printf("jwt: %s\n", token);
+
+        String uri = baseURL.toExternalForm() + "/endp/echo";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam("input", "hello")
+            ;
+        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
+        String reply = response.readEntity(String.class);
+        System.out.printf("Reply: %s\n", reply);
+    }
+
 }

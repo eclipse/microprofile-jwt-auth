@@ -44,7 +44,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
@@ -109,8 +108,6 @@ public class RolesAllowedTest extends Arquillian {
         Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
-
-
 
     /**
      * Used to test how a standard auth-method works with the authorization layer.
