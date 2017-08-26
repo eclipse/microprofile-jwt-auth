@@ -23,6 +23,7 @@ import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -31,12 +32,14 @@ import net.minidev.json.parser.JSONParser;
 import org.eclipse.microprofile.jwt.Claims;
 
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -132,7 +135,14 @@ public class TokenUtils {
         // Create RSA-signer with the private key
         JWSSigner signer = new RSASSASigner(pk);
         JWTClaimsSet claimsSet = JWTClaimsSet.parse(jwtContent);
-        JWSHeader jwtHeader = new JWSHeader.Builder(JWSAlgorithm.RS256)
+        JWSAlgorithm alg = JWSAlgorithm.RS256;
+        if(invalidClaims.contains(InvalidClaims.ALG)) {
+            alg = JWSAlgorithm.HS256;
+            SecureRandom random = new SecureRandom();
+            BigInteger secret = BigInteger.probablePrime(256, random);
+            signer = new MACSigner(secret.toByteArray());
+        }
+        JWSHeader jwtHeader = new JWSHeader.Builder(alg)
                 .keyID("/privateKey.pem")
                 .type(JOSEObjectType.JWT)
                 .build();
@@ -238,6 +248,7 @@ public class TokenUtils {
     public enum InvalidClaims {
         ISSUER, // Set an invalid issuer
         EXP,    // Set an invalid expiration
-        SIGNER  // Sign the token with the incorrect private key
+        SIGNER, // Sign the token with the incorrect private key
+        ALG, // Sign the token with the correct private key, but HS
     }
 }

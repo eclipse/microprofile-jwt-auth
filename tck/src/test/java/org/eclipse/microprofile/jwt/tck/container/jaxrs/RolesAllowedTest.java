@@ -44,7 +44,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
@@ -108,24 +107,6 @@ public class RolesAllowedTest extends Arquillian {
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
-    }
-
-    @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with expired token fails with 403")
-    public void callEchoExpiredToken() throws Exception {
-        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidClaims.EXP);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
-        System.out.printf("jwt: %s\n", token);
-
-        String uri = baseURL.toExternalForm() + "/endp/echo";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("input", "hello")
-            ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
-        String reply = response.readEntity(String.class);
     }
 
     /**

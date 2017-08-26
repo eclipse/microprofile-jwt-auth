@@ -19,18 +19,5 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
-
-@Path("/ping")
-public class PingEndpoint {
-    @GET
-    @Path("/echo")
-    public String echoInput(@Context SecurityContext sec, @QueryParam("input") String input) {
-        return "pinged, input="+input;
-    }
+public class ProviderInjectionTest {
 }
-

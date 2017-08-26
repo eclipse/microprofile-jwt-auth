@@ -19,6 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.parsing;
 
+import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.ITokenParser;
@@ -28,6 +29,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.security.PublicKey;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -38,7 +40,6 @@ import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JWT;
  * Basic token parsing and validation tests for JWTPrincipal implementations
  */
 public class TokenValidationTest {
-    private static final String TEST_ISSUER = "https://server.example.com";
     /** */
     private static ITokenParser tokenParser;
     /** */
@@ -65,17 +66,24 @@ public class TokenValidationTest {
     }
 
     /**
-     * Create a JWT token representation of the testRIJWTCallerPrincipal.json test resource and then parse it into a
-     * JWTPrincipal to validate the container's implementation.
+     * Create a JWT token representation of the testJWTCallerPrincipal.json test
+     * resource and then parse it into a JWTPrincipal to validate the
+     * container's implementation.
      *
      * @throws Exception on parse failure
      */
-    @Test(groups = TEST_GROUP_JWT, description = "validate the JWTPrincipal returned by ITokenParser")
-    public void testRIJWTCallerPrincipal() throws Exception {
+    @Test(groups = TEST_GROUP_JWT,
+        description = "validate the JsonWebToken returned by ITokenParser")
+    public void testJWTCallerPrincipal() throws Exception {
         long nowInSeconds = System.currentTimeMillis() / 1000;
-        String jwt = TokenUtils.generateTokenString("/testRIJWTCallerPrincipal.json");
+        HashMap<String, Long> timeClaims = new HashMap<>();
+        String jwt = TokenUtils.generateTokenString("/testJWTCallerPrincipal.json", null, timeClaims);
         System.out.printf("jwt: %s\n", jwt);
-        JsonWebToken jwtPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+        long iatClaim = timeClaims.get(Claims.iat.name());
+        Long authTimeClaim = timeClaims.get(Claims.auth_time.name());
+        long expClaim = timeClaims.get(Claims.exp.name());
+
+        JsonWebToken jwtPrincipal = tokenParser.parse(jwt, TCKConstants.TEST_ISSUER, publicKey);
         System.out.printf("Parsed caller principal: %s\n", jwtPrincipal);
 
         // Validate the required claims
@@ -85,8 +93,8 @@ public class TokenValidationTest {
         Assert.assertEquals("s6BhdRkqt3", jwtPrincipal.getAudience().toArray()[0], "aud");
         Assert.assertEquals("jdoe@example.com", jwtPrincipal.getName(), "name");
         Assert.assertEquals("a-123", jwtPrincipal.getTokenID(), "jti");
-        Assert.assertTrue(jwtPrincipal.getExpirationTime() > nowInSeconds, "exp is > nowInSeconds");
-        Assert.assertTrue(jwtPrincipal.getIssuedAtTime() >= nowInSeconds, "iat is >= nowInSeconds");
+        Assert.assertEquals(expClaim, jwtPrincipal.getExpirationTime());
+        Assert.assertEquals(iatClaim, jwtPrincipal.getIssuedAtTime());
 
         // Validate the groups
         Set<String> groups = jwtPrincipal.getGroups();
@@ -117,10 +125,10 @@ public class TokenValidationTest {
      */
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Internal test to validate the behavior of TokenUtils.generateTokenString")
     public void testUtilsToken() throws Exception {
-        String jwt = TokenUtils.generateTokenString("/jwt-content1.json");
-        JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
-        System.out.println(callerPrincipal);
         long nowSec = System.currentTimeMillis() / 1000;
+        String jwt = TokenUtils.generateTokenString("/jwt-content1.json");
+        JsonWebToken callerPrincipal = tokenParser.parse(jwt, TCKConstants.TEST_ISSUER, publicKey);
+        System.out.println(callerPrincipal);
         long iss = callerPrincipal.getIssuedAtTime();
         Assert.assertTrue((nowSec - iss) < 1, String.format("now(%d) < 1s from iss(%d)", nowSec, iss));
         long exp = callerPrincipal.getExpirationTime();
@@ -137,7 +145,7 @@ public class TokenValidationTest {
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         try {
-            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TCKConstants.TEST_ISSUER, publicKey);
             Assert.fail("Was able to parse the token: " + callerPrincipal);
         }
         catch (Exception e) {
@@ -147,7 +155,8 @@ public class TokenValidationTest {
     }
 
     /**
-     * Validate that if an issuer other than {@link #TEST_ISSUER} is used on the token, the token fails to validate
+     * Validate that if an issuer other than {@link TCKConstants#TEST_ISSUER} is
+     * used on the token, the token fails to validate
      * @throws Exception thrown on unexpected error
      */
     @Test(groups = TEST_GROUP_JWT, description = "Validate the token fails to validate when using an invalid issuer")
@@ -158,7 +167,7 @@ public class TokenValidationTest {
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         PublicKey publicKey = TokenUtils.readPublicKey("/publicKey.pem");
         try {
-            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TCKConstants.TEST_ISSUER, publicKey);
             Assert.fail("Was able to parse the token: " + callerPrincipal);
         }
         catch (Exception e) {
@@ -173,7 +182,7 @@ public class TokenValidationTest {
         invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
         String jwt = TokenUtils.generateTokenString("/jwt-content1.json", invalidFields);
         try {
-            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TEST_ISSUER, publicKey);
+            JsonWebToken callerPrincipal = tokenParser.parse(jwt, TCKConstants.TEST_ISSUER, publicKey);
             Assert.fail("Was able to parse the token: " + callerPrincipal);
         }
         catch (Exception e) {
@@ -181,5 +190,4 @@ public class TokenValidationTest {
             System.out.printf("Failed as expected with cause: %s\n", cause.getMessage());
         }
     }
-
 }
