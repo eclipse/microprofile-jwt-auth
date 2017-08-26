@@ -251,7 +251,7 @@ public class ClaimValueInjectionTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomInteger";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("customInteger", 123456789)
+            .queryParam("value", 123456789)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
@@ -268,7 +268,7 @@ public class ClaimValueInjectionTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomDouble";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("customDouble", 3.14159265358979323846)
+            .queryParam("value", 3.14159265358979323846)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
