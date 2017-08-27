@@ -105,7 +105,6 @@ public class ClaimValueInjectionEndpoint {
     public JsonObject verifyInjectedRawToken(@QueryParam("raw_token") String rt) {
         boolean pass = false;
         String msg;
-        String issValue = issuer.getValue();
         // raw_token
         String rawTokenValue = rawToken.getValue();
         if(rawTokenValue == null || rawTokenValue.length() == 0) {
@@ -116,7 +115,7 @@ public class ClaimValueInjectionEndpoint {
             pass = true;
         }
         else {
-            msg = String.format("%s: %s != %s", Claims.raw_token.name(), issValue, rt);
+            msg = String.format("%s: %s != %s", Claims.raw_token.name(), rawTokenValue, rt);
         }
         JsonObject result = Json.createObjectBuilder()
             .add("pass", pass)
