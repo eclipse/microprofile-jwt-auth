@@ -244,30 +244,37 @@ your build root:
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="microprofile-jwt-auth-BaseTCK" verbose="1" preserve-order="true" configfailurepolicy="continue" >
 
-    <!-- The required base JAX-RS and CDI based tests that all MP-JWT implementations
-    must pass.
-    -->
-    <test name="base-tests">
-        <groups>
-            <run>
-                <include name="arquillian" />
-                <include name="jwt" />
-                <include name="utils" />
-                <include name="jaxrs" />
-                <include name="cdi" />
-                <exclude name="debug" />
-                <exclude name="ejb-optional" />
-                <exclude name="servlet-optional" />
-                <exclude name="jacc-optional" />
-            </run>
-        </groups>
-        <classes>
-            <class name="org.eclipse.microprofile.jwt.tck.parsing.TokenValidationTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PingTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
-        </classes>
-    </test>
+  <!-- The required base JAX-RS and CDI based tests that all MP-JWT implementations
+  must pass.
+  -->
+  <test name="base-tests">
+    <groups>
+      <run>
+        <include name="arquillian" />
+        <include name="jwt" />
+        <include name="utils" />
+        <include name="jaxrs" />
+        <include name="cdi" />
+        <include name="cdi-json" />
+        <include name="cdi-provider" />
+        <exclude name="debug" />
+        <exclude name="ejb-optional" />
+        <exclude name="servlet-optional" />
+        <exclude name="jacc-optional" />
+      </run>
+    </groups>
+    <classes>
+      <class name="org.eclipse.microprofile.jwt.tck.parsing.TokenValidationTest" />
+      <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsTest" />
+      <class name="org.eclipse.microprofile.jwt.tck.parsing.TestTokenClaimTypesTest" />
+      <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.UnsecuredPingTest" />
+      <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ClaimValueInjectionTest" />
+      <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.JsonValueInjectionTest" />
+      <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionEndpoint" />
+      <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
+      <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest" />
+    </classes>
+  </test>
 
 </suite>
 ```
