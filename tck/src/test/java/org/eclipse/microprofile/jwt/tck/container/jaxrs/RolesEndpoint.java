@@ -34,9 +34,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 
 @Path("/endp")
 @DenyAll
@@ -47,30 +44,6 @@ public class RolesEndpoint {
     @Inject
     @Claim("raw_token")
     private ClaimValue<String> rawToken;
-    @Inject
-    @Claim("iss")
-    private ClaimValue<String> issuer;
-    @Inject
-    @Claim("jti")
-    private ClaimValue<String> jti;
-    @Inject
-    @Claim("aud")
-    private ClaimValue<Set<String>> aud;
-    @Inject
-    @Claim("roles")
-    private ClaimValue<String[]> roles;
-    @Inject
-    @Claim("iat")
-    private ClaimValue<Long> issuedAt;
-    @Inject
-    @Claim("sub")
-    private ClaimValue<Optional<String>> optSubject;
-    @Inject
-    @Claim("auth_time")
-    private ClaimValue<Optional<Long>> authTime;
-    @Inject
-    @Claim("custom-missing")
-    private ClaimValue<Optional<Long>> custom;
 
     @GET
     @Path("/echo")
@@ -97,44 +70,19 @@ public class RolesEndpoint {
         return input + ", user="+user.getName();
     }
 
+    /**
+     * Validate that the  SecurityContext#getUserPrincipal is a JsonWebToken
+     * @param sec
+     * @return
+     */
     @GET
     @Path("/getPrincipalClass")
     @RolesAllowed("Tester")
     public String getPrincipalClass(@Context SecurityContext sec) {
         Principal user = sec.getUserPrincipal();
-        HashSet<Class> interfaces = new HashSet<>();
-        Class current = user.getClass();
-        while(current.equals(Object.class) == false) {
-            Class[] tmp = current.getInterfaces();
-            for(Class c : tmp) {
-                interfaces.add(c);
-            }
-            current = current.getSuperclass();
-        }
-        StringBuilder tmp = new StringBuilder();
-        for(Class iface : interfaces) {
-            tmp.append(iface.getTypeName());
-            tmp.append(',');
-        }
-        tmp.setLength(tmp.length()-1);
-        return tmp.toString();
+        boolean isJsonWebToken = user instanceof JsonWebToken;
+        return "isJsonWebToken:"+isJsonWebToken;
     }
-
-    @GET
-    @Path("/getEJBPrincipalClass")
-    @RolesAllowed("Tester")
-    public String getEJBPrincipalClass(@Context SecurityContext sec) {
-        return "serviceEJB.getPrincipalClass()";
-    }
-
-    @GET
-    @Path("/getEJBSubjectClass")
-    @RolesAllowed("Tester")
-    public String getEJBSubjectClass(@Context SecurityContext sec) throws Exception {
-        return "serviceEJB.getSubjectClass()";
-    }
-
-
 
     /**
      * This
@@ -152,22 +100,8 @@ public class RolesEndpoint {
     @GET
     @Path("/getInjectedPrincipal")
     public String getInjectedPrincipal(@Context SecurityContext sec) {
-        HashSet<Class> interfaces = new HashSet<>();
-        Class current = jwtPrincipal.getClass();
-        while(current.equals(Object.class) == false) {
-            Class[] tmp = current.getInterfaces();
-            for(Class c : tmp) {
-                interfaces.add(c);
-            }
-            current = current.getSuperclass();
-        }
-        StringBuilder tmp = new StringBuilder();
-        for(Class iface : interfaces) {
-            tmp.append(iface.getTypeName());
-            tmp.append(',');
-        }
-        tmp.setLength(tmp.length()-1);
-        return tmp.toString();
+        boolean isJsonWebToken = this.jwtPrincipal instanceof JsonWebToken;
+        return "isJsonWebToken:"+isJsonWebToken;
     }
 
     @GET
