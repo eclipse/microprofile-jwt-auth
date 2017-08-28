@@ -21,14 +21,16 @@
     <test name="base-tests" verbose="10">
         <groups>
             <define name="base-groups">
-                <include name="arquillian" description=""/>
-                <include name="utils" description=""/>
-                <include name="jwt" description=""/>
-                <include name="jaxrs" description=""/>
-                <include name="cdi" description=""/>
+                <include name="arquillian" description="Arquillian internal"/>
+                <include name="utils" description="Utility tests"/>
+                <include name="jwt" description="Base JsonWebToken tests"/>
+                <include name="jaxrs" description="JAX-RS invocation tests"/>
+                <include name="cdi" description="Base CDI injection of ClaimValues"/>
+                <include name="cdi-json" description="CDI injection of JSON-P values"/>
+                <include name="cdi-provider" description="CDI injection of javax.inject.Provider values"/>
             </define>
             <define name="excludes">
-                <include name="debug" description="" />
+                <include name="debug" description="Internal debugging tests" />
             </define>
             <run>
                 <include name="base-groups" />
@@ -41,6 +43,8 @@
             <class name="org.eclipse.microprofile.jwt.tck.parsing.TestTokenClaimTypesTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.UnsecuredPingTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ClaimValueInjectionTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.JsonValueInjectionTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionEndpoint" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest" />
         </classes>

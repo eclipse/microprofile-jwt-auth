@@ -19,62 +19,60 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.Claim;
-import org.eclipse.microprofile.jwt.ClaimValue;
-import org.eclipse.microprofile.jwt.Claims;
+import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
+import javax.annotation.security.DenyAll;
 import javax.inject.Inject;
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Optional;
-import java.util.Set;
+
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.Claims;
 
 @Path("/endp")
-@RolesAllowed({"Echoer", "Tester"})
-public class ClaimValueInjectionEndpoint {
+@DenyAll
+public class JsonValuejectionEndpoint {
     @Inject
     @Claim("raw_token")
-    private ClaimValue<String> rawToken;
+    private JsonString rawToken;
     @Inject
     @Claim("iss")
-    private ClaimValue<String> issuer;
+    private JsonString issuer;
     @Inject
     @Claim("jti")
-    private ClaimValue<String> jti;
+    private JsonString jti;
     @Inject
     @Claim("aud")
-    private ClaimValue<Set<String>> aud;
+    private JsonArray aud;
     @Inject
     @Claim("roles")
-    private ClaimValue<String[]> roles;
+    private JsonArray roles;
     @Inject
     @Claim("iat")
-    private ClaimValue<Long> issuedAt;
-    @Inject
-    @Claim("sub")
-    private ClaimValue<Optional<String>> optSubject;
+    private JsonNumber issuedAt;
     @Inject
     @Claim("auth_time")
-    private ClaimValue<Optional<Long>> authTime;
-    @Inject
-    @Claim("custom-missing")
-    private ClaimValue<Optional<Long>> custom;
+    private JsonNumber authTime;
     @Inject
     @Claim("customString")
-    private ClaimValue<String> customString;
+    private JsonString customString;
     @Inject
     @Claim("customInteger")
-    private ClaimValue<JsonNumber> customInteger;
+    private JsonNumber customInteger;
     @Inject
     @Claim("customDouble")
-    private ClaimValue<JsonNumber> customDouble;
+    private JsonNumber customDouble;
+    @Inject
+    @Claim("customObject")
+    private JsonObject customObject;
 
     @GET
     @Path("/verifyInjectedIssuer")
@@ -82,7 +80,7 @@ public class ClaimValueInjectionEndpoint {
     public JsonObject verifyInjectedIssuer(@QueryParam("iss") String iss) {
         boolean pass = false;
         String msg;
-        String issValue = issuer.getValue();
+        String issValue = issuer.getString();
         if(issValue == null || issValue.length() == 0) {
             msg = Claims.iss.name()+"value is null or empty, FAIL";
         }
@@ -106,7 +104,7 @@ public class ClaimValueInjectionEndpoint {
         boolean pass = false;
         String msg;
         // raw_token
-        String rawTokenValue = rawToken.getValue();
+        String rawTokenValue = rawToken.getString();
         if(rawTokenValue == null || rawTokenValue.length() == 0) {
             msg = Claims.raw_token.name()+"value is null or empty, FAIL";
         }
@@ -130,7 +128,7 @@ public class ClaimValueInjectionEndpoint {
         boolean pass = false;
         String msg;
         // jti
-        String jtiValue = jti.getValue();
+        String jtiValue = jti.getString();
         if(jtiValue == null || jtiValue.length() == 0) {
             msg = Claims.jti.name()+"value is null or empty, FAIL";
         }
@@ -154,7 +152,7 @@ public class ClaimValueInjectionEndpoint {
         boolean pass = false;
         String msg;
         // aud
-        Set<String> audValue = aud.getValue();
+        List<JsonString> audValue = aud.getValuesAs(JsonString.class);
         if(audValue == null || audValue.size() == 0) {
             msg = Claims.aud.name()+"value is null or empty, FAIL";
         }
@@ -178,7 +176,7 @@ public class ClaimValueInjectionEndpoint {
         boolean pass = false;
         String msg;
         // iat
-        Long iatValue = issuedAt.getValue();
+        Long iatValue = issuedAt.longValue();
         if(iatValue == null || iatValue.intValue() == 0) {
             msg = Claims.iat.name()+"value is null or empty, FAIL";
         }
@@ -196,74 +194,22 @@ public class ClaimValueInjectionEndpoint {
         return result;
     }
     @GET
-    @Path("/verifyInjectedOptionalSubject")
+    @Path("/verifyInjectedAuthTime")
     @Produces(MediaType.APPLICATION_JSON)
-    public JsonObject verifyInjectedOptionalSubject(@QueryParam("sub") String subject) {
-        boolean pass = false;
-        String msg;
-        // sub
-        Optional<String> optSubValue = optSubject.getValue();
-        if(optSubValue == null || !optSubValue.isPresent()) {
-            msg = Claims.sub.name()+" value is null or missing, FAIL";
-        }
-        else if(optSubValue.get().equals(subject)) {
-            msg = Claims.sub.name()+" PASS";
-            pass = true;
-        }
-        else {
-            msg = String.format("%s: %s != %s", Claims.sub.name(), optSubValue, subject);
-        }
-        JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
-        return result;
-    }
-    @GET
-    @Path("/verifyInjectedOptionalAuthTime")
-    @Produces(MediaType.APPLICATION_JSON)
-    public JsonObject verifyInjectedOptionalAuthTime(@QueryParam("auth_time") Long authTime) {
+    public JsonObject verifyInjectedAuthTime(@QueryParam("auth_time") Long authTime) {
         boolean pass = false;
         String msg;
         // auth_time
-        Optional<Long> optAuthTimeValue = this.authTime.getValue();
-        if(optAuthTimeValue == null || !optAuthTimeValue.isPresent()) {
+        Long authTimeValue = this.authTime.longValue();
+        if(authTimeValue == null) {
             msg = Claims.auth_time.name()+" value is null or missing, FAIL";
         }
-        else if(optAuthTimeValue.get().equals(authTime)) {
+        else if(authTimeValue.equals(authTime)) {
             msg = Claims.auth_time.name()+" PASS";
             pass = true;
         }
         else {
-            msg = String.format("%s: %s != %s", Claims.auth_time.name(), optAuthTimeValue, authTime);
-        }
-        JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
-        return result;
-    }
-    /**
-     * Verify that values exist and that types match the corresponding Claims enum
-     * @return a series of pass/fail statements regarding the check for each injected claim
-     */
-    @GET
-    @Path("/verifyInjectedOptionalCustomMissing")
-    @Produces(MediaType.APPLICATION_JSON)
-    public JsonObject verifyInjectedOptionalCustomMissing() {
-        boolean pass = false;
-        String msg;
-        // custom-missing
-        Optional<Long> customValue = custom.getValue();
-        if(customValue == null) {
-            msg = "custom-missing value is null, FAIL";
-        }
-        else if(!customValue.isPresent()) {
-            msg = "custom-missing PASS";
-            pass = true;
-        }
-        else {
-            msg = String.format("custom: %s != %s", null, customValue.get());
+            msg = String.format("%s: %s != %s", Claims.auth_time.name(), authTimeValue, authTime);
         }
         JsonObject result = Json.createObjectBuilder()
             .add("pass", pass)
@@ -279,7 +225,7 @@ public class ClaimValueInjectionEndpoint {
         boolean pass = false;
         String msg;
         // iat
-        String customValue = customString.getValue();
+        String customValue = customString.getString();
         if(customValue == null || customValue.length() == 0) {
             msg = "customString value is null or empty, FAIL";
         }
@@ -304,20 +250,10 @@ public class ClaimValueInjectionEndpoint {
         boolean pass = false;
         String msg;
         // iat
-        Object test = customInteger.getValue();
+        Long customValue = customInteger.longValue();
         System.out.printf("+++ verifyInjectedCustomInteger, JsonNumber.class.CL: %s\n",
             JsonNumber.class.getClassLoader());
-        System.out.printf("+++ customInteger.CL: %s\n",
-            test.getClass().getClassLoader());
-        Class[] ifaces = test.getClass().getInterfaces();
-        for(Class iface : ifaces) {
-            System.out.printf("%s: %s\n", iface, iface.getClassLoader());
-        }
-        JsonNumber customValue = JsonNumber.class.cast(test);
-        if(customValue == null || customValue.isIntegral() == false) {
-            msg = "customInteger value is null or not integral, FAIL";
-        }
-        else if(customValue.longValueExact() == value) {
+        if(customValue == value) {
             msg = "customInteger PASS";
             pass = true;
         }
@@ -338,7 +274,7 @@ public class ClaimValueInjectionEndpoint {
         boolean pass = false;
         String msg;
         // iat
-        JsonNumber customValue = customDouble.getValue();
+        Double customValue = customDouble.doubleValue();
         if(customValue == null) {
             msg = "customDouble value is null, FAIL";
         }
@@ -355,4 +291,5 @@ public class ClaimValueInjectionEndpoint {
             .build();
         return result;
     }
+
 }
