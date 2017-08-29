@@ -156,7 +156,7 @@ public class JsonValuejectionEndpoint {
         if(audValue == null || audValue.size() == 0) {
             msg = Claims.aud.name()+"value is null or empty, FAIL";
         }
-        else if(audValue.contains(audience)) {
+        else if(audValue.get(0).getString().equals(audience)) {
             msg = Claims.aud.name()+" PASS";
             pass = true;
         }
