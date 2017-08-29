@@ -45,7 +45,7 @@ import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI_PROVIDER;
 
 /**
  * Tests of injection JsonWebToken claims using the {@linkplain javax.inject.Provider} interface.
@@ -97,7 +97,7 @@ public class ProviderInjectionTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected token issuer claim is as expected")
     public void verifyIssuerClaim() throws Exception {
         Reporter.log("Begin verifyIssuerClaim");
@@ -114,7 +114,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected raw token claim is as expected")
     public void verifyInjectedRawToken() throws Exception {
         Reporter.log("Begin verifyInjectedRawToken\n");
@@ -131,7 +131,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected jti claim is as expected")
     public void verifyInjectedJTI() throws Exception {
         Reporter.log("Begin verifyInjectedJTI\n");
@@ -148,7 +148,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected aud claim is as expected")
     public void verifyInjectedAudience() throws Exception {
         Reporter.log("Begin verifyInjectedAudience\n");
@@ -165,7 +165,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected iat claim is as expected")
     public void verifyInjectedIssuedAt() throws Exception {
         Reporter.log("Begin verifyInjectedIssuedAt\n");
@@ -182,7 +182,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected sub claim is as expected")
     public void verifyInjectedOptionalSubject() throws Exception {
         Reporter.log("Begin verifyInjectedOptionalSubject\n");
@@ -199,7 +199,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected raw token claim is as expected")
     public void verifyInjectedOptionalAuthTime() throws Exception {
         Reporter.log("Begin verifyInjectedOptionalAuthTime\n");
@@ -215,7 +215,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected custom claim is missing as expected")
     public void verifyInjectedOptionalCustomMissing() throws Exception {
         Reporter.log("Begin verifyInjectedOptionalCustomMissing\n");
@@ -231,7 +231,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected customString claim is as expected")
     public void verifyInjectedCustomString() throws Exception {
         Reporter.log("Begin verifyInjectedCustomString\n");
@@ -248,7 +248,7 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected customInteger claim is as expected")
     public void verifyInjectedCustomInteger() throws Exception {
         Reporter.log("Begin verifyInjectedCustomInteger\n");
@@ -265,14 +265,14 @@ public class ProviderInjectionTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_JSON,
+    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected customDouble claim is as expected")
     public void verifyInjectedCustomDouble() throws Exception {
         Reporter.log("Begin verifyInjectedCustomDouble\n");
         String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomDouble";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("value", 3.14159265358979323846)
+            .queryParam("value", 3.141592653589793)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);

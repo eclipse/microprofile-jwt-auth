@@ -22,6 +22,8 @@ package org.eclipse.microprofile.jwt.tck.container.servlet;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.container.ejb.EjbEndpoint;
+import org.eclipse.microprofile.jwt.tck.container.ejb.IService;
+import org.eclipse.microprofile.jwt.tck.container.ejb.ServiceEJB;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -73,6 +75,8 @@ public class ServletTest extends Arquillian {
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(EjbEndpoint.class)
             .addClass(ServiceServlet.class)
+            .addClass(IService.class)
+            .addClass(ServiceEJB.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
