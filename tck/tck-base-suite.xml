@@ -44,7 +44,7 @@
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.UnsecuredPingTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ClaimValueInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.JsonValueInjectionTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionEndpoint" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest" />
         </classes>
