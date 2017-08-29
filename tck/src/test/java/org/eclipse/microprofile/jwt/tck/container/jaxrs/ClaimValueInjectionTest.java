@@ -268,7 +268,7 @@ public class ClaimValueInjectionTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomDouble";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("value", 3.14159265358979323846)
+            .queryParam("value", 3.141592653589793)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
