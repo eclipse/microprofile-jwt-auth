@@ -59,7 +59,7 @@ public class InvalidTokenTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL publicKey = InvalidTokenTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "InvalidTokenTest.war")
             .addAsResource(publicKey, "/publicKey.pem")

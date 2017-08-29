@@ -72,9 +72,9 @@ public class JsonValueInjectionTest {
     public static WebArchive createDeployment() throws IOException {
         URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "ProviderInjectionTest.war")
+            .create(WebArchive.class, "JsonValueInjectionTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(ProviderInjectionEndpoint.class)
+            .addClass(JsonValueInjectionTest.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
