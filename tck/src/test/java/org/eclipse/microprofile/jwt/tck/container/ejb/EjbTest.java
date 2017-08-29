@@ -71,6 +71,8 @@ public class EjbTest extends Arquillian {
             .create(WebArchive.class, "EjbTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(EjbEndpoint.class)
+            .addClass(IService.class)
+            .addClass(ServiceEJB.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
