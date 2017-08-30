@@ -19,9 +19,12 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.security.DenyAll;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -73,10 +76,20 @@ public class JsonValuejectionEndpoint {
     @Inject
     @Claim("customObject")
     private JsonObject customObject;
+    @Inject
+    @Claim("customStringArray")
+    private JsonArray customStringArray;
+    @Inject
+    @Claim("customIntegerArray")
+    private JsonArray customIntegerArray;
+    @Inject
+    @Claim("customDoubleArray")
+    private JsonArray customDoubleArray;
 
     @GET
     @Path("/verifyInjectedIssuer")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedIssuer(@QueryParam("iss") String iss) {
         boolean pass = false;
         String msg;
@@ -100,6 +113,7 @@ public class JsonValuejectionEndpoint {
     @GET
     @Path("/verifyInjectedRawToken")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedRawToken(@QueryParam("raw_token") String rt) {
         boolean pass = false;
         String msg;
@@ -124,6 +138,7 @@ public class JsonValuejectionEndpoint {
     @GET
     @Path("/verifyInjectedJTI")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedJTI(@QueryParam("jti") String jwtID) {
         boolean pass = false;
         String msg;
@@ -148,6 +163,7 @@ public class JsonValuejectionEndpoint {
     @GET
     @Path("/verifyInjectedAudience")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedAudience(@QueryParam("aud") String audience) {
         boolean pass = false;
         String msg;
@@ -172,6 +188,7 @@ public class JsonValuejectionEndpoint {
     @GET
     @Path("/verifyInjectedIssuedAt")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedIssuedAt(@QueryParam("iat") Long iat) {
         boolean pass = false;
         String msg;
@@ -196,6 +213,7 @@ public class JsonValuejectionEndpoint {
     @GET
     @Path("/verifyInjectedAuthTime")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedAuthTime(@QueryParam("auth_time") Long authTime) {
         boolean pass = false;
         String msg;
@@ -221,6 +239,7 @@ public class JsonValuejectionEndpoint {
     @GET
     @Path("/verifyInjectedCustomString")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedCustomString(@QueryParam("value") String value) {
         boolean pass = false;
         String msg;
@@ -246,13 +265,12 @@ public class JsonValuejectionEndpoint {
     @GET
     @Path("/verifyInjectedCustomInteger")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedCustomInteger(@QueryParam("value") Long value) {
         boolean pass = false;
         String msg;
         // iat
         Long customValue = customInteger.longValue();
-        System.out.printf("+++ verifyInjectedCustomInteger, JsonNumber.class.CL: %s\n",
-            JsonNumber.class.getClassLoader());
         if(customValue.equals(value)) {
             msg = "customInteger PASS";
             pass = true;
@@ -270,6 +288,7 @@ public class JsonValuejectionEndpoint {
     @GET
     @Path("/verifyInjectedCustomDouble")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
     public JsonObject verifyInjectedCustomDouble(@QueryParam("value") Double value) {
         boolean pass = false;
         String msg;
@@ -289,4 +308,108 @@ public class JsonValuejectionEndpoint {
         return result;
     }
 
+    @GET
+    @Path("/verifyInjectedCustomStringArray")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyInjectedCustomStringArray(@QueryParam("value") List<String> array) {
+        boolean pass = false;
+        HashSet<String> expected = new HashSet<>();
+        for(String value : array) {
+            expected.add(value);
+        }
+        StringBuilder msg = new StringBuilder();
+
+        if(customStringArray == null || customStringArray.size() == 0) {
+            msg.append("customStringArray value is null or empty, FAIL");
+        }
+        else if(customStringArray.size() != array.size()) {
+            msg.append(String.format("customStringArray.size(%d) != expected.size(%d)", customStringArray.size(), array.size()));
+        }
+        else {
+            for(int n = 0; n < customStringArray.size(); n ++) {
+                JsonString js = customStringArray.getJsonString(n);
+                if(!expected.remove(js.getString())) {
+                    msg.append(String.format("%s not found in expected", js.getString()));
+                }
+            }
+            pass = expected.size() == 0;
+        }
+
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg.toString())
+            .build();
+        return result;
+    }
+
+    @GET
+    @Path("/verifyInjectedCustomIntegerArray")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyInjectedCustomIntegerArray(@QueryParam("value") List<Long> array) {
+        boolean pass = false;
+        HashSet<Long> expected = new HashSet<>();
+        for(Long value : array) {
+            expected.add(value);
+        }
+        StringBuilder msg = new StringBuilder();
+
+        if(customIntegerArray == null || customIntegerArray.size() == 0) {
+            msg.append("customStringArray value is null or empty, FAIL");
+        }
+        else if(customIntegerArray.size() != array.size()) {
+            msg.append(String.format("customStringArray.size(%d) != expected.size(%d)", customIntegerArray.size(), array.size()));
+        }
+        else {
+            for(int n = 0; n < customIntegerArray.size(); n ++) {
+                Long value = customIntegerArray.getJsonNumber(n).longValue();
+                if(!expected.remove(value)) {
+                    msg.append(String.format("%s not found in expected", value));
+                }
+            }
+            pass = expected.size() == 0;
+        }
+
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg.toString())
+            .build();
+        return result;
+    }
+
+    @GET
+    @Path("/verifyInjectedCustomDoubleArray")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyInjectedCustomDoubleArray(@QueryParam("value") List<Double> array) {
+        boolean pass = false;
+        HashSet<BigDecimal> expected = new HashSet<>();
+        for(Double value : array) {
+            expected.add(BigDecimal.valueOf(value));
+        }
+        StringBuilder msg = new StringBuilder();
+
+        if(customDoubleArray == null || customDoubleArray.size() == 0) {
+            msg.append("customStringArray value is null or empty, FAIL");
+        }
+        else if(customDoubleArray.size() != array.size()) {
+            msg.append(String.format("customStringArray.size(%d) != expected.size(%d)", customDoubleArray.size(), array.size()));
+        }
+        else {
+            for(int n = 0; n < customDoubleArray.size(); n ++) {
+                BigDecimal value = customDoubleArray.getJsonNumber(n).bigDecimalValue();
+                if(!expected.remove(value)) {
+                    msg.append(String.format("%s not found in expected", value));
+                }
+            }
+            pass = expected.size() == 0;
+        }
+
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg.toString())
+            .build();
+        return result;
+    }
 }
