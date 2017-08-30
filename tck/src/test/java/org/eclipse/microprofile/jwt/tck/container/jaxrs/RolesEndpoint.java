@@ -31,6 +31,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
 import java.util.Date;
@@ -63,9 +65,9 @@ public class RolesEndpoint {
     }
 
     @GET
-    @Path("/echo3")
-    @RolesAllowed("EndpointCustom")
-    public String echoInput3(@Context SecurityContext sec, @QueryParam("input") String input) {
+    @Path("/echoNeedsToken2Role")
+    @RolesAllowed("Token2Role")
+    public String echoNeedsToken2Role(@Context SecurityContext sec, @QueryParam("input") String input) {
         Principal user = sec.getUserPrincipal();
         return input + ", user="+user.getName();
     }
@@ -85,8 +87,8 @@ public class RolesEndpoint {
     }
 
     /**
-     * This
-     * @return
+     * This endpoint requires a role that is mapped to the group1 role
+     * @return principal name
      */
     @GET
     @Path("/needsGroup1Mapping")
@@ -95,6 +97,42 @@ public class RolesEndpoint {
         Principal user = sec.getUserPrincipal();
         sec.isUserInRole("group1");
         return user.getName();
+    }
+
+    /**
+     * This endpoint requires a Tester role, and also validates that the caller has the role Echoer by calling
+     * {@linkplain SecurityContext#isUserInRole(String)}.
+     *
+     * @return principal name or FORBIDDEN error
+     */
+    @GET
+    @Path("/checkIsUserInRole")
+    @RolesAllowed("Tester")
+    public Response checkIsUserInRole(@Context SecurityContext sec) {
+        Principal user = sec.getUserPrincipal();
+        Response response;
+        if(!sec.isUserInRole("Echoer")) {
+            response = Response.status(new Response.StatusType() {
+                @Override
+                public int getStatusCode() {
+                    return Response.Status.FORBIDDEN.getStatusCode();
+                }
+
+                @Override
+                public Response.Status.Family getFamily() {
+                    return Response.Status.FORBIDDEN.getFamily();
+                }
+
+                @Override
+                public String getReasonPhrase() {
+                    return "SecurityContext.isUserInRole(Echoer) was false";
+                }
+            }).build();
+        }
+        else {
+            response = Response.ok(user.getName(), MediaType.TEXT_PLAIN).build();
+        }
+        return response;
     }
 
     @GET
