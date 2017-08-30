@@ -373,7 +373,7 @@ integration is with the JAX-RS container, and injection of the MP-JWT types.
 
 #### Injection of `JsonWebToken`
 An MP-JWT implementation must support the injection of the currently authenticated
-caller as a JsonWebToken with @RequestScoped scope:
+caller as a JsonWebToken with `@RequestScoped` or `@Dependent` scoping:
 
 ```java
 @Path("/endp")
@@ -441,7 +441,7 @@ public interface ClaimValue<T> extends Principal {
 }
 ----
 
-with @RequestScoped scoping. The following example code fragment illustrates various
+with `@RequestScoped` or `@Dependent` scoping. The following example code fragment illustrates various
 examples of injecting different types of claims using a range of generic forms of
 the `ClaimValue`:
 
@@ -514,7 +514,7 @@ injection sites by `@Claim` value and `ClaimValue` type. An example of one way
 to accomplish this via dynamic producer methods is shown in this prototype
 extension: https://github.com/MicroProfileJWT/microprofile-jwt-auth-wfswarm/blob/master/src/main/java/org/eclipse/microprofile/jwt/wfswarm/cdi/MPJWTExtension.java[MPJWTExtension].
 
-#### Injection of Claim Values using `javax.inject.Provider<?>`
+#### Injection of Claim Values Using `javax.inject.Provider<?>`
 An MP-JWT implementation is required to support injection of the currently
 authenticated `JsonWebToken` claim values using the `javax.inject.Provider<?>`
 wrapper as the injection site type as shown in this code fragment:
@@ -536,6 +536,37 @@ public class RolesEndpoint {
     @Claim("groups")
     private Provider<Set<String>> providerGroups;
 ----
+
+This requires `@Dependent` scoping due to the final nature of most claim standard claim
+values.
+
+#### Injection of Claim Values As JSON-P Types
+An MP-JWT implementation is required to support injection of the currently
+authenticated `JsonWebToken` claim values using the `javax.json.JsonValue`
+subtypes as the injection site type as shown in this code fragment:
+
+[source,java]
+----
+@Path("/endp")
+@ApplicationScoped
+public class RolesEndpoint {
+...
+
+    @Inject
+    @Claim(standard = Claims.jti)
+    private JsonString providerJTI;
+    @Inject
+    @Claim(standard = Claims.iat)
+    private JsonNumber providerIAT;
+    @Inject
+    @Claim("groups")
+    private JsonArray providerGroups;
+    @Inject
+    @Claim("customObject")
+    private JsonObject customObject;
+----
+
+using `@RequestScoped` or `@Dependent` scoping.
 
 ### JAX-RS Container API Integration
 The behavior of the following JAX-RS security related methods is required for
