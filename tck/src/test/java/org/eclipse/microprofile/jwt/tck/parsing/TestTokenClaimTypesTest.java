@@ -64,7 +64,7 @@ public class TestTokenClaimTypesTest {
     @BeforeClass(alwaysRun=true)
     public static void generateToken() throws Exception {
         HashMap<String, Long> timeClaims = new HashMap<>();
-        token = TokenUtils.generateTokenString("/RolesEndpoint.json", null, timeClaims);
+        token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
         iatClaim = timeClaims.get(Claims.iat.name());
         authTimeClaim = timeClaims.get(Claims.auth_time.name());
         expClaim = timeClaims.get(Claims.exp.name());

@@ -48,7 +48,7 @@ import java.net.URL;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
- *
+ * Basic servlet container integration tests
  */
 public class ServletTest extends Arquillian {
 
@@ -79,7 +79,6 @@ public class ServletTest extends Arquillian {
             .addClass(ServiceEJB.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
@@ -87,7 +86,7 @@ public class ServletTest extends Arquillian {
 
     @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
-        token = TokenUtils.generateTokenString("/RolesEndpoint.json");
+        token = TokenUtils.generateTokenString("/Token1.json");
     }
 
     @RunAsClient

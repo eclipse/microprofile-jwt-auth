@@ -66,7 +66,6 @@ public class InvalidTokenTest extends Arquillian {
             .addClass(RolesEndpoint.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
@@ -78,7 +77,7 @@ public class InvalidTokenTest extends Arquillian {
     public void callEchoExpiredToken() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "/endp/echo";
@@ -98,7 +97,7 @@ public class InvalidTokenTest extends Arquillian {
     public void callEchoBadIssuer() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "/endp/echo";
@@ -118,7 +117,7 @@ public class InvalidTokenTest extends Arquillian {
     public void callEchoBadSigner() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "/endp/echo";
@@ -138,7 +137,7 @@ public class InvalidTokenTest extends Arquillian {
     public void callEchoBadSignerAlg() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ALG);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "/endp/echo";

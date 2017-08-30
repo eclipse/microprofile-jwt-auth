@@ -20,6 +20,7 @@
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 import org.eclipse.microprofile.jwt.Claims;
+import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -46,6 +47,9 @@ import java.util.HashMap;
 
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
 
+/**
+ * Tests of injection of JsonWebToken claims using {@linkplain org.eclipse.microprofile.jwt.ClaimValue} interface wrappers.
+ */
 public class ClaimValueInjectionTest extends Arquillian {
 
     /**
@@ -77,7 +81,6 @@ public class ClaimValueInjectionTest extends Arquillian {
             .addClass(ClaimValueInjectionEndpoint.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
@@ -86,7 +89,7 @@ public class ClaimValueInjectionTest extends Arquillian {
     @BeforeClass(alwaysRun=true)
     public static void generateToken() throws Exception {
         HashMap<String, Long> timeClaims = new HashMap<>();
-        token = TokenUtils.generateTokenString("/RolesEndpoint.json", null, timeClaims);
+        token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
         iatClaim = timeClaims.get(Claims.iat.name());
         authTimeClaim = timeClaims.get(Claims.auth_time.name());
         expClaim = timeClaims.get(Claims.exp.name());
@@ -100,7 +103,7 @@ public class ClaimValueInjectionTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuer";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam(Claims.iss.name(), "https://server.example.com")
+            .queryParam(Claims.iss.name(), TCKConstants.TEST_ISSUER)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
