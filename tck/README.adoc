@@ -152,7 +152,15 @@ An example skeleton pom.xml is shown here:
             <artifactId>microprofile-jwt-auth-tck</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!-- Arquillian extension SPI --><2>
+        <!-- This is the actual MP-JWT TCK test classes --><2>
+        <dependency>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth-tck</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <!-- Arquillian extension SPI --><3>
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
             <artifactId>arquillian-container-spi</artifactId>
@@ -163,7 +171,7 @@ An example skeleton pom.xml is shown here:
         </dependency>
         <!-- You need to specify a JAX-RS client implementation as the unit
         tests make use of that API, but do not specify and implementation.
-        --><3>
+        --><4>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-client</artifactId>
@@ -171,7 +179,7 @@ An example skeleton pom.xml is shown here:
         </dependency>
 
         <!-- Specify your container runtime arquillian integration and dependencies -->
-        <dependency><4>
+        <dependency><5>
             <groupId>MY_GROUP</groupId>
             <artifactId>arquillian-container</artifactId>
             <version>${container-version}</version>
@@ -186,13 +194,16 @@ An example skeleton pom.xml is shown here:
 <1> org.eclipse.microprofile.jwt:microprofile-jwt-auth-tck is the MP-JWT artifact
 that contains the base `LoadableExtension` and `ApplicationArchiveProcessor` classes,
 as well as the `ITokenParser` harness factory interface and `TokenUtils` class.
-<2> The 2 indicated Arquillian extension SPI dependencies provide the
+<2> org.eclipse.microprofile.jwt:microprofile-jwt-auth-tck type=test-jar is the MP-JWT
+TCK tests themselves you need to run for the TCK. You would only need this if you are
+running the TCK from within your TCK harness project.
+<3> The 2 indicated Arquillian extension SPI dependencies provide the
 `LoadableExtension` and `ApplicationArchiveProcessor` interfaces and dependent
 classes.
-<3> The TCK unit tests make use of the JAX-RS client API, but do not provide an
+<4> The TCK unit tests make use of the JAX-RS client API, but do not provide an
 implementation, so your TCK harness artifact must specify what implementation to use.
 Here the Resteasy implementation is being specified.
-<4> Lastly, you must specify the property Arquillian container runtime that is
+<5> Lastly, you must specify the property Arquillian container runtime that is
 approriate for you MP-JWT implementation, along with whatever container
 runtime dependencies are required.
 
@@ -259,7 +270,7 @@ following in your pom.xml:
 ```maven
     </dependencies>
     ...
-        <!-- Include the MP-JWT TCK dependencies -->
+        <!-- Include the MP-JWT TCK dependencies, utility and base classes + actual test classes -->
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-tck</artifactId>
