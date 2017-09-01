@@ -598,8 +598,8 @@ This method MUST return true for any name that is included in the MP-JWT "groups
 role name that has been mapped to a group name in the MP-JWT "group" claim.
 
 ### Mapping from `@RolesAllowed`
-Any role names used in @RolesAllowed or equivalent security constraint metadata that match role names in either
-the MP-JWT "roles" claim, or role names that have been mapped to group names in the MP-JWT "group" claim, MUST result
+Any role names used in @RolesAllowed or equivalent security constraint metadata that match role names in
+the role names that have been mapped to group names in the MP-JWT "groups" claim, MUST result
 in an allowing authorization decision wherever the security constraint has been applied.
 
 ### Recommendations for Optional Container Integration
@@ -614,6 +614,10 @@ The java.security.Principal returned from this method MUST be an instance of org
 #### javax.ejb.SessionContext#isCallerInRole(String)
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "group" claim.
+
+#### Overriding @LoginConfig from web.xml login-config
+If a deployment with a web.xml descriptor contains a login-config element, an MP-JWT implementation should view the
+web.xml metadata as an override to the deployment annotation.
 
 #### javax.servlet.http.HttpServletRequest.getUserPrincipal()
 The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JsonWebToken.
