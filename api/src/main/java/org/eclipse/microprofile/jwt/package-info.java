@@ -34,6 +34,7 @@
  *     <li>ClaimValue: this is a proxyable/injectable interface that represents the value of a single JWT claim.</li>
  * </ul>
  *
- * @version 1.0
+ * 
  */
+@org.osgi.annotation.versioning.Version("1.0")
 package org.eclipse.microprofile.jwt;
