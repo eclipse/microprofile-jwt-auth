@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.annotation.security.DenyAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.json.Json;
