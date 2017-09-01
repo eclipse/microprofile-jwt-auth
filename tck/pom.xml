@@ -27,6 +27,7 @@
     <artifactId>microprofile-jwt-auth-tck</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>MicroProfile JWT Auth TCK Harness</name>
+    <description>Eclipse MicroProfile JWT Feature - TCK</description>
 
     <properties>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>

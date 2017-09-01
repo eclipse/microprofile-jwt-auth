@@ -27,6 +27,7 @@
     <artifactId>microprofile-jwt-auth-api</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>MicroProfile JWT Auth API</name>
+    <description>Eclipse MicroProfile JWT Feature - API</description>
 
     <dependencies>
         <dependency>

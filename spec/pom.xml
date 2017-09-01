@@ -27,6 +27,7 @@
     <artifactId>microprofile-jwt-auth-spec</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>MicroProfile JWT Auth Specification</name>
+    <description>Eclipse MicroProfile JWT Feature - Specification POM</description>
     <packaging>pom</packaging>
 
     <properties>
