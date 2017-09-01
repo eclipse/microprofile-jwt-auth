@@ -305,7 +305,7 @@ public class JsonValueInjectionTest extends Arquillian {
     }
 
     // Duplicate tests that use Token2.json to verify that @RequestScope or @Dependent scoping is in use
-
+    @RunAsClient
     @Test(groups = TEST_GROUP_CDI_JSON,
         description = "Verify that the injected token issuer claim is as expected from Token2")
     public void verifyIssuerClaim2() throws Exception {

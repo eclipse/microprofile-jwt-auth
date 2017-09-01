@@ -41,7 +41,7 @@ import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.Claims;
 
 @Path("/endp")
-@DenyAll
+@RolesAllowed({"Echoer", "Tester"})
 public class JsonValuejectionEndpoint {
     @Inject
     @Claim("raw_token")

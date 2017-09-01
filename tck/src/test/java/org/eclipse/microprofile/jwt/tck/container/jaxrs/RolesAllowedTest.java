@@ -97,6 +97,7 @@ public class RolesAllowedTest extends Arquillian {
         expClaim = timeClaims.get(Claims.exp.name());
     }
 
+    @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with no token fails with HTTP_UNAUTHORIZED")
     public void callEchoNoAuth() throws Exception {
         Reporter.log("callEchoNoAuth, expect HTTP_UNAUTHORIZED");
@@ -256,6 +257,7 @@ public class RolesAllowedTest extends Arquillian {
         System.out.println(reply);
     }
 
+    @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Validate that accessing secured method has HTTP_OK and injected JsonWebToken principal")
     public void getInjectedPrincipal() throws Exception {
