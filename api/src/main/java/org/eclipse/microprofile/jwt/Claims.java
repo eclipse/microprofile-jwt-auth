@@ -27,7 +27,7 @@ import java.util.Set;
  * This enum represents the standardized claims that the MP-JWT specification allows for in terms of interoperability.
  * For every claim in this enum, an MP-JWT implementation must return a value of the indicated type from
  * {@link JsonWebToken#getClaim(String)} method. An implementation is free to include
- * any additional claims, and users of {@link JsonWebToken#getClaim(String)} can expect that the JSON-B corresponding
+ * any additional claims, and users of {@link JsonWebToken#getClaim(String)} can expect that the JSON-P corresponding
  * Java type is seen based on the JSON type of the claim.
  *
  * The set of included claims is defined by IANA, see https://www.iana.org/assignments/jwt/jwt.xhtml
@@ -87,7 +87,7 @@ public enum Claims {
     kid("Key identifier", String.class),
     jku("JWK Set URL", String.class),
 
-    UNKNOWN("A catch all for any unknown claim", Object.class)
+    UNKNOWN("A catch all for any unknown claim", Void.class)
     ;
 
     private String description;
