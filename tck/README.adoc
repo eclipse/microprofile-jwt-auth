@@ -169,8 +169,8 @@ An example skeleton pom.xml is shown here:
             <groupId>org.jboss.arquillian.container</groupId>
             <artifactId>arquillian-container-test-spi</artifactId>
         </dependency>
-        <!-- You need to specify a JAX-RS client implementation as the unit
-        tests make use of that API, but do not specify and implementation.
+        <!-- You need to specify your JAX-RS client implementation as the unit
+        tests make use of that API, but do not specify the implementation.
         --><4>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -200,7 +200,7 @@ running the TCK from within your TCK harness project.
 <3> The 2 indicated Arquillian extension SPI dependencies provide the
 `LoadableExtension` and `ApplicationArchiveProcessor` interfaces and dependent
 classes.
-<4> The TCK unit tests make use of the JAX-RS client API, but do not provide an
+<4> The TCK unit tests make use of the JAX-RS client API, but does not provide an
 implementation, so your TCK harness artifact must specify what implementation to use.
 Here the Resteasy implementation is being specified.
 <5> Lastly, you must specify the property Arquillian container runtime that is
@@ -284,6 +284,14 @@ following in your pom.xml:
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <!-- You need to add a dependency for a JAX-RS client implementation -->
+        <dependency>
+            <groupId>FIXME</groupId>
+            <artifactId>some-jaxrs-client-impl</artifactId>
+            <version>x.y</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Your additional container dependences... -->
     </dependencies>
 
     <build>
