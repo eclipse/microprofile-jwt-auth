@@ -252,7 +252,7 @@ MP-JWT that contains additional "auth_time", "preferred_username", "acr",
 }
 ```
 
-### The `Claims` Enumeration Utility Class
+### The `Claims` Enumeration Utility Class, and the Set of Claim Value Types
 
 The `org.eclipse.microprofile.jwt.Claims` utility class encapsulate an enumeration
 of all the standard JWT related claims along with a description and the required
@@ -335,6 +335,18 @@ public enum Claims {
 }
 ```
 
+Custom claims not handled by the Claims enum are required to be valid JSON-P `javax.json.JsonValue` subtypes. The
+current complete set of valid claim types is therfore, (excluding the invalid Claims.UNKNOWN Void type):
+* java.lang.String
+* java.lang.Long
+* java.lang.Boolean
+* java.util.Set<java.lang.String>
+* javax.json.JsonValue.TRUE/FALSE
+* javax.json.JsonString
+* javax.json.JsonNumber
+* javax.json.JsonArray
+* javax.json.JsonObject
+
 ### Service Specific Authorization Claims
 An extended form of authorization on a per service basis using a "resource_access"
 claim has been postponed to a future release. See <<resource_access,Future Directions>>
@@ -389,13 +401,17 @@ integration is with the JAX-RS container, and injection of the MP-JWT types.
 
 ### CDI Injection Requirements
 
+This section describes the requirements for MP-JWT implementations with regard to the injection of MP-JWT
+tokens and their associated claim values.
+
 #### Injection of `JsonWebToken`
 An MP-JWT implementation must support the injection of the currently authenticated
-caller as a JsonWebToken with `@RequestScoped` or `@Dependent` scoping:
+caller as a `JsonWebToken` with `@RequestScoped` scoping:
 
 ```java
 @Path("/endp")
 @DenyAll
+@ApplicationScoped
 public class RolesEndpoint {
 
     @Inject
@@ -403,7 +419,7 @@ public class RolesEndpoint {
 
 ```
 
-#### Injection of `ClaimValue`
+#### Injection of `JsonWebToken` claims via Raw Type, `ClaimValue`, `javax.inject.Provider` and JSON-P Types
 
 This specification requires support for injection of claims from the current
 `JsonWebToken` using the `org.eclipse.microprofile.jwt.Claim` qualifier:
@@ -435,7 +451,21 @@ public @interface Claim {
 }
 ----
 
-and `org.eclipse.microprofile.jwt.ClaimValue` interface:
+with `@Dependent` scoping for any CDI defined non-proxyable type. For currently defined standard
+claims, the set of non-proxyable types include:
+* java.lang.String
+* java.lang.Long
+* java.lang.Boolean
+* java.util.Optional
+
+All other types of claims values should be available with `@RequestScoped` scoping.
+MP-JWT implementations are required to support injection of the claim values
+using any of:
+* The raw type associated with the JsonWebToken claim value.
+* `org.eclipse.microprofile.jwt.ClaimValue` wrapper.
+* `javax.json.JsonValue` JSON-P subtypes.
+
+The `org.eclipse.microprofile.jwt.ClaimValue` interface is:
 [source,java]
 ----
 /**
@@ -459,9 +489,9 @@ public interface ClaimValue<T> extends Principal {
 }
 ----
 
-with `@RequestScoped` or `@Dependent` scoping. The following example code fragment illustrates various
+The following example code fragment illustrates various
 examples of injecting different types of claims using a range of generic forms of
-the `ClaimValue`:
+the `ClaimValue`, `JsonValue` as well as the raw claim types:
 
 [source,java]
 ----
@@ -471,12 +501,22 @@ import org.eclipse.microprofile.jwt.Claims;
 
 @Path("/endp")
 @DenyAll
+@RequestScoped
 public class RolesEndpoint {
 ...
 
+    // Raw types
+    @Inject
+    @Claim(standard = Claims.raw_token)
+    private String rawToken;
+    @Inject // <0>
+    @Claim(standard=Claims.iat)
+    private Long issuedAt;
+
+    // ClaimValue wrappers
     @Inject // <1>
     @Claim(standard = Claims.raw_token)
-    private ClaimValue<String> rawToken;
+    private ClaimValue<String> rawTokenCV;
     @Inject
     @Claim(standard = Claims.iss)
     private ClaimValue<String> issuer;
@@ -497,7 +537,7 @@ public class RolesEndpoint {
     private ClaimValue<Set<String>> groups;
     @Inject // <4>
     @Claim(standard=Claims.iat)
-    private ClaimValue<Long> issuedAt;
+    private ClaimValue<Long> issuedAtCV;
     @Inject
     @Claim("iat")
     private ClaimValue<Long> dupIssuedAt;
@@ -510,7 +550,32 @@ public class RolesEndpoint {
     @Inject // <5>
     @Claim("custom-missing")
     private ClaimValue<Optional<Long>> custom;
+    //
+    @Inject
+    @Claim(standard = Claims.jti)
+    private Provider<String> providerJTI;
+    @Inject // <6>
+    @Claim(standard = Claims.iat)
+    private Provider<Long> providerIAT;
+    @Inject
+    @Claim("groups")
+    private Provider<Set<String>> providerGroups;
+    //
+    @Inject
+    @Claim(standard = Claims.jti)
+    private JsonString jsonJTI;
+    @Inject
+    @Claim(standard = Claims.iat)
+    private JsonNumber jsonIAT;
+    @Inject // <7>
+    @Claim("roles")
+    private JsonArray jsonRoles;
+    @Inject
+    @Claim("customObject")
+    private JsonObject jsonCustomObject;
 ----
+<0> Injection of a non-proxyable raw type like java.lang.Long must happen in a RequestScoped bean as
+the producer will have dependendent scope.
 <1> Injection of the raw MP-JWT token string.
 <2> Injection of the jti token id as an `Optional<String>` wapper.
 <3> Injection of the aud audience claim as a Set<String>. This is the required
@@ -519,72 +584,23 @@ type as seen by looking at the Claims.aud enum value's Java type member.
 claim name using the Claims.iat enum value.
 <5> Injection of a custom claim that does exist will result in an Optional<Long>
 value for which isPresent() will return false.
+<6> Another inection of a non-proxyable raw type like java.lang.Long, but the use of the javax.inject.Provider interface
+allows for injection to occur in non-RequestScoped contexts.
+<7> Injection of a JsonArray of role names via a custom "roles" claim.
 
-The example shows that one may specify the name of the claim using with a
+The example shows that one may specify the name of the claim using a
 string or a `Claims` enum value. The string form would allow for specifying non-standard
 claims while the `Claims` enum approach guards against typos and mis-spellings.
 
-The `@RequestScoped` requirement does introduce some additional complexity for
-a CDI extension as a producer method cannot have the
-`javax.enterprise.inject.spi.InjectionPoint` provided as a parameter to allow
-for distinguishing type. This requires that the CDI extension collect the `ClaimValue`
-injection sites by `@Claim` value and `ClaimValue` type. An example of one way
-to accomplish this via dynamic producer methods is shown in this prototype
-extension: https://github.com/MicroProfileJWT/microprofile-jwt-auth-wfswarm/blob/master/src/main/java/org/eclipse/microprofile/jwt/wfswarm/cdi/MPJWTExtension.java[MPJWTExtension].
+#### Handling of Non-RequestScoped Injection of Non-Proxyable Claim Values
+MP-JWT implementations are required to validate the use of claim value injection into contexts that do not match
+@RequestScoped. When the target context has @ApplicationScoped or @SessionScoped scope, implementations are
+required to generate a `javax.enterprise.inject.spi.DeploymentException`. For any other context, implementations
+should issue a warning, that may be suppressed by an implementation specific configuration setting.
 
-#### Injection of Claim Values Using `javax.inject.Provider<?>`
-An MP-JWT implementation is required to support injection of the currently
-authenticated `JsonWebToken` claim values using the `javax.inject.Provider<?>`
-wrapper as the injection site type as shown in this code fragment:
-
-[source,java]
-----
-@Path("/endp")
-@ApplicationScoped
-public class RolesEndpoint {
-...
-
-    @Inject
-    @Claim(standard = Claims.jti)
-    private Provider<String> providerJTI;
-    @Inject
-    @Claim(standard = Claims.iat)
-    private Provider<Long> providerIAT;
-    @Inject
-    @Claim("groups")
-    private Provider<Set<String>> providerGroups;
-----
-
-This requires `@Dependent` scoping due to the final nature of most claim standard claim
-values.
-
-#### Injection of Claim Values As JSON-P Types
-An MP-JWT implementation is required to support injection of the currently
-authenticated `JsonWebToken` claim values using the `javax.json.JsonValue`
-subtypes as the injection site type as shown in this code fragment:
-
-[source,java]
-----
-@Path("/endp")
-@ApplicationScoped
-public class RolesEndpoint {
-...
-
-    @Inject
-    @Claim(standard = Claims.jti)
-    private JsonString providerJTI;
-    @Inject
-    @Claim(standard = Claims.iat)
-    private JsonNumber providerIAT;
-    @Inject
-    @Claim("groups")
-    private JsonArray providerGroups;
-    @Inject
-    @Claim("customObject")
-    private JsonObject customObject;
-----
-
-using `@RequestScoped` or `@Dependent` scoping.
+[NOTE]
+If one needs to inject a claim value into a scope with a lifetime greater than @RequestScoped, such as
+@ApplicationScoped or @SessionScoped, one can use the javax.inject.Provider interface to do so.
 
 ### JAX-RS Container API Integration
 The behavior of the following JAX-RS security related methods is required for
