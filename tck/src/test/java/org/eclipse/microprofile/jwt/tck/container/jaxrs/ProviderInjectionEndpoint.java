@@ -53,9 +53,6 @@ public class ProviderInjectionEndpoint {
     @Claim("aud")
     private Provider<Set<String>> aud;
     @Inject
-    @Claim("roles")
-    private Provider<String[]> roles;
-    @Inject
     @Claim("iat")
     private Provider<Long> issuedAt;
     @Inject

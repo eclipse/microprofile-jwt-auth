@@ -52,9 +52,6 @@ public class ClaimValueInjectionEndpoint {
     @Claim("aud")
     private ClaimValue<Set<String>> aud;
     @Inject
-    @Claim("roles")
-    private ClaimValue<String[]> roles;
-    @Inject
     @Claim("iat")
     private ClaimValue<Long> issuedAt;
     @Inject
