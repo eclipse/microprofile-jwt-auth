@@ -381,10 +381,10 @@ The MP-JWT specification requires that an MP-JWT implementation reject a bearer 
 invalid MP-JWT token if any of the following conditions are not met:
 
 1. The JWT must have a JOSE header that indicates the token was signed using the RS256 algorithm.
-1. The JWT must have an iss claim representing the token issuer that maps to an MP-JWT implementation
+2. The JWT must have an iss claim representing the token issuer that maps to an MP-JWT implementation
 container runtime configured value. Any issuer other than those issuers that have been whitelisted
 by the container configuration must be rejected with an HTTP_UNUATHENTICATED(401) error.
-1. The JWT signer must have a public key that that maps to an MP-JWT implementation container runtime
+3. The JWT signer must have a public key that that maps to an MP-JWT implementation container runtime
 configured value. Any public key other than those that have been whitelisted by the container
 configuration must be rejected with an HTTP_UNUATHENTICATED(401) error.
 
@@ -451,12 +451,30 @@ public @interface Claim {
 }
 ----
 
-with `@Dependent` scoping for any CDI defined non-proxyable type. For currently defined standard
-claims, the set of non-proxyable types include:
+with `@Dependent` scoping for any CDI defined non-proxyable type.
+
+MP-JWT implementation are required to throw a `DeploymentException` when detecting the ambiguous use of a
+@Claim qualifier that includes inconsistent non-default values for both the value and standard elements as
+is the case shown here:
+
+[source,java]
+----
+@ApplicationScoped
+public class MyEndpoint {
+    @Inject
+    @Claim(value="exp", standard=Claims.iat)
+    private Long timeClaim;
+...
+}
+----
+
+For currently defined standard claims, the set of non-proxyable types include:
+
 * java.lang.String
 * java.lang.Long
 * java.lang.Boolean
 * java.util.Optional
+
 
 All other types of claims values should be available with `@RequestScoped` scoping.
 MP-JWT implementations are required to support injection of the claim values
@@ -509,12 +527,12 @@ public class RolesEndpoint {
     @Inject
     @Claim(standard = Claims.raw_token)
     private String rawToken;
-    @Inject // <0>
+    @Inject // <1>
     @Claim(standard=Claims.iat)
     private Long issuedAt;
 
     // ClaimValue wrappers
-    @Inject // <1>
+    @Inject // <2>
     @Claim(standard = Claims.raw_token)
     private ClaimValue<String> rawTokenCV;
     @Inject
@@ -523,19 +541,19 @@ public class RolesEndpoint {
     @Inject
     @Claim(standard = Claims.jti)
     private ClaimValue<String> jti;
-    @Inject // <2>
+    @Inject // <3>
     @Claim("jti")
     private ClaimValue<Optional<String>> optJTI;
     @Inject
     @Claim("jti")
     private ClaimValue objJTI;
-    @Inject // <3>
+    @Inject // <4>
     @Claim("aud")
     private ClaimValue<Set<String>> aud;
     @Inject
     @Claim("groups")
     private ClaimValue<Set<String>> groups;
-    @Inject // <4>
+    @Inject // <5>
     @Claim(standard=Claims.iat)
     private ClaimValue<Long> issuedAtCV;
     @Inject
@@ -547,14 +565,14 @@ public class RolesEndpoint {
     @Inject
     @Claim("auth_time")
     private ClaimValue<Optional<Long>> authTime;
-    @Inject // <5>
+    @Inject // <6>
     @Claim("custom-missing")
     private ClaimValue<Optional<Long>> custom;
     //
     @Inject
     @Claim(standard = Claims.jti)
     private Provider<String> providerJTI;
-    @Inject // <6>
+    @Inject // <7>
     @Claim(standard = Claims.iat)
     private Provider<Long> providerIAT;
     @Inject
@@ -567,26 +585,26 @@ public class RolesEndpoint {
     @Inject
     @Claim(standard = Claims.iat)
     private JsonNumber jsonIAT;
-    @Inject // <7>
+    @Inject // <8>
     @Claim("roles")
     private JsonArray jsonRoles;
     @Inject
     @Claim("customObject")
     private JsonObject jsonCustomObject;
 ----
-<0> Injection of a non-proxyable raw type like java.lang.Long must happen in a RequestScoped bean as
+<1> Injection of a non-proxyable raw type like java.lang.Long must happen in a RequestScoped bean as
 the producer will have dependendent scope.
-<1> Injection of the raw MP-JWT token string.
-<2> Injection of the jti token id as an `Optional<String>` wapper.
-<3> Injection of the aud audience claim as a Set<String>. This is the required
+<2> Injection of the raw MP-JWT token string.
+<3> Injection of the jti token id as an `Optional<String>` wapper.
+<4> Injection of the aud audience claim as a Set<String>. This is the required
 type as seen by looking at the Claims.aud enum value's Java type member.
-<4> Injection of the issued at time claim using an @Claim that references the
+<5> Injection of the issued at time claim using an @Claim that references the
 claim name using the Claims.iat enum value.
-<5> Injection of a custom claim that does exist will result in an Optional<Long>
+<6> Injection of a custom claim that does exist will result in an Optional<Long>
 value for which isPresent() will return false.
-<6> Another inection of a non-proxyable raw type like java.lang.Long, but the use of the javax.inject.Provider interface
+<7> Another inection of a non-proxyable raw type like java.lang.Long, but the use of the javax.inject.Provider interface
 allows for injection to occur in non-RequestScoped contexts.
-<7> Injection of a JsonArray of role names via a custom "roles" claim.
+<8> Injection of a JsonArray of role names via a custom "roles" claim.
 
 The example shows that one may specify the name of the claim using a
 string or a `Claims` enum value. The string form would allow for specifying non-standard
