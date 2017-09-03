@@ -33,13 +33,16 @@ import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -106,8 +109,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -123,8 +127,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -140,8 +145,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -157,7 +163,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         System.out.println(reply);
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
@@ -174,8 +182,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -191,8 +200,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -207,8 +217,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -223,8 +234,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             ;
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -240,8 +252,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -257,8 +270,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -274,7 +288,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         System.out.println(reply);
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
