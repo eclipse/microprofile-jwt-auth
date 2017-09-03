@@ -23,6 +23,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.RolesAllowed;
+import javax.enterprise.context.RequestScoped;
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 import javax.ws.rs.GET;
@@ -34,6 +35,7 @@ import java.util.Set;
 
 @Path("/endp")
 @DenyAll
+@RequestScoped
 public class SubjectEndpoint {
     @GET
     @Path("/getSubjectClass")

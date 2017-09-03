@@ -26,6 +26,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -39,6 +40,7 @@ import java.util.Date;
 
 @Path("/endp")
 @DenyAll
+@RequestScoped
 public class RolesEndpoint {
 
     @Inject

@@ -24,6 +24,7 @@ import org.eclipse.microprofile.jwt.ClaimValue;
 import org.eclipse.microprofile.jwt.Claims;
 
 import javax.annotation.security.RolesAllowed;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonNumber;
@@ -38,6 +39,7 @@ import java.util.Set;
 
 @Path("/endp")
 @RolesAllowed({"Echoer", "Tester"})
+@RequestScoped
 public class ClaimValueInjectionEndpoint {
     @Inject
     @Claim("raw_token")
