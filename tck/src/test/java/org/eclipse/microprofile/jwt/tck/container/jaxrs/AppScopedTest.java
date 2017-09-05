@@ -30,6 +30,8 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
+
 /**
  *
  */
@@ -54,7 +56,7 @@ public class AppScopedTest {
         return webArchive;
     }
 
-    @Test
+    @Test(groups = TEST_GROUP_CDI)
     public void verifyDeploymentException() {
         Assert.fail("Should not execute as a deployment exception should have aborted all tests");
     }
