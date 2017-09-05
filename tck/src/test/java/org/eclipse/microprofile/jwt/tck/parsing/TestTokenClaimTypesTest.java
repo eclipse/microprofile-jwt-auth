@@ -23,10 +23,12 @@ import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.util.ITokenParser;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
+import org.jboss.arquillian.testng.Arquillian;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.enterprise.inject.spi.CDI;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
@@ -45,15 +47,14 @@ import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_ISSUER;
  * A more extensive test of the how the token JSON content types are mapped
  * to values via the JsonWebToken implementation.
  */
-public class TestTokenClaimTypesTest {
-    /**
-     * The test generated JWT token string
-     */
+public class TestTokenClaimTypesTest extends Arquillian {
+    /** The test generated JWT token string */
     private static String token;
+    /** The corresponding JsonWebToken */
     private static JsonWebToken jwt;
-    /** */
+    /** The TCK harness ITokenParser instance */
     private static ITokenParser tokenParser;
-    /** */
+    /** The /publicKey.pem instance */
     private static PublicKey publicKey;
 
     // Time claims in the token
@@ -75,14 +76,20 @@ public class TestTokenClaimTypesTest {
             throw new IllegalStateException("Failed to load /publicKey.pem resource");
         }
 
-        // Load the ITokenParser implementation
+        // Load the ITokenParser via the ServiceLoader
         ServiceLoader<ITokenParser> serviceLoader = ServiceLoader.load(ITokenParser.class);
         if(serviceLoader.iterator().hasNext() == false) {
-            throw new IllegalStateException(String.format("An %s service provider is required", ITokenParser.class.getName()));
+            // Try to obtain ITokenParser via CDI
+            tokenParser = CDI.current().select(ITokenParser.class).get();
+            if(tokenParser == null) {
+                throw new IllegalStateException(String.format("An %s service provider or producer is required", ITokenParser.class.getName()));
+            }
         }
-        tokenParser = serviceLoader.iterator().next();
-        if(tokenParser == null) {
-            throw new IllegalStateException(String.format("Service provider for %s  produced a null parser", ITokenParser.class.getName()));
+        else {
+            tokenParser = serviceLoader.iterator().next();
+            if (tokenParser == null) {
+                throw new IllegalStateException(String.format("Service provider for %s  produced a null parser", ITokenParser.class.getName()));
+            }
         }
         System.out.printf("Using ITokenParser: %s\n", tokenParser);
 
