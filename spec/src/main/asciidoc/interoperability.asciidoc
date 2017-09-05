@@ -432,13 +432,14 @@ This specification requires support for injection of claims from the current
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE})
 public @interface Claim {
     /**
      * The value specifies the id name the claim to inject
      * @return the claim name
      * @see JsonWebToken#getClaim(String)
      */
+    @Nonbinding
     String value() default "";
 
     /**
@@ -446,8 +447,8 @@ public @interface Claim {
      * enum
      * @return the claim enum
      */
+    @Nonbinding
     Claims standard() default Claims.UNKNOWN;
-
 }
 ----
 
@@ -474,6 +475,7 @@ For currently defined standard claims, the set of non-proxyable types include:
 * java.lang.Long
 * java.lang.Boolean
 * java.util.Optional
+* javax.json.JsonValue subtypes
 
 
 All other types of claims values should be available with `@RequestScoped` scoping.
