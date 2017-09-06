@@ -29,7 +29,6 @@ and authorization spec in various container environments. This particular implem
 * a default implementation of the JsonWebToken interface
 * a JAX-RS ContainerRequestFilter prototype
 * JSR-375 IdentityStore and Credential prototypes
-* TODO: a JSR-196 ServerAuthModule
 
 ### Wildfly Swarm Implementations
 

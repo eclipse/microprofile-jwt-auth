@@ -453,7 +453,7 @@ public @interface Claim {
 }
 ----
 
-with `@Dependent` scoping for any CDI defined non-proxyable type.
+with `@Dependent` scoping.
 
 MP-JWT implementation are required to throw a `DeploymentException` when detecting the ambiguous use of a
 @Claim qualifier that includes inconsistent non-default values for both the value and standard elements as
@@ -470,21 +470,18 @@ public class MyEndpoint {
 }
 ----
 
-For currently defined standard claims, the set of non-proxyable types include:
+The set of types one my use for a claim value injection is:
 
 * java.lang.String
+* java.util.Set<java.lang.String>
 * java.lang.Long
 * java.lang.Boolean
-* java.util.Optional
 * javax.json.JsonValue subtypes
+* java.util.Optional wrapper of the above types.
+* org.eclipse.microprofile.jwt.ClaimValue wrapper of the above types.
 
-
-All other types of claims values should be available with `@RequestScoped` scoping.
 MP-JWT implementations are required to support injection of the claim values
-using any of:
-* The raw type associated with the JsonWebToken claim value.
-* `org.eclipse.microprofile.jwt.ClaimValue` wrapper.
-* `javax.json.JsonValue` JSON-P subtypes.
+using any of these types.
 
 The `org.eclipse.microprofile.jwt.ClaimValue` interface is:
 [source,java]
@@ -611,9 +608,9 @@ allows for injection to occur in non-RequestScoped contexts.
 
 The example shows that one may specify the name of the claim using a
 string or a `Claims` enum value. The string form would allow for specifying non-standard
-claims while the `Claims` enum approach guards against typos and mis-spellings.
+claims while the `Claims` enum approach guards against typos.
 
-#### Handling of Non-RequestScoped Injection of Non-Proxyable Claim Values
+#### Handling of Non-RequestScoped Injection of Claim Values
 MP-JWT implementations are required to validate the use of claim value injection into contexts that do not match
 @RequestScoped. When the target context has @ApplicationScoped or @SessionScoped scope, implementations are
 required to generate a `javax.enterprise.inject.spi.DeploymentException`. For any other context, implementations
@@ -621,7 +618,8 @@ should issue a warning, that may be suppressed by an implementation specific con
 
 [NOTE]
 If one needs to inject a claim value into a scope with a lifetime greater than @RequestScoped, such as
-@ApplicationScoped or @SessionScoped, one can use the javax.inject.Provider interface to do so.
+@ApplicationScoped or @SessionScoped, one can use the javax.inject.Provider or javax.inject.Instance
+interfaces to do so.
 
 ### JAX-RS Container API Integration
 The behavior of the following JAX-RS security related methods is required for
