@@ -17,7 +17,7 @@
 
 [[resource_access]]
 ## Future Directions
-In future versions of the API we would like to address service specific role and group claims. The "resource_access"
+In future versions of the API we would like to address service specific group claims. The "resource_access"
 claim originally targeted for the 1.0 release of the specification has been postponed as addition work to determine
 the format of the claim key as well as how these claims would be surface through the standard Java EE APIs needs
 more work than the 1.0 release timeline will allow.

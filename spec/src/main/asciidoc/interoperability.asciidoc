@@ -23,10 +23,11 @@ issue tokens using the MP-JWT format in a way that service providers can underst
 gather information about a subject. To that end, the requirements for the MicroProfile JWT are:
 
 1. Be usable as an authentication token.
-2. Be usable as an authorization token that contains Java EE application level roles indirectly granted via a groups claim.
-3. Can be mapped to IdentityStore in JSR375.
-4. Can support additional standard claims described in https://www.iana.org/assignments/jwt/jwt.xhtml as
-well as non-standard claims.
+2. Be usable as an authorization token that contains Java EE application level roles indirectly granted via a
+groups claim.
+3. Can be mapped to IdentityStore in https://www.jcp.org/en/jsr/detail?id=375[JSR375].
+4. Can support additional standard claims described in https://www.iana.org/assignments/jwt/jwt.xhtml[IANA JWT Assignments]
+as well as non-standard claims.
 
 To meet those requirements, we introduce 2 new claims to the MP-JWT:
 
@@ -336,7 +337,7 @@ public enum Claims {
 ```
 
 Custom claims not handled by the Claims enum are required to be valid JSON-P `javax.json.JsonValue` subtypes. The
-current complete set of valid claim types is therfore, (excluding the invalid Claims.UNKNOWN Void type):
+current complete set of valid claim types is therefore, (excluding the invalid Claims.UNKNOWN Void type):
 * java.lang.String
 * java.lang.Long
 * java.lang.Boolean
@@ -604,7 +605,7 @@ type as seen by looking at the Claims.aud enum value's Java type member.
 claim name using the Claims.iat enum value.
 <6> Injection of a custom claim that does exist will result in an Optional<Long>
 value for which isPresent() will return false.
-<7> Another inection of a non-proxyable raw type like java.lang.Long, but the use of the javax.inject.Provider interface
+<7> Another injection of a non-proxyable raw type like java.lang.Long, but the use of the javax.inject.Provider interface
 allows for injection to occur in non-RequestScoped contexts.
 <8> Injection of a JsonArray of role names via a custom "roles" claim.
 
@@ -631,10 +632,10 @@ The `java.security.Principal` returned from these methods MUST be an instance of
 
 #### `javax.ws.rs.core.SecurityContext#isUserInRole(String)`
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any
-role name that has been mapped to a group name in the MP-JWT "group" claim.
+role name that has been mapped to a group name in the MP-JWT "groups" claim.
 
 ### Mapping from `@RolesAllowed`
-Any role names used in @RolesAllowed or equivalent security constraint metadata that match role names in
+Any role names used in @RolesAllowed or equivalent security constraint metadata that match names in
 the role names that have been mapped to group names in the MP-JWT "groups" claim, MUST result
 in an allowing authorization decision wherever the security constraint has been applied.
 
@@ -649,7 +650,7 @@ The java.security.Principal returned from this method MUST be an instance of org
 
 #### javax.ejb.SessionContext#isCallerInRole(String)
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any
-role name that has been mapped to a group name in the MP-JWT "group" claim.
+role name that has been mapped to a group name in the MP-JWT "groups" claim.
 
 #### Overriding @LoginConfig from web.xml login-config
 If a deployment with a web.xml descriptor contains a login-config element, an MP-JWT implementation should view the
@@ -660,7 +661,7 @@ The java.security.Principal returned from this method MUST be an instance of org
 
 #### javax.servlet.http.HttpServletRequest#isUserInRole(String)
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any
-role name that has been mapped to a group name in the MP-JWT "group" claim.
+role name that has been mapped to a group name in the MP-JWT "groups" claim.
 
 #### javax.security.jacc.PolicyContext.getContext("javax.security.auth.Subject.container")
 The javax.security.auth.Subject returned by the PolicyContext.getContext(String key) method with the standard

@@ -83,24 +83,39 @@ For now, use cases are based on a scenario where services belong to the same sec
 
 The use case can be described as follows:
 
-. Client sends a HTTP request to Service A including the JWT as a bearer token:
+A client sends a HTTP request to Service A including the JWT as a bearer token:
 ----
     GET /resource/1 HTTP/1.1
     Host: example.com
     Authorization: Bearer mF_9.B5f-4.1JqM
 ----
-. Token-Based Authentication Mechanism in front of Service A perform all steps described on the Token-Based Authentication Section.
-. Token-Based Authentication Mechanism perform a role and group mapping based on the JWT claims. Where the role and group mapping is fully configurable by the application.
+On the server, a token-based authentication mechanism in front of Service A perform all steps described
+on the <<Token Based Authentication>> section. As part of the security context creation, the server establishes
+role and group mappings for the subject based on the JWT claims. The role to group mapping is fully
+configurable by the server along the lines of the Java EE RBAC security model.
 
-https://tools.ietf.org/html/rfc7519[JWT] tokens follow a well defined and known standard that is becoming the most common token format to protect services. It not only provides a token format but additional security aspects like signature and encryption based on another set of standards like JWS, JWE and others.
+https://tools.ietf.org/html/rfc7519[JWT] tokens follow a well defined and known standard that is becoming
+the most common token format to protect services. It not only provides a token format but additional
+security aspects like signature and encryption based on another set of standards like
+https://tools.ietf.org/html/rfc7515[JSON Web Signature (JWS)],
+https://tools.ietf.org/html/rfc7516[JSON Web Encryption (JWE)]
+and others.
 
 There are few reasons why JWT is becoming so widely adopted:
 
 * Token validation doesn’t require an additional trip and can be validated locally by each service
-* Given its JSON nature, it is solely based on claims or attributes to carry authentication and authorization information about a subject.
-* Makes easier to support different types of access control mechanisms such as ABAC, RBAC, Context-Based Access Control, etc.
+* Given its JSON nature, it is solely based on claims or attributes to carry authentication and
+authorization information about a subject.
+* Makes easier to support different types of access control mechanisms such as ABAC, RBAC,
+Context-Based Access Control, etc.
 * Message-level security using signature and encryption as defined by both JWS and JWE standards
-* Given its JSON nature, processing JWT tokens becomes trivial and lightweight. Especially if considering Java EE standards such as JSON-P or the different third-party libraries out there such as Nimbus, Jackson, etc.
-* Parties can easily agree on a specific set of claims in order to exchange both authentication and authorization information
-* Widely adopted by different Single Sign-On solutions and well known standards such as OpenID Connect given its small overhead and ability to be used across different different security domains (federation)
+* Given its JSON nature, processing JWT tokens becomes trivial and lightweight. Especially if
+considering Java EE standards such as JSON-P or the different third-party libraries out there such
+as Nimbus, Jackson, etc.
+* Parties can easily agree on a specific set of claims in order to exchange both authentication
+and authorization information. Defining this along with the Java API and mapping to JAX-RS APIs are the
+primary tasks of the MP-JWT specification.
+* Widely adopted by different Single Sign-On solutions and well known standards such as OpenID
+Connect given its small overhead and ability to be used across different different
+security domains (federation)
 
