@@ -420,7 +420,7 @@ public class RolesEndpoint {
 
 ```
 
-#### Injection of `JsonWebToken` claims via Raw Type, `ClaimValue`, `javax.inject.Provider` and JSON-P Types
+#### Injection of `JsonWebToken` claims via Raw Type, `ClaimValue`, `javax.enterprise.inject.Instance` and JSON-P Types
 
 This specification requires support for injection of claims from the current
 `JsonWebToken` using the `org.eclipse.microprofile.jwt.Claim` qualifier:
@@ -571,13 +571,13 @@ public class RolesEndpoint {
     //
     @Inject
     @Claim(standard = Claims.jti)
-    private Provider<String> providerJTI;
+    private Instance<String> providerJTI;
     @Inject // <7>
     @Claim(standard = Claims.iat)
-    private Provider<Long> providerIAT;
+    private Instance<Long> providerIAT;
     @Inject
     @Claim("groups")
-    private Provider<Set<String>> providerGroups;
+    private Instance<Set<String>> providerGroups;
     //
     @Inject
     @Claim(standard = Claims.jti)
@@ -602,7 +602,7 @@ type as seen by looking at the Claims.aud enum value's Java type member.
 claim name using the Claims.iat enum value.
 <6> Injection of a custom claim that does exist will result in an Optional<Long>
 value for which isPresent() will return false.
-<7> Another injection of a non-proxyable raw type like java.lang.Long, but the use of the javax.inject.Provider interface
+<7> Another injection of a non-proxyable raw type like java.lang.Long, but the use of the javax.enterprise.inject.Instance interface
 allows for injection to occur in non-RequestScoped contexts.
 <8> Injection of a JsonArray of role names via a custom "roles" claim.
 
@@ -618,8 +618,7 @@ should issue a warning, that may be suppressed by an implementation specific con
 
 [NOTE]
 If one needs to inject a claim value into a scope with a lifetime greater than @RequestScoped, such as
-@ApplicationScoped or @SessionScoped, one can use the javax.inject.Provider or javax.inject.Instance
-interfaces to do so.
+@ApplicationScoped or @SessionScoped, one can use the javax.enterprise.inject.Instance interface to do so.
 
 ### JAX-RS Container API Integration
 The behavior of the following JAX-RS security related methods is required for
@@ -644,7 +643,7 @@ This section describes the expected behaviors for Java EE container APIs other t
 This method should return the set of names found in the "groups" claim in the JWT if it exists, an empty set otherwise.
 
 #### javax.ejb.SessionContext.getCallerPrincipal()
-The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JsonWebToken.
+The java.security.Principal returned from this method MUST be an instance of `org.eclipse.microprofile.jwt.JsonWebToken`.
 
 #### javax.ejb.SessionContext#isCallerInRole(String)
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any

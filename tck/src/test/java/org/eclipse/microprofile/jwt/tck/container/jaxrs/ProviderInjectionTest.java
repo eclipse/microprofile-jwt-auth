@@ -51,7 +51,7 @@ import org.testng.annotations.Test;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI_PROVIDER;
 
 /**
- * Tests of injection JsonWebToken claims using the {@linkplain javax.inject.Provider} interface.
+ * Tests of injection JsonWebToken claims using the {@linkplain javax.enterprise.inject.Instance} interface.
  */
 public class ProviderInjectionTest extends Arquillian {
 
