@@ -24,8 +24,8 @@ import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.json.Json;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
@@ -44,37 +44,37 @@ import org.eclipse.microprofile.jwt.Claims;
 public class ProviderInjectionEndpoint {
     @Inject
     @Claim("raw_token")
-    private Instance<String> rawToken;
+    private Provider<String> rawToken;
     @Inject
     @Claim("iss")
-    private Instance<String> issuer;
+    private Provider<String> issuer;
     @Inject
     @Claim("jti")
-    private Instance<String> jti;
+    private Provider<String> jti;
     @Inject
     @Claim("aud")
-    private Instance<Set<String>> aud;
+    private Provider<Set<String>> aud;
     @Inject
     @Claim("iat")
-    private Instance<Long> issuedAt;
+    private Provider<Long> issuedAt;
     @Inject
     @Claim("sub")
-    private Instance<Optional<String>> optSubject;
+    private Provider<Optional<String>> optSubject;
     @Inject
     @Claim("auth_time")
-    private Instance<Optional<Long>> authTime;
+    private Provider<Optional<Long>> authTime;
     @Inject
     @Claim("custom-missing")
-    private Instance<Optional<Long>> custom;
+    private Provider<Optional<Long>> custom;
     @Inject
     @Claim("customString")
-    private Instance<String> customString;
+    private Provider<String> customString;
     @Inject
     @Claim("customInteger")
-    private Instance<JsonNumber> customInteger;
+    private Provider<JsonNumber> customInteger;
     @Inject
     @Claim("customDouble")
-    private Instance<JsonNumber> customDouble;
+    private Provider<JsonNumber> customDouble;
 
     @GET
     @Path("/verifyInjectedIssuer")
