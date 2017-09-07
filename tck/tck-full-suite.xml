@@ -56,6 +56,7 @@
                 <include name="ejb-optional" description="EJB container integration tests"/>
                 <include name="jacc-optional" description="JACC API integration tests"/>
                 <include name="servlet-optional" description="Servlet container integration tests"/>
+                <include name="ee-security-optional" description="Java EE security feature tests"/>
             </define>
             <define name="excludes">
                 <include name="debug" description="Internal debugging tests" />

@@ -46,6 +46,7 @@ import java.util.HashMap;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_EE_SECURITY;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
 
 /**
@@ -242,7 +243,7 @@ public class RolesAllowedTest extends Arquillian {
      * application declared role.
      */
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
+    @Test(groups = TEST_GROUP_EE_SECURITY,
         description = "Validate a request without an MP-JWT to endpoint requiring role mapping has HTTP_OK")
     public void testNeedsGroup1Mapping() {
         Reporter.log("testNeedsGroup1Mapping, expect HTTP_OK");
