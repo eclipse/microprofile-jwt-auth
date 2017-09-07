@@ -139,6 +139,7 @@ public class RolesEndpoint {
 
     @GET
     @Path("/getInjectedPrincipal")
+    @RolesAllowed("Tester")
     public String getInjectedPrincipal(@Context SecurityContext sec) {
         boolean isJsonWebToken = this.jwtPrincipal instanceof JsonWebToken;
         return "isJsonWebToken:"+isJsonWebToken;
