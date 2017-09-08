@@ -24,10 +24,10 @@ token. There are 3 categories of unit tests in the base required TCK:
 
 1. Tests that validate the basic behavior of the MP-JWT JsonWebToken implementation independent of any
 JAX-RS application. Tests in this category are marked with the TestNG groups of "jwt" and "utils".
-1. Tests that validate the authentication and authorization of JAX-RS application endpoints
+2. Tests that validate the authentication and authorization of JAX-RS application endpoints
 secured using `@RolesAllowed` annotations. This includes testing the requirements for rejecting MP-JWT
 tokens. Tests in this category are marked with the TestNG group "jaxrs".
-1. Tests that validate the injection of `o.e.m.j.ClaimValue`, `javax.json.JsonValue` and `javax.inject.Provider` wrappers
+3. Tests that validate the injection of `o.e.m.j.ClaimValue`, `javax.json.JsonValue` and `javax.inject.Provider` wrappers
 for the JsonWebToken claim values. Tests in this category are marked with the TestNG groups of "cdi", "cdi-json"
 and "cdi-provider".
 
@@ -36,9 +36,9 @@ The TestNG testsuite for these categories of tests can be found in the tck direc
 == Optional Java EE Container Integration Tests
 In addition to the categories of tests defined above, there are optional tests that illustrate the expected container API
 integration for Java EE container runtimes beyond JAX-RS. These tests are marked with the TestNG groups "ejb-optional",
-"jacc-optional", and "servlet-optional". An MP-JWT implementation is not required to pass these tests in order to be considered
-a valid implementation. The TestNG testsuite for these categories + the base categories of tests can be found
-in the tck directory root as tck-full-suite.xml.
+"jacc-optional", "servlet-optional" and "ee-security-optional". An MP-JWT implementation is not required to pass these tests
+in order to be considered a valid implementation. The TestNG testsuite for these categories + the base categories of tests can
+be found in the tck directory root as tck-full-suite.xml.
 
 == TCK Resource Files and Information
 
@@ -206,6 +206,42 @@ Here the Resteasy implementation is being specified.
 <5> Lastly, you must specify the property Arquillian container runtime that is
 approriate for you MP-JWT implementation, along with whatever container
 runtime dependencies are required.
+
+== What Your TCK Harness Needs to Configure
+The primary elements that need to be configured in the MP-JWT runtime are the security domain settings.
+This will entail the installation of the MP-JWT authentication mechanism, the token validation settings,
+and a group to role mapping.
+
+=== Role Mapping
+Some tests in the "ee-security-optional" group require a mapping from a group name in the "groups" claim of the
+MP-JWT token to a custom role name used in an endpoint @RolesAllowed statement. The following table lists the
+group names and the role mappings that are expected in the TCK unit tests. This includes the required one-to-one
+mapping of the group name:
+
+Echoer:: Echoer
+Tester:: Tester
+Token2Role:: Token2Role
+group1:: group1, Group1MappedRole
+
+An example of how a TCK harness implementation that is based on Glassfish might perform the group1 required mappings via  
+is shown in the following glassfish-web.xml descriptor that the TCK harness would add to the test WebArchive in it's
+ApplicationArchiveProcessor:
+[source,xml]
+-----
+<glassfish-web-app>
+    ...
+    <security-role-mapping>
+        <role-name>group1</role-name>
+        <group-name>group1</group-name>
+    </security-role-mapping>
+
+    <security-role-mapping>
+        <role-name>group1</role-name>
+        <group-name>Group1MappedRole</group-name>
+    </security-role-mapping>
+    ...
+</glassfish-web-app>
+-----
 
 == Running Your Implementation With the TCK
 Once you have built and installed your TCK harness artifact, you can run the
