@@ -61,6 +61,7 @@ public class UnsecuredPingTest extends Arquillian {
             .create(WebArchive.class, "PingTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(UnsecuredPingEndpoint.class)
+            .addClass(UnsecureTCKApplication.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
@@ -76,7 +77,7 @@ public class UnsecuredPingTest extends Arquillian {
             .queryParam("input", "hello")
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
     }
 
 }
