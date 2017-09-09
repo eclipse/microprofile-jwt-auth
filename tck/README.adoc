@@ -243,6 +243,41 @@ ApplicationArchiveProcessor:
 </glassfish-web-app>
 -----
 
+=== Equivalent Security Constraints
+This section describes the equivalent web.xml style of security constraints that are 
+expected for the various TCK deployments.
+
+ClaimValueInjectionTest::
+    * url-pattern: /endp/*
+    * role-name: Echoer
+    * role-name: Tester
+InvalidTokenTest::
+    * url-pattern: /endp/*
+    * role-name: Echoer
+JsonValueInjectionTest::
+    * url-pattern: /endp/*
+    * role-name: Echoer
+    * role-name: Tester
+ProviderValueInjectionTest::
+    * url-pattern: /endp/*
+    * role-name: Echoer
+    * role-name: Tester
+RolesAllowedTest::
+    * url-pattern: /endp/echo
+    * role-name: Echoer
+    * url-pattern: /endp/echo2
+    * role-name: NoSuchUser - This role is not granted to any test token
+    * url-pattern/endp/getPrincipalClass
+    * url-pattern/endp/checkIsUserInRole
+    * url-pattern/endp/getInjectedPrincipal
+    * role-name: Echoer
+    * url-pattern: /endp/needsGroup1Mapping
+    * role-name: Group1MappedRole - This role needs to be mapped to the token group1 group
+    * url-pattern/endp/echoNeedsToken2Role
+    * role-name: Token2Role
+UnsecuredPingTest::
+    No authentication required
+
 == Running Your Implementation With the TCK
 Once you have built and installed your TCK harness artifact, you can run the
 TCK tests against it by using either the `tokens-se` or `container` profiles.
