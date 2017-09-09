@@ -8,10 +8,7 @@
   "exp": 1311281970,
   "iat": 1311280970,
   "auth_time": 1311280969,
-  "roles": [
-    "Echoer2", "Tester2", "Tester", "Token2Role"
-  ],
-  "groups": ["Echoer2", "Tester", "group1.2", "group2.2"],
+  "groups": ["Echoer2", "Tester", "Token2Role", "group1.2", "group2.2"],
   "resource_access": {
     "/endp/echo3": {
       "groups": [
