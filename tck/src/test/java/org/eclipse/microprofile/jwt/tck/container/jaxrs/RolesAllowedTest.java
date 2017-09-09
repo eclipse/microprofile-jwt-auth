@@ -142,7 +142,7 @@ public class RolesAllowedTest extends Arquillian {
             .queryParam("input", "hello")
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         // Must return hello, user={token upn claim}
         Assert.assertEquals(reply, "hello, user=jdoe@example.com");
@@ -267,7 +267,7 @@ public class RolesAllowedTest extends Arquillian {
             .target(uri)
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         Assert.assertEquals(reply, "isJsonWebToken:true");
     }
