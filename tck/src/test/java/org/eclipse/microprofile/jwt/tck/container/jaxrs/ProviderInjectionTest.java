@@ -154,24 +154,6 @@ public class ProviderInjectionTest extends Arquillian {
     }
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI_PROVIDER,
-        description = "Verify that the injected aud claim is as expected")
-    public void verifyInjectedAudience() throws Exception {
-        Reporter.log("Begin verifyInjectedAudience\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAudience";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam(Claims.aud.name(), "s6BhdRkqt3")
-            .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        String replyString = response.readEntity(String.class);
-        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
-        JsonObject reply = jsonReader.readObject();
-        Reporter.log(reply.toString());
-        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
-    }
-    @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_PROVIDER,
         description = "Verify that the injected iat claim is as expected")
     public void verifyInjectedIssuedAt() throws Exception {
         Reporter.log("Begin verifyInjectedIssuedAt\n");
@@ -342,24 +324,6 @@ public class ProviderInjectionTest extends Arquillian {
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.jti.name(), "a-123")
-            .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        String replyString = response.readEntity(String.class);
-        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
-        JsonObject reply = jsonReader.readObject();
-        Reporter.log(reply.toString());
-        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
-    }
-    @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_PROVIDER,
-        description = "Verify that the injected aud claim is as expected")
-    public void verifyInjectedAudience2() throws Exception {
-        Reporter.log("Begin verifyInjectedAudience\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAudience";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam(Claims.aud.name(), "s6BhdRkqt3")
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);

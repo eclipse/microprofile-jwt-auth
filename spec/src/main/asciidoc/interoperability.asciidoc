@@ -1,6 +1,6 @@
 //
 // Copyright (c) 2016-2017 Eclipse Microprofile Contributors:
-// Red Hat, IBM
+// Red Hat, IBM, Tomitribe
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ kid:: This JOSE header parameter is a hint indicating which key was used to secu
 iss:: The MP-JWT issuer. https://tools.ietf.org/html/rfc7519#section-4.1.1[RFC7519, Section 4.1.1]
 sub:: Identifies the principal that is the subject of the JWT. See the "upn" claim for how this relates to the container
  java.security.Principal. https://tools.ietf.org/html/rfc7519#section-4.1.2[RFC7519, Section 4.1.2]
-aud:: Identifies the recipients that the JWT is intended for. https://tools.ietf.org/html/rfc7519#section-4.1.3[RFC7519, Section 4.1.3]
 exp:: Identifies the expiration time on or after which the JWT MUST NOT be accepted for processing.  The processing of the
     "exp" claim requires that the current date/time MUST be before the expiration date/time listed in the "exp" claim.
     Implementers MAY provide for some small leeway, usually no more than a few minutes, to account for clock skew.
@@ -82,7 +81,6 @@ An example minimal MP-JWT in JSON would be:
 }
 {
        "iss": "https://server.example.com",
-       "aud": "s6BhdRkqt3",
        "jti": "a-123",
        "exp": 1311281970,
        "iat": 1311280970,
@@ -123,15 +121,6 @@ public interface JsonWebToken extends Principal {
      */
     default String getIssuer() {
         return getClaim(Claims.iss.name());
-    }
-
-    /**
-     * The aud(Audience) claim identifies the recipients that the JWT is
-     * intended for.
-     * @return the aud claim.
-     */
-    default Set<String> getAudience() {
-        return getClaim(Claims.aud.name());
     }
 
     /**
@@ -228,7 +217,7 @@ public interface JsonWebToken extends Principal {
 The JWT can contain any number of other custom and standard claims, and these are
 made available from the JsonWebToken getOtherClaim(String) method. An example
 MP-JWT that contains additional "auth_time", "preferred_username", "acr",
-"nbf" and "roles" claims is:
+"nbf", "aud" and "roles" claims is:
 
 ```json
 {
@@ -238,7 +227,7 @@ MP-JWT that contains additional "auth_time", "preferred_username", "acr",
 }
 {
    "iss": "https://server.example.com",
-   "aud": "s6BhdRkqt3",
+   "aud": ["s6BhdRkqt3"],
    "exp": 1311281970,
    "iat": 1311280970,
    "sub": "24400320",
@@ -265,7 +254,6 @@ public enum Claims {
     // The base set of required claims that MUST have non-null values in the JsonWebToken
     iss("Issuer", String.class),
     sub("Subject", String.class),
-    aud("Audience", Set.class),
     exp("Expiration Time", Long.class),
     iat("Issued At Time", Long.class),
     jti("JWT ID", String.class),
@@ -338,6 +326,7 @@ public enum Claims {
 
 Custom claims not handled by the Claims enum are required to be valid JSON-P `javax.json.JsonValue` subtypes. The
 current complete set of valid claim types is therefore, (excluding the invalid Claims.UNKNOWN Void type):
+
 * java.lang.String
 * java.lang.Long
 * java.lang.Boolean
@@ -456,7 +445,7 @@ public @interface Claim {
 with `@Dependent` scoping.
 
 MP-JWT implementation are required to throw a `DeploymentException` when detecting the ambiguous use of a
-@Claim qualifier that includes inconsistent non-default values for both the value and standard elements as
+`@Claim` qualifier that includes inconsistent non-default values for both the value and standard elements as
 is the case shown here:
 
 [source,java]
@@ -547,13 +536,10 @@ public class RolesEndpoint {
     @Inject
     @Claim("jti")
     private ClaimValue objJTI;
-    @Inject // <4>
-    @Claim("aud")
-    private ClaimValue<Set<String>> aud;
     @Inject
     @Claim("groups")
     private ClaimValue<Set<String>> groups;
-    @Inject // <5>
+    @Inject // <6>
     @Claim(standard=Claims.iat)
     private ClaimValue<Long> issuedAtCV;
     @Inject
@@ -565,14 +551,14 @@ public class RolesEndpoint {
     @Inject
     @Claim("auth_time")
     private ClaimValue<Optional<Long>> authTime;
-    @Inject // <6>
+    @Inject // <7>
     @Claim("custom-missing")
     private ClaimValue<Optional<Long>> custom;
     //
     @Inject
     @Claim(standard = Claims.jti)
     private Instance<String> providerJTI;
-    @Inject // <7>
+    @Inject // <8>
     @Claim(standard = Claims.iat)
     private Instance<Long> providerIAT;
     @Inject
@@ -585,7 +571,7 @@ public class RolesEndpoint {
     @Inject
     @Claim(standard = Claims.iat)
     private JsonNumber jsonIAT;
-    @Inject // <8>
+    @Inject // <7>
     @Claim("roles")
     private JsonArray jsonRoles;
     @Inject
@@ -596,15 +582,13 @@ public class RolesEndpoint {
 the producer will have dependendent scope.
 <2> Injection of the raw MP-JWT token string.
 <3> Injection of the jti token id as an `Optional<String>` wapper.
-<4> Injection of the aud audience claim as a Set<String>. This is the required
-type as seen by looking at the Claims.aud enum value's Java type member.
-<5> Injection of the issued at time claim using an @Claim that references the
+<4> Injection of the issued at time claim using an `@Claim` that references the
 claim name using the Claims.iat enum value.
-<6> Injection of a custom claim that does exist will result in an Optional<Long>
+<5> Injection of a custom claim that does exist will result in an Optional<Long>
 value for which isPresent() will return false.
-<7> Another injection of a non-proxyable raw type like java.lang.Long, but the use of the javax.enterprise.inject.Instance interface
+<6> Another injection of a non-proxyable raw type like java.lang.Long, but the use of the javax.enterprise.inject.Instance interface
 allows for injection to occur in non-RequestScoped contexts.
-<8> Injection of a JsonArray of role names via a custom "roles" claim.
+<7> Injection of a JsonArray of role names via a custom "roles" claim.
 
 The example shows that one may specify the name of the claim using a
 string or a `Claims` enum value. The string form would allow for specifying non-standard

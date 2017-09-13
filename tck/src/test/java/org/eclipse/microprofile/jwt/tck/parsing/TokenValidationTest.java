@@ -99,7 +99,6 @@ public class TokenValidationTest extends Arquillian {
         Assert.assertEquals(jwt, jwtPrincipal.getRawToken(), "bearer_token");
         Assert.assertEquals("https://server.example.com", jwtPrincipal.getIssuer(), "iss");
         Assert.assertEquals("24400320", jwtPrincipal.getSubject(), "sub");
-        Assert.assertEquals("s6BhdRkqt3", jwtPrincipal.getAudience().toArray()[0], "aud");
         Assert.assertEquals("jdoe@example.com", jwtPrincipal.getName(), "name");
         Assert.assertEquals("a-123", jwtPrincipal.getTokenID(), "jti");
         Assert.assertEquals(expClaim, jwtPrincipal.getExpirationTime());
