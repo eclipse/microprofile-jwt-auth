@@ -17,6 +17,9 @@
 
 [[resource_access]]
 ## Future Directions
+
+### "resource_access" claim
+
 In future versions of the API we would like to address service specific group claims. The "resource_access"
 claim originally targeted for the 1.0 release of the specification has been postponed as addition work to determine
 the format of the claim key as well as how these claims would be surface through the standard Java EE APIs needs
@@ -27,3 +30,23 @@ https://tools.ietf.org/html/draft-campbell-oauth-resource-indicators-02[Resource
 has not gained much traction. The key point it makes that seems relevant to our investigation is that the service
 specific grants most likely need to be specified using URIs for the service endpoints. How these endpoints map to
 deployment virtual hosts and partial, wildcard, etc. URIs needs to be determined.
+
+### "roles" claim
+
+A "roles" claim was considered in addition to the "groups" claim that made it into the final
+specification.  The "groups" claim is intended to be mapped to specific roles on the target resource server.  The "roles"
+claim was intended to explicitly state roles inside the JWT that would not be subject to any mappings and are made
+available to directly to the application for `@RolesAllowed` and similar RBAC checks.  The roles in the JWT should
+be exposed to the app in addition to any roles that result from group-to-role mapping provided by the target resource server.
+The intended JWT datatype for "roles" should be a JSON string array.
+
+Though a "roles" claim is not required, implementations that support it and applications that use it should do so as
+detailed in this section to ensure alignment for any future standardization.
+
+### "aud" claim
+
+The "aud" claim defined in RFC 7519 section 4.1.3 was considered for addition.  The intended JWT datatype for
+"aud" should be a JSON string array or a single string as defined in RFC 7519.
+
+Though a "aud" claim is not required, implementations that support it and applications that use it should do so as
+detailed in this section to ensure alignment for any future standardization.
