@@ -18,8 +18,8 @@
 = Interoperable JWT RBAC for Microprofile
 :author: Scott Stark; Pedro Igor Silva
 :email: sstark@redhat.com
-:revnumber: 1.0-RC11
-:revdate: 2017-09-06
+:revnumber: 1.0
+:revdate: 2017-09-14
 :revremark: Proposed Final Draft
 :version-label!:
 :sectanchors:
