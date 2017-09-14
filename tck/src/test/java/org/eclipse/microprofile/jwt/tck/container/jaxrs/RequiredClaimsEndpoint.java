@@ -22,6 +22,7 @@ package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.Json;
@@ -36,6 +37,7 @@ import java.util.Set;
 
 @Path("/endp")
 @RequestScoped
+@RolesAllowed("Tester")
 public class RequiredClaimsEndpoint {
 
     @Inject
@@ -123,7 +125,7 @@ public class RequiredClaimsEndpoint {
         boolean pass = false;
         String msg;
         // upn
-        String upnValue = rawTokenJson.getTokenID();
+        String upnValue = rawTokenJson.getName();
         if (upnValue == null || upnValue.length() == 0) {
             msg = Claims.upn.name() + "value is null or empty, FAIL";
         }
@@ -148,7 +150,7 @@ public class RequiredClaimsEndpoint {
         boolean pass = false;
         String msg;
         // sub
-        String subValue = rawTokenJson.getTokenID();
+        String subValue = rawTokenJson.getSubject();
         if (subValue == null || subValue.length() == 0) {
             msg = Claims.sub.name() + "value is null or empty, FAIL";
         }
@@ -175,7 +177,7 @@ public class RequiredClaimsEndpoint {
         // aud
         final Set<String> audValue = rawTokenJson.getAudience();
         if (audValue != null) {
-            msg = Claims.aud.name() + "value is null or empty, FAIL";
+            msg = Claims.aud.name() + "value is NOT null, FAIL";
         }
         else {
             msg = Claims.aud.name() + " PASS";
@@ -197,7 +199,7 @@ public class RequiredClaimsEndpoint {
         // aud
         final Optional<Object> audValue = rawTokenJson.claim("aud");
         if (audValue.isPresent()) {
-            msg = Claims.aud.name() + "value is null or empty, FAIL";
+            msg = Claims.aud.name() + "value IS present, FAIL";
         }
         else {
             msg = Claims.aud.name() + " PASS";

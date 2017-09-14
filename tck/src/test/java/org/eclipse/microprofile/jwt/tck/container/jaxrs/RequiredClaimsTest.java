@@ -47,6 +47,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JWT;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_ISSUER;
 
 /**
  * Test to ensure that a MP-JWT containing only the minimum set of
@@ -106,7 +107,7 @@ public class RequiredClaimsTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "/endp/verifyIssuer";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
-                .queryParam(Claims.iss.name(), "https://issuer.example.com")
+                .queryParam(Claims.iss.name(), TEST_ISSUER)
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
