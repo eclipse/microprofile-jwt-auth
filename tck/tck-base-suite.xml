@@ -42,6 +42,7 @@
             <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsTest" />
             <class name="org.eclipse.microprofile.jwt.tck.parsing.TestTokenClaimTypesTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.UnsecuredPingTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RequiredClaimsTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ClaimValueInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.JsonValueInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionTest" />
