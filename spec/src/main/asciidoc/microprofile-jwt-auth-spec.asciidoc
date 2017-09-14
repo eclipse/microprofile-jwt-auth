@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-= Interoperable JWT RBAC for Microprofile
+= Eclipse MicroProfile Interoperable JWT RBAC
 :author: Scott Stark; Pedro Igor Silva
-:email: sstark@redhat.com
+:email: microprofile@googlegroups.com
 :revnumber: 1.0
 :revdate: 2017-09-14
 :revremark: Proposed Final Draft
@@ -31,6 +31,7 @@
 :sectnumlevels: 4
 ifdef::backend-pdf[]
 :pagenums:
+:numbered:
 endif::[]
 
 
