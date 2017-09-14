@@ -60,6 +60,15 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
+     * The aud(Audience) claim identifies the recipients that the JWT is
+     * intended for.
+     * @return the aud claim or null if the claim is not present
+     */
+    default Set<String> getAudience() {
+        return getClaim(Claims.aud.name());
+    }
+
+    /**
      * The sub(Subject) claim identifies the principal that is the subject of
      * the JWT. This is the token issuing
      * IDP subject, not the
