@@ -124,6 +124,15 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
+     * The aud(Audience) claim identifies the recipients that the JWT is
+     * intended for.
+     * @return the aud claim.
+     */
+    default Set<String> getAudience() {
+        return getClaim(Claims.aud.name());
+    }
+
+    /**
      * The sub(Subject) claim identifies the principal that is the subject of
      * the JWT. This is the token issuing
      * IDP subject, not the
@@ -262,6 +271,7 @@ public enum Claims {
     raw_token("MP-JWT specific original bearer token", String.class),
 
     // The IANA registered, but MP-JWT optional claims
+    aud("Audience", Set.class),
     nbf("Not Before", Long.class),
     auth_time("Time when the authentication occurred", Long.class),
     updated_at("Time the information was last updated", Long.class),
@@ -539,7 +549,7 @@ public class RolesEndpoint {
     @Inject
     @Claim("groups")
     private ClaimValue<Set<String>> groups;
-    @Inject // <6>
+    @Inject // <4>
     @Claim(standard=Claims.iat)
     private ClaimValue<Long> issuedAtCV;
     @Inject
@@ -551,14 +561,14 @@ public class RolesEndpoint {
     @Inject
     @Claim("auth_time")
     private ClaimValue<Optional<Long>> authTime;
-    @Inject // <7>
+    @Inject // <5>
     @Claim("custom-missing")
     private ClaimValue<Optional<Long>> custom;
     //
     @Inject
     @Claim(standard = Claims.jti)
     private Instance<String> providerJTI;
-    @Inject // <8>
+    @Inject // <6>
     @Claim(standard = Claims.iat)
     private Instance<Long> providerIAT;
     @Inject
