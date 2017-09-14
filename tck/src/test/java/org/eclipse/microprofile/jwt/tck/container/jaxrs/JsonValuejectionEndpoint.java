@@ -54,6 +54,9 @@ public class JsonValuejectionEndpoint {
     @Claim("jti")
     private JsonString jti;
     @Inject
+    @Claim("aud")
+    private JsonArray aud;
+    @Inject
     @Claim("roles")
     private JsonArray roles;
     @Inject
@@ -151,6 +154,31 @@ public class JsonValuejectionEndpoint {
         }
         else {
             msg = String.format("%s: %s != %s", Claims.jti.name(), jtiValue, jwtID);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+    @GET
+    @Path("/verifyInjectedAudience")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyInjectedAudience(@QueryParam("aud") String audience) {
+        boolean pass = false;
+        String msg;
+        // aud
+        List<JsonString> audValue = aud.getValuesAs(JsonString.class);
+        if(audValue == null || audValue.size() == 0) {
+            msg = Claims.aud.name()+"value is null or empty, FAIL";
+        }
+        else if(audValue.get(0).getString().equals(audience)) {
+            msg = Claims.aud.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.aud.name(), audValue, audience);
         }
         JsonObject result = Json.createObjectBuilder()
             .add("pass", pass)

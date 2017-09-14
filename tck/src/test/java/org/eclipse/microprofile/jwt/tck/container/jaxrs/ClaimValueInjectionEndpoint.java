@@ -51,6 +51,9 @@ public class ClaimValueInjectionEndpoint {
     @Claim("jti")
     private ClaimValue<String> jti;
     @Inject
+    @Claim("aud")
+    private ClaimValue<Set<String>> aud;
+    @Inject
     @Claim("iat")
     private ClaimValue<Long> issuedAt;
     @Inject
@@ -143,7 +146,30 @@ public class ClaimValueInjectionEndpoint {
             .build();
         return result;
     }
-
+    @GET
+    @Path("/verifyInjectedAudience")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedAudience(@QueryParam("aud") String audience) {
+        boolean pass = false;
+        String msg;
+        // aud
+        Set<String> audValue = aud.getValue();
+        if(audValue == null || audValue.size() == 0) {
+            msg = Claims.aud.name()+"value is null or empty, FAIL";
+        }
+        else if(audValue.contains(audience)) {
+            msg = Claims.aud.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.aud.name(), audValue, audience);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
     @GET
     @Path("/verifyInjectedIssuedAt")
     @Produces(MediaType.APPLICATION_JSON)

@@ -120,6 +120,15 @@ public class TestTokenClaimTypesTest extends Arquillian {
         Assert.assertEquals("a-123", jwt.getClaim(Claims.jti.name()));
     }
     @Test(groups = TEST_GROUP_JWT,
+        description = "validate the aud claim")
+    public void validateAudience() {
+        Set<String> audience = jwt.getAudience();
+        HashSet<String> actual = new HashSet<>();
+        actual.add("s6BhdRkqt3");
+        Assert.assertEquals(actual, audience);
+        Assert.assertEquals(actual, jwt.getClaim(Claims.aud.name()));
+    }
+    @Test(groups = TEST_GROUP_JWT,
         description = "validate the exp claim")
     public void validateExpirationTime() {
         Assert.assertEquals(expClaim.longValue(), jwt.getExpirationTime());
@@ -153,7 +162,7 @@ public class TestTokenClaimTypesTest extends Arquillian {
         description = "validate the claim names")
     public void validateClaimNames() {
         String[] expected = {"iss", "jti", "sub", "upn", "preferred_username",
-            "exp","iat", "roles","groups", "customString","customInteger",
+            "aud","exp","iat", "roles","groups", "customString","customInteger",
             "customStringArray", "customIntegerArray", "customDoubleArray",
             "customObject"};
         Set<String> claimNames = jwt.getClaimNames();
@@ -223,9 +232,6 @@ public class TestTokenClaimTypesTest extends Arquillian {
         JsonArray roles = myService.getJsonArray("roles");
         Assert.assertNotNull(roles);
         Assert.assertEquals("role-in-my-service", roles.getString(0));
-        JsonArray aud = myService.getJsonArray("aud");
-        Assert.assertNotNull(aud);
-        Assert.assertEquals("s6BhdRkqt3", aud.getString(0));
 
         JsonObject serviceB = value.getJsonObject("service-B");
         Assert.assertNotNull(serviceB);
