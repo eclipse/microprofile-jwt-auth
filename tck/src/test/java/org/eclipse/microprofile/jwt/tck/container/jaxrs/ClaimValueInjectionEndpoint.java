@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Optional;
 import java.util.Set;
 
+
 @Path("/endp")
 @RolesAllowed({"Echoer", "Tester"})
 @RequestScoped
@@ -75,6 +76,28 @@ public class ClaimValueInjectionEndpoint {
     @Claim("customDouble")
     private ClaimValue<JsonNumber> customDouble;
 
+    @Inject
+    @Claim(standard = Claims.raw_token)
+    private ClaimValue<String> rawTokenStandard;
+    @Inject
+    @Claim(standard = Claims.iss)
+    private ClaimValue<String> issuerStandard;
+    @Inject
+    @Claim(standard = Claims.jti)
+    private ClaimValue<String> jtiStandard;
+    @Inject
+    @Claim(standard = Claims.aud)
+    private ClaimValue<Set<String>> audStandard;
+    @Inject
+    @Claim(standard = Claims.iat)
+    private ClaimValue<Long> issuedAtStandard;
+    @Inject
+    @Claim(standard = Claims.sub)
+    private ClaimValue<String> subStandard;
+    @Inject
+    @Claim(standard = Claims.auth_time)
+    private ClaimValue<Long> authTimeStandard;
+
     @GET
     @Path("/verifyInjectedIssuer")
     @Produces(MediaType.APPLICATION_JSON)
@@ -98,6 +121,30 @@ public class ClaimValueInjectionEndpoint {
             .build();
         return result;
     }
+    @GET
+    @Path("/verifyInjectedIssuerStandard")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedIssuerStandard(@QueryParam("iss") String iss) {
+        boolean pass = false;
+        String msg;
+        String issValue = issuerStandard.getValue();
+        if(issValue == null || issValue.length() == 0) {
+            msg = Claims.iss.name()+"value is null or empty, FAIL";
+        }
+        else if(issValue.equals(iss)) {
+            msg = Claims.iss.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.iss.name(), issValue, iss);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
     @GET
     @Path("/verifyInjectedRawToken")
     @Produces(MediaType.APPLICATION_JSON)
@@ -123,6 +170,31 @@ public class ClaimValueInjectionEndpoint {
         return result;
     }
     @GET
+    @Path("/verifyInjectedRawTokenStandard")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedRawTokenStandard(@QueryParam("raw_token") String rt) {
+        boolean pass = false;
+        String msg;
+        // raw_token
+        String rawTokenValue = rawTokenStandard.getValue();
+        if(rawTokenValue == null || rawTokenValue.length() == 0) {
+            msg = Claims.raw_token.name()+"value is null or empty, FAIL";
+        }
+        else if(rawTokenValue.equals(rt)) {
+            msg = Claims.raw_token.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.raw_token.name(), rawTokenValue, rt);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
+    @GET
     @Path("/verifyInjectedJTI")
     @Produces(MediaType.APPLICATION_JSON)
     public JsonObject verifyInjectedJTI(@QueryParam("jti") String jwtID) {
@@ -146,6 +218,31 @@ public class ClaimValueInjectionEndpoint {
             .build();
         return result;
     }
+    @GET
+    @Path("/verifyInjectedJTIStandard")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedJTIStandard(@QueryParam("jti") String jwtID) {
+        boolean pass = false;
+        String msg;
+        // jti
+        String jtiValue = jtiStandard.getValue();
+        if(jtiValue == null || jtiValue.length() == 0) {
+            msg = Claims.jti.name()+"value is null or empty, FAIL";
+        }
+        else if(jtiValue.equals(jwtID)) {
+            msg = Claims.jti.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.jti.name(), jtiValue, jwtID);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
     @GET
     @Path("/verifyInjectedAudience")
     @Produces(MediaType.APPLICATION_JSON)
@@ -171,6 +268,31 @@ public class ClaimValueInjectionEndpoint {
         return result;
     }
     @GET
+    @Path("/verifyInjectedAudienceStandard")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedAudienceStandard(@QueryParam("aud") String audience) {
+        boolean pass = false;
+        String msg;
+        // aud
+        Set<String> audValue = audStandard.getValue();
+        if(audValue == null || audValue.size() == 0) {
+            msg = Claims.aud.name()+"value is null or empty, FAIL";
+        }
+        else if(audValue.contains(audience)) {
+            msg = Claims.aud.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.aud.name(), audValue, audience);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
+    @GET
     @Path("/verifyInjectedIssuedAt")
     @Produces(MediaType.APPLICATION_JSON)
     public JsonObject verifyInjectedIssuedAt(@QueryParam("iat") Long iat) {
@@ -194,6 +316,31 @@ public class ClaimValueInjectionEndpoint {
             .build();
         return result;
     }
+    @GET
+    @Path("/verifyInjectedIssuedAtStandard")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedIssuedAtStandard(@QueryParam("iat") Long iat) {
+        boolean pass = false;
+        String msg;
+        // iat
+        Long iatValue = issuedAtStandard.getValue();
+        if(iatValue == null || iatValue.intValue() == 0) {
+            msg = Claims.iat.name()+"value is null or empty, FAIL";
+        }
+        else if(iatValue.equals(iat)) {
+            msg = Claims.iat.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.iat.name(), iatValue, iat);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
     @GET
     @Path("/verifyInjectedOptionalSubject")
     @Produces(MediaType.APPLICATION_JSON)
@@ -219,6 +366,31 @@ public class ClaimValueInjectionEndpoint {
         return result;
     }
     @GET
+    @Path("/verifyInjectedSubjectStandard")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedSubjectStandard(@QueryParam("sub") String subject) {
+        boolean pass = false;
+        String msg;
+        // sub
+        String subValue = subStandard.getValue();
+        if(subValue == null || subValue.length() == 0) {
+            msg = Claims.sub.name()+" value is null or missing, FAIL";
+        }
+        else if(subValue.equals(subject)) {
+            msg = Claims.sub.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.sub.name(), subValue, subject);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
+    @GET
     @Path("/verifyInjectedOptionalAuthTime")
     @Produces(MediaType.APPLICATION_JSON)
     public JsonObject verifyInjectedOptionalAuthTime(@QueryParam("auth_time") Long authTime) {
@@ -242,6 +414,31 @@ public class ClaimValueInjectionEndpoint {
             .build();
         return result;
     }
+    @GET
+    @Path("/verifyInjectedAuthTimeStandard")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedAuthTimeStandard(@QueryParam("auth_time") Long authTime) {
+        boolean pass = false;
+        String msg;
+        // auth_time
+        Long authTimeValue = authTimeStandard.getValue();
+        if(authTimeValue == null || authTimeValue == 0) {
+            msg = Claims.auth_time.name()+" value is null or zero, FAIL";
+        }
+        else if(authTimeValue.equals(authTime)) {
+            msg = Claims.auth_time.name()+" PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("%s: %s != %s", Claims.auth_time.name(), authTimeValue, authTime);
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
     /**
      * Verify that values exist and that types match the corresponding Claims enum
      * @return a series of pass/fail statements regarding the check for each injected claim
