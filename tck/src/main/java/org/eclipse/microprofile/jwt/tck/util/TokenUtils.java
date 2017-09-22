@@ -109,6 +109,10 @@ public class TokenUtils {
         }
         long currentTimeInSecs = currentTimeInSecs();
         long exp = currentTimeInSecs + 300;
+        // Check for an input exp to override the default of now + 300 seconds
+        if (timeClaims != null && timeClaims.containsKey(Claims.exp.name())) {
+            exp = timeClaims.get(Claims.exp.name());
+        }
         jwtContent.put(Claims.iat.name(), currentTimeInSecs);
         jwtContent.put(Claims.auth_time.name(), currentTimeInSecs);
         // If the exp claim is not updated, it will be an old value that should be seen as expired
@@ -236,7 +240,7 @@ public class TokenUtils {
     /**
      * @return the current time in seconds since epoch
      */
-    private static int currentTimeInSecs() {
+    public static int currentTimeInSecs() {
         long currentTimeMS = System.currentTimeMillis();
         int currentTimeSec = (int) (currentTimeMS / 1000);
         return currentTimeSec;
