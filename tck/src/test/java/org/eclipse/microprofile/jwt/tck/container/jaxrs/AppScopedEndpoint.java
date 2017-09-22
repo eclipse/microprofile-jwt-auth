@@ -40,7 +40,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 @Path("/endp")
 public class AppScopedEndpoint {
     @Inject
-    JsonWebToken jwt;
+    private JsonWebToken jwt;
     @Inject
     @Claim(standard = Claims.iss)
     private String issuer;
