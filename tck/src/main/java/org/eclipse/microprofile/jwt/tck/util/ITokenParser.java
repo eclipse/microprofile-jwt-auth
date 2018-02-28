@@ -32,11 +32,11 @@ import java.security.PublicKey;
 public interface ITokenParser {
     /**
      *
-     * @param bearerToken
-     * @param issuer
-     * @param signedBy
+     * @param bearerToken the bearer token to parse and validate
+     * @param issuer issuer to validate the bearer token issuer against
+     * @param signedBy the public key used to validate the bearer token signature
      * @return the parsed JWTPrincipal representation
      * @throws Exception thrown on parse or validation failure
      */
-    public JsonWebToken parse(String bearerToken, String issuer, PublicKey signedBy) throws Exception;
+    JsonWebToken parse(String bearerToken, String issuer, PublicKey signedBy) throws Exception;
 }
