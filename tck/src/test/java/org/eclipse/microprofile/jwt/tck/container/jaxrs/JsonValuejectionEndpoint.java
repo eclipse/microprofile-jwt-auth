@@ -96,7 +96,7 @@ public class JsonValuejectionEndpoint {
         String msg;
         String issValue = issuer.getString();
         if(issValue == null || issValue.length() == 0) {
-            msg = Claims.iss.name()+"value is null or empty, FAIL";
+            msg = Claims.iss.name()+" value is null or empty, FAIL";
         }
         else if(issValue.equals(iss)) {
             msg = Claims.iss.name()+" PASS";
@@ -121,7 +121,7 @@ public class JsonValuejectionEndpoint {
         // raw_token
         String rawTokenValue = rawToken.getString();
         if(rawTokenValue == null || rawTokenValue.length() == 0) {
-            msg = Claims.raw_token.name()+"value is null or empty, FAIL";
+            msg = Claims.raw_token.name()+" value is null or empty, FAIL";
         }
         else if(rawTokenValue.equals(rt)) {
             msg = Claims.raw_token.name()+" PASS";
@@ -146,7 +146,7 @@ public class JsonValuejectionEndpoint {
         // jti
         String jtiValue = jti.getString();
         if(jtiValue == null || jtiValue.length() == 0) {
-            msg = Claims.jti.name()+"value is null or empty, FAIL";
+            msg = Claims.jti.name()+" value is null or empty, FAIL";
         }
         else if(jtiValue.equals(jwtID)) {
             msg = Claims.jti.name()+" PASS";
@@ -171,7 +171,7 @@ public class JsonValuejectionEndpoint {
         // aud
         List<JsonString> audValue = aud.getValuesAs(JsonString.class);
         if(audValue == null || audValue.size() == 0) {
-            msg = Claims.aud.name()+"value is null or empty, FAIL";
+            msg = Claims.aud.name()+" value is null or empty, FAIL";
         }
         else if(audValue.get(0).getString().equals(audience)) {
             msg = Claims.aud.name()+" PASS";
@@ -196,7 +196,7 @@ public class JsonValuejectionEndpoint {
         // iat
         Long iatValue = issuedAt.longValue();
         if(iatValue == null || iatValue.intValue() == 0) {
-            msg = Claims.iat.name()+"value is null or empty, FAIL";
+            msg = Claims.iat.name()+" value is null or empty, FAIL";
         }
         else if(iatValue.equals(iat)) {
             msg = Claims.iat.name()+" PASS";

@@ -106,7 +106,7 @@ public class ClaimValueInjectionEndpoint {
         String msg;
         String issValue = issuer.getValue();
         if(issValue == null || issValue.length() == 0) {
-            msg = Claims.iss.name()+"value is null or empty, FAIL";
+            msg = Claims.iss.name()+" value is null or empty, FAIL";
         }
         else if(issValue.equals(iss)) {
             msg = Claims.iss.name()+" PASS";
@@ -129,7 +129,7 @@ public class ClaimValueInjectionEndpoint {
         String msg;
         String issValue = issuerStandard.getValue();
         if(issValue == null || issValue.length() == 0) {
-            msg = Claims.iss.name()+"value is null or empty, FAIL";
+            msg = Claims.iss.name()+" value is null or empty, FAIL";
         }
         else if(issValue.equals(iss)) {
             msg = Claims.iss.name()+" PASS";
@@ -154,7 +154,7 @@ public class ClaimValueInjectionEndpoint {
         // raw_token
         String rawTokenValue = rawToken.getValue();
         if(rawTokenValue == null || rawTokenValue.length() == 0) {
-            msg = Claims.raw_token.name()+"value is null or empty, FAIL";
+            msg = Claims.raw_token.name()+" value is null or empty, FAIL";
         }
         else if(rawTokenValue.equals(rt)) {
             msg = Claims.raw_token.name()+" PASS";
@@ -178,7 +178,7 @@ public class ClaimValueInjectionEndpoint {
         // raw_token
         String rawTokenValue = rawTokenStandard.getValue();
         if(rawTokenValue == null || rawTokenValue.length() == 0) {
-            msg = Claims.raw_token.name()+"value is null or empty, FAIL";
+            msg = Claims.raw_token.name()+" value is null or empty, FAIL";
         }
         else if(rawTokenValue.equals(rt)) {
             msg = Claims.raw_token.name()+" PASS";
@@ -203,7 +203,7 @@ public class ClaimValueInjectionEndpoint {
         // jti
         String jtiValue = jti.getValue();
         if(jtiValue == null || jtiValue.length() == 0) {
-            msg = Claims.jti.name()+"value is null or empty, FAIL";
+            msg = Claims.jti.name()+" value is null or empty, FAIL";
         }
         else if(jtiValue.equals(jwtID)) {
             msg = Claims.jti.name()+" PASS";
@@ -227,7 +227,7 @@ public class ClaimValueInjectionEndpoint {
         // jti
         String jtiValue = jtiStandard.getValue();
         if(jtiValue == null || jtiValue.length() == 0) {
-            msg = Claims.jti.name()+"value is null or empty, FAIL";
+            msg = Claims.jti.name()+" value is null or empty, FAIL";
         }
         else if(jtiValue.equals(jwtID)) {
             msg = Claims.jti.name()+" PASS";
@@ -252,7 +252,7 @@ public class ClaimValueInjectionEndpoint {
         // aud
         Set<String> audValue = aud.getValue();
         if(audValue == null || audValue.size() == 0) {
-            msg = Claims.aud.name()+"value is null or empty, FAIL";
+            msg = Claims.aud.name()+" value is null or empty, FAIL";
         }
         else if(audValue.contains(audience)) {
             msg = Claims.aud.name()+" PASS";
@@ -276,7 +276,7 @@ public class ClaimValueInjectionEndpoint {
         // aud
         Set<String> audValue = audStandard.getValue();
         if(audValue == null || audValue.size() == 0) {
-            msg = Claims.aud.name()+"value is null or empty, FAIL";
+            msg = Claims.aud.name()+" value is null or empty, FAIL";
         }
         else if(audValue.contains(audience)) {
             msg = Claims.aud.name()+" PASS";
@@ -301,7 +301,7 @@ public class ClaimValueInjectionEndpoint {
         // iat
         Long iatValue = issuedAt.getValue();
         if(iatValue == null || iatValue.intValue() == 0) {
-            msg = Claims.iat.name()+"value is null or empty, FAIL";
+            msg = Claims.iat.name()+" value is null or empty, FAIL";
         }
         else if(iatValue.equals(iat)) {
             msg = Claims.iat.name()+" PASS";
@@ -325,7 +325,7 @@ public class ClaimValueInjectionEndpoint {
         // iat
         Long iatValue = issuedAtStandard.getValue();
         if(iatValue == null || iatValue.intValue() == 0) {
-            msg = Claims.iat.name()+"value is null or empty, FAIL";
+            msg = Claims.iat.name()+" value is null or empty, FAIL";
         }
         else if(iatValue.equals(iat)) {
             msg = Claims.iat.name()+" PASS";
