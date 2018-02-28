@@ -58,7 +58,7 @@ public @interface LoginConfig {
     /**
      * The realm name element specifies the realm name to
      use in HTTP Basic authorization.
-     * @return the realm name
+     * @return the configured realm-name
      */
     String realmName() default "";
 }
