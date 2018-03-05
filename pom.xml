@@ -64,7 +64,7 @@
 
     <scm>
         <connection>scm:git:https://github.com/eclipse/microprofile-jwt-auth.git</connection>
-        <developerConnection>scm:git:https://github.com/eclipse/microprofile-jwt-auth.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:eclipse/microprofile-jwt-auth.git</developerConnection>
         <url>https://github.com/eclipse/microprofile-jwt-auth</url>
         <tag>HEAD</tag>
     </scm>
