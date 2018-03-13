@@ -286,6 +286,8 @@
                         <exclude>.checkstyle</exclude>
                         <exclude>.factorypath</exclude>
                         <exclude>.editorconfig</exclude>
+                        <exclude>api/**</exclude>
+                        <exclude>spec/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
