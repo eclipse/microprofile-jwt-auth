@@ -18,7 +18,7 @@
 
     <groupId>org.eclipse.microprofile.jwt</groupId>
     <artifactId>microprofile-jwt-auth-parent</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <name>MicroProfile JWT Auth Parent</name>
     <description>Eclipse MicroProfile JWT Feature - Parent POM</description>
     <packaging>pom</packaging>
@@ -65,31 +65,30 @@
 
     <scm>
         <connection>scm:git:https://github.com/eclipse/microprofile-jwt-auth.git</connection>
-        <developerConnection>scm:git:https://github.com/eclipse/microprofile-jwt-auth.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:eclipse/microprofile-jwt-auth.git</developerConnection>
         <url>https://github.com/eclipse/microprofile-jwt-auth</url>
-        <tag>1.0</tag>
+        <tag>1.0.1</tag>
     </scm>
 
     <distributionManagement>
         <repository>
-            <id>repo.eclipse.org</id>
-            <name>Eclipse MicroProfile Repository - Releases</name>
-            <url>https://repo.eclipse.org/content/repositories/microprofile-releases/</url>
+            <id>ossrh</id>
+            <name>Sonatype OSSRH - Release Staging Area</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
-            <id>repo.eclipse.org</id>
-            <name>Eclipse MicroProfile Repository - Snapshots</name>
-            <url>https://repo.eclipse.org/content/repositories/microprofile-snapshots/</url>
-
+            <id>ossrh</id>
+             <name>Sonatype OSSRH Snapshots</name>
+             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <uniqueVersion>true</uniqueVersion>  <!-- for keeping multipe snapshot versions - maybe for staging a final version besides nightly versions -->
 
         </snapshotRepository>
     </distributionManagement>
 
     <modules>
-        <module>api</module>
+        <!--module>api</module-->
         <module>tck</module>
-        <module>spec</module>
+        <!--module>spec</module-->
     </modules>
 
     <dependencyManagement>
@@ -128,8 +127,9 @@
                     <version>2.5.3</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <arguments>${arguments} -Prelease -Drevremark=${revremark}</arguments>
                     </configuration>
                 </plugin>
                 <plugin>
