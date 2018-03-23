@@ -21,6 +21,7 @@
 /**
  * <p>Interoperable JWT RBAC for Microprofile
  *
+ * <h2>Overview</h2>
  * This package contains the primary interfaces and support classes for the JSON Web Tokens(JWT) for role based
  * access control(RBAC) of MicroProfile microservice endpoints. The primary class is the JsonWebToken interface
  * that defines the view of the current authenticated user and associated JWT claims. It is available for injection
@@ -34,7 +35,7 @@
  *     <li>ClaimValue: this is a proxyable/injectable interface that represents the value of a single JWT claim.</li>
  * </ul>
  *
- * 
+ *
  */
 @org.osgi.annotation.versioning.Version("1.0")
 package org.eclipse.microprofile.jwt;
