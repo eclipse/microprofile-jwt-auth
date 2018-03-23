@@ -178,46 +178,46 @@ public class TestTokenClaimTypesTest extends Arquillian {
         description = "validate a customString claim as String")
     public void validateCustomString() {
         String value = jwt.getClaim("customString");
-        Assert.assertEquals("customStringValue", value);
+        Assert.assertEquals(value, "customStringValue");
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate a customInteger claim as JsonNumber")
     public void validateCustomInteger() {
         JsonNumber value = jwt.getClaim("customInteger");
-        Assert.assertEquals(123456789L, value.longValue());
+        Assert.assertEquals(value.longValue(), 123456789L);
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate a customDouble claim as JsonNumber")
     public void validateCustomDouble() {
         JsonNumber value = jwt.getClaim("customDouble");
-        Assert.assertEquals(3.141592653589793, value.doubleValue(), 0.000000001);
+        Assert.assertEquals(value.doubleValue(), 3.141592653589793);
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate a customStringArray claim as JsonArray")
     public void validateCustomStringArray() {
         JsonArray value = jwt.getClaim("customStringArray");
-        Assert.assertEquals("value0", value.getString(0));
-        Assert.assertEquals("value1", value.getString(1));
-        Assert.assertEquals("value2", value.getString(2));
+        Assert.assertEquals(value.getString(0), "value0");
+        Assert.assertEquals(value.getString(1), "value1");
+        Assert.assertEquals(value.getString(2), "value2");
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate a customIntegerArray claim as JsonArray")
     public void validateCustomIntegerArray() {
         JsonArray value = jwt.getClaim("customIntegerArray");
-        Assert.assertEquals(0, value.getInt(0));
-        Assert.assertEquals(1, value.getInt(1));
-        Assert.assertEquals(2, value.getInt(2));
-        Assert.assertEquals(3, value.getInt(3));
+        Assert.assertEquals(value.getInt(0), 0);
+        Assert.assertEquals(value.getInt(1), 1);
+        Assert.assertEquals(value.getInt(2), 2);
+        Assert.assertEquals(value.getInt(3), 3);
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate a customDoubleArray claim as JsonArray")
     public void validateCustomDoubleArray() {
         JsonArray value = jwt.getClaim("customDoubleArray");
-        Assert.assertEquals(0.1, value.getJsonNumber(0).doubleValue(), 0.000001);
-        Assert.assertEquals(1.1, value.getJsonNumber(1).doubleValue(), 0.000001);
-        Assert.assertEquals(2.2, value.getJsonNumber(2).doubleValue(), 0.000001);
-        Assert.assertEquals(3.3, value.getJsonNumber(3).doubleValue(), 0.000001);
-        Assert.assertEquals(4.4, value.getJsonNumber(4).doubleValue(), 0.000001);
+        Assert.assertEquals(value.getJsonNumber(0).doubleValue(), 0.1);
+        Assert.assertEquals(value.getJsonNumber(1).doubleValue(), 1.1);
+        Assert.assertEquals(value.getJsonNumber(2).doubleValue(), 2.2);
+        Assert.assertEquals(value.getJsonNumber(3).doubleValue(), 3.3);
+        Assert.assertEquals(value.getJsonNumber(4).doubleValue(), 4.4);
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate a customObject claim as JsonObject")
@@ -227,42 +227,42 @@ public class TestTokenClaimTypesTest extends Arquillian {
         Assert.assertNotNull(myService);
         JsonArray groups = myService.getJsonArray("groups");
         Assert.assertNotNull(groups);
-        Assert.assertEquals("group1", groups.getString(0));
-        Assert.assertEquals("group2", groups.getString(1));
+        Assert.assertEquals(groups.getString(0), "group1");
+        Assert.assertEquals(groups.getString(1), "group2");
         JsonArray roles = myService.getJsonArray("roles");
         Assert.assertNotNull(roles);
-        Assert.assertEquals("role-in-my-service", roles.getString(0));
+        Assert.assertEquals(roles.getString(0), "role-in-my-service");
 
         JsonObject serviceB = value.getJsonObject("service-B");
         Assert.assertNotNull(serviceB);
         JsonArray rolesB = serviceB.getJsonArray("roles");
         Assert.assertNotNull(roles);
-        Assert.assertEquals("role-in-B", rolesB.getString(0));
+        Assert.assertEquals(rolesB.getString(0), "role-in-B");
 
         JsonObject serviceC = value.getJsonObject("service-C");
         Assert.assertNotNull(serviceC);
         JsonArray groupsC = serviceC.getJsonArray("groups");
         Assert.assertNotNull(groups);
-        Assert.assertEquals("groupC", groupsC.getString(0));
-        Assert.assertEquals("web-tier", groupsC.getString(1));
+        Assert.assertEquals(groupsC.getString(0), "groupC");
+        Assert.assertEquals(groupsC.getString(1), "web-tier");
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate the name comes from the upn claim")
     public void validateNameIsUPN() {
-        Assert.assertEquals("jdoe@example.com", jwt.getName());
+        Assert.assertEquals(jwt.getName(), "jdoe@example.com");
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate the name comes from the upn claim")
     public void validateNameIsPreferredName() throws Exception {
         String token2 = TokenUtils.generateTokenString("/usePreferredName.json");
         JsonWebToken jwt2 = tokenParser.parse(token2, TEST_ISSUER, publicKey);
-        Assert.assertEquals("jdoe", jwt2.getName());
+        Assert.assertEquals(jwt2.getName(), "jdoe");
     }
     @Test(groups = TEST_GROUP_JWT,
         description = "validate the name comes from the sub claim")
     public void validateNameIsSubject() throws Exception {
         String token2 = TokenUtils.generateTokenString("/useSubject.json");
         JsonWebToken jwt2 = tokenParser.parse(token2, TEST_ISSUER, publicKey);
-        Assert.assertEquals("24400320", jwt2.getName());
+        Assert.assertEquals(jwt2.getName(), "24400320");
     }
 }
