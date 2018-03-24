@@ -432,6 +432,7 @@ your build root:
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PrimitiveInjectionTest" />
         </classes>
     </test>
 </suite>
