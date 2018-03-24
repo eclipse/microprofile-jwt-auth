@@ -25,7 +25,6 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -59,14 +58,13 @@ public class InvalidTokenTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL publicKey = InvalidTokenTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "InvalidTokenTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(RolesEndpoint.class)
             .addClass(TCKApplication.class)
-            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
+            .addAsWebInfResource("beans.xml", "beans.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
@@ -78,7 +76,7 @@ public class InvalidTokenTest extends Arquillian {
     public void callEchoExpiredToken() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "/endp/echo";
@@ -98,7 +96,7 @@ public class InvalidTokenTest extends Arquillian {
     public void callEchoBadIssuer() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "/endp/echo";
@@ -118,7 +116,7 @@ public class InvalidTokenTest extends Arquillian {
     public void callEchoBadSigner() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "/endp/echo";
@@ -138,7 +136,7 @@ public class InvalidTokenTest extends Arquillian {
     public void callEchoBadSignerAlg() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ALG);
-        String token = TokenUtils.generateTokenString("/RolesEndpoint.json", invalidFields);
+        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "/endp/echo";

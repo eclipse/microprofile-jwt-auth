@@ -20,32 +20,38 @@
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 import org.eclipse.microprofile.jwt.Claims;
+import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
 
+/**
+ * Tests of injection of JsonWebToken claims using {@linkplain org.eclipse.microprofile.jwt.ClaimValue} interface wrappers.
+ */
 public class ClaimValueInjectionTest extends Arquillian {
 
     /**
@@ -70,14 +76,13 @@ public class ClaimValueInjectionTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL publicKey = ClaimValueInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "ClaimValueInjectionTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(ClaimValueInjectionEndpoint.class)
             .addClass(TCKApplication.class)
-            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
+            .addAsWebInfResource("beans.xml", "beans.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
@@ -86,7 +91,7 @@ public class ClaimValueInjectionTest extends Arquillian {
     @BeforeClass(alwaysRun=true)
     public static void generateToken() throws Exception {
         HashMap<String, Long> timeClaims = new HashMap<>();
-        token = TokenUtils.generateTokenString("/RolesEndpoint.json", null, timeClaims);
+        token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
         iatClaim = timeClaims.get(Claims.iat.name());
         authTimeClaim = timeClaims.get(Claims.auth_time.name());
         expClaim = timeClaims.get(Claims.exp.name());
@@ -100,15 +105,35 @@ public class ClaimValueInjectionTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuer";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam(Claims.iss.name(), "https://server.example.com")
+            .queryParam(Claims.iss.name(), TCKConstants.TEST_ISSUER)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
+    @RunAsClient
+    @Test(groups = TEST_GROUP_CDI,
+        description = "Verify that the injected token issuer claim using @Claim(standard) is as expected")
+    public void verifyIssuerStandardClaim() throws Exception {
+        Reporter.log("Begin verifyIssuerClaim");
+        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuerStandard";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam(Claims.iss.name(), TCKConstants.TEST_ISSUER)
+            .queryParam(Claims.auth_time.name(), authTimeClaim);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
+        Reporter.log(reply.toString());
+        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
+    }
+
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Verify that the injected raw token claim is as expected")
@@ -121,11 +146,31 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
+    @RunAsClient
+    @Test(groups = TEST_GROUP_CDI,
+        description = "Verify that the injected raw token claim using @Claim(standard) is as expected")
+    public void verifyInjectedRawTokenStandard() throws Exception {
+        Reporter.log("Begin verifyInjectedRawTokenStandard\n");
+        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedRawTokenStandard";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam(Claims.raw_token.name(), token)
+            .queryParam(Claims.auth_time.name(), authTimeClaim);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
+        Reporter.log(reply.toString());
+        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
+    }
+
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Verify that the injected jti claim is as expected")
@@ -138,11 +183,31 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
+    @RunAsClient
+    @Test(groups = TEST_GROUP_CDI,
+        description = "Verify that the injected jti claim using @Claim(standard) is as expected")
+    public void verifyInjectedJTIStandard() throws Exception {
+        Reporter.log("Begin verifyInjectedJTIStandard\n");
+        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedJTIStandard";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam(Claims.jti.name(), "a-123")
+            .queryParam(Claims.auth_time.name(), authTimeClaim);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
+        Reporter.log(reply.toString());
+        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
+    }
+
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Verify that the injected aud claim is as expected")
@@ -155,11 +220,33 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         System.out.println(reply);
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
+    @RunAsClient
+    @Test(groups = TEST_GROUP_CDI,
+        description = "Verify that the injected aud claim using @Claim(standard) is as expected")
+    public void verifyInjectedAudienceStandard() throws Exception {
+        Reporter.log("Begin verifyInjectedAudienceStandard\n");
+        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAudienceStandard";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam(Claims.aud.name(), "s6BhdRkqt3")
+            .queryParam(Claims.auth_time.name(), authTimeClaim);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
+        System.out.println(reply);
+        Reporter.log(reply.toString());
+        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
+    }
+
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Verify that the injected iat claim is as expected")
@@ -172,11 +259,31 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
+    @RunAsClient
+    @Test(groups = TEST_GROUP_CDI,
+        description = "Verify that the injected iat claim using @Claim(standard) is as expected")
+    public void verifyInjectedIssuedAtStandard() throws Exception {
+        Reporter.log("Begin verifyInjectedIssuedAtStandard\n");
+        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuedAtStandard";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam(Claims.iat.name(), iatClaim)
+            .queryParam(Claims.auth_time.name(), authTimeClaim);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
+        Reporter.log(reply.toString());
+        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
+    }
+
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Verify that the injected sub claim is as expected")
@@ -189,11 +296,31 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
+    @RunAsClient
+    @Test(groups = TEST_GROUP_CDI,
+        description = "Verify that the injected sub claim using @Claim(standard) is as expected")
+    public void verifyInjectedSubjectStandard() throws Exception {
+        Reporter.log("Begin verifyInjectedSubjectStandard\n");
+        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedSubjectStandard";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam(Claims.sub.name(), "24400320")
+            .queryParam(Claims.auth_time.name(), authTimeClaim);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
+        Reporter.log(reply.toString());
+        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
+    }
+
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Verify that the injected raw token claim is as expected")
@@ -205,11 +332,30 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
+    @RunAsClient
+    @Test(groups = TEST_GROUP_CDI,
+        description = "Verify that the injected raw token claim using @Claim(standard) is as expected")
+    public void verifyInjectedAuthTimeStandard() throws Exception {
+        Reporter.log("Begin verifyInjectedAuthTimeStandard\n");
+        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAuthTimeStandard";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam(Claims.auth_time.name(), authTimeClaim);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
+        Reporter.log(reply.toString());
+        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
+    }
+
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Verify that the injected custom claim is missing as expected")
@@ -221,8 +367,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             ;
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -238,8 +385,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -255,8 +403,9 @@ public class ClaimValueInjectionTest extends Arquillian {
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
-        System.out.println(reply);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
@@ -268,13 +417,17 @@ public class ClaimValueInjectionTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomDouble";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("value", 3.14159265358979323846)
+            .queryParam("value", 3.141592653589793)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        JsonObject reply = response.readEntity(JsonObject.class);
+        String replyString = response.readEntity(String.class);
+        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
+        JsonObject reply = jsonReader.readObject();
         System.out.println(reply);
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
+
+
 }

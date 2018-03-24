@@ -48,7 +48,7 @@ public class TokenUtilsTest {
     @Test(groups = TEST_GROUP_UTILS)
     public void testParseRolesEndpoint() throws Exception {
         JSONParser parser = new JSONParser(DEFAULT_PERMISSIVE_MODE);
-        InputStream contentIS = TokenUtils.class.getResourceAsStream("/RolesEndpoint.json");
+        InputStream contentIS = TokenUtils.class.getResourceAsStream("/Token1.json");
         byte[] tmp = new byte[4096];
         int length = contentIS.read(tmp);
         byte[] content = new byte[length];
@@ -65,7 +65,7 @@ public class TokenUtilsTest {
     @Test
     public void testRolesEndpointToJWTString() throws Exception {
         // Transform the JSON content into a signed JWT
-        String jwt = TokenUtils.generateTokenString("/RolesEndpoint.json");
+        String jwt = TokenUtils.generateTokenString("/Token1.json");
         System.out.println(jwt);
         /* Note that if you try to validate this token string via jwt.io debugger, you need to take the
         /publicKey.pem contents, and use

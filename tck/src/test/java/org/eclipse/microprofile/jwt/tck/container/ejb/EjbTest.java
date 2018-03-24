@@ -45,7 +45,7 @@ import java.net.URL;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
- *
+ * Basic EJB container integration tests
  */
 public class EjbTest extends Arquillian {
 
@@ -71,9 +71,10 @@ public class EjbTest extends Arquillian {
             .create(WebArchive.class, "EjbTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(EjbEndpoint.class)
+            .addClass(IService.class)
+            .addClass(ServiceEJB.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
@@ -81,7 +82,7 @@ public class EjbTest extends Arquillian {
 
     @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
-        token = TokenUtils.generateTokenString("/RolesEndpoint.json");
+        token = TokenUtils.generateTokenString("/Token1.json");
     }
 
     @RunAsClient
@@ -93,7 +94,7 @@ public class EjbTest extends Arquillian {
             .target(uri)
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         System.out.println(reply);
     }
@@ -107,7 +108,7 @@ public class EjbTest extends Arquillian {
             .target(uri)
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         System.out.println(reply);
     }
@@ -121,7 +122,7 @@ public class EjbTest extends Arquillian {
             .target(uri)
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         String[] ifaces = reply.split(",");
         boolean hasJsonWebToken = false;

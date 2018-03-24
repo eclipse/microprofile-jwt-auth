@@ -17,22 +17,18 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
-
-@Path("/ping")
-@RequestScoped
-public class UnsecuredPingEndpoint {
-    @GET
-    @Path("/echo")
-    public String echoInput(@Context SecurityContext sec, @QueryParam("input") String input) {
-        return "pinged, input="+input;
-    }
-}
-
+/**
+ * <p>Metadata for JWT RBAC for Microprofile
+ *
+ * <h2>Overview</h2>
+ * This package contains supporting metadata classes:
+ * <ul>
+ *     <li>LoginConfig: an annotation that is used by a JAX-RS Application to define the authentication
+ *     method and associated security realm.</li>
+ * </ul>
+ *
+ *
+ */
+@org.osgi.annotation.versioning.Version("1.0")
+package org.eclipse.microprofile.auth;

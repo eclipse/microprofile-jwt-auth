@@ -29,6 +29,7 @@ public class TCKConstants {
     public static final String TEST_GROUP_CDI_PROVIDER="cdi-provider";
     public static final String TEST_GROUP_EJB="ejb-optional";
     public static final String TEST_GROUP_SERVLET="servlet-optional";
+    public static final String TEST_GROUP_EE_SECURITY="ee-security-optional";
     public static final String TEST_GROUP_JACC="jacc-optional";
     public static final String TEST_GROUP_DEBUG="debug";
     public static final String TEST_ISSUER = "https://server.example.com";

@@ -20,10 +20,10 @@
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -61,11 +61,14 @@ public class UnsecuredPingTest extends Arquillian {
             .create(WebArchive.class, "PingTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(UnsecuredPingEndpoint.class)
-            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+            .addClass(UnsecureTCKApplication.class)
+            .addAsWebInfResource("beans.xml", "beans.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
+
+    @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Basic test of an unsecured JAX-RS endpoint")
     public void callEchoNoAuth() throws Exception {
         String uri = baseURL.toExternalForm() + "/ping/echo";
@@ -74,7 +77,7 @@ public class UnsecuredPingTest extends Arquillian {
             .queryParam("input", "hello")
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
     }
 
 }

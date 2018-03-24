@@ -44,7 +44,7 @@ import java.net.URL;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
- *
+ * Tests of accessing the JACC Subject to validate it contains a JsonWebToken principal
  */
 public class SubjectTest  extends Arquillian {
 
@@ -79,7 +79,7 @@ public class SubjectTest  extends Arquillian {
 
     @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
-        token = TokenUtils.generateTokenString("/RolesEndpoint.json");
+        token = TokenUtils.generateTokenString("/Token1.json");
     }
 
     @RunAsClient
@@ -91,7 +91,7 @@ public class SubjectTest  extends Arquillian {
             .target(uri)
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         System.out.println(reply);
     }

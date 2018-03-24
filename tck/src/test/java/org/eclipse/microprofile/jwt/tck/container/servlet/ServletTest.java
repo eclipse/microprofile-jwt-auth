@@ -22,6 +22,8 @@ package org.eclipse.microprofile.jwt.tck.container.servlet;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.container.ejb.EjbEndpoint;
+import org.eclipse.microprofile.jwt.tck.container.ejb.IService;
+import org.eclipse.microprofile.jwt.tck.container.ejb.ServiceEJB;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -46,7 +48,7 @@ import java.net.URL;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
- *
+ * Basic servlet container integration tests
  */
 public class ServletTest extends Arquillian {
 
@@ -73,9 +75,10 @@ public class ServletTest extends Arquillian {
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(EjbEndpoint.class)
             .addClass(ServiceServlet.class)
+            .addClass(IService.class)
+            .addClass(ServiceEJB.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
             ;
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
@@ -83,7 +86,7 @@ public class ServletTest extends Arquillian {
 
     @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
-        token = TokenUtils.generateTokenString("/RolesEndpoint.json");
+        token = TokenUtils.generateTokenString("/Token1.json");
     }
 
     @RunAsClient
@@ -95,7 +98,7 @@ public class ServletTest extends Arquillian {
             .target(uri)
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         String[] ifaces = reply.split(",");
         boolean hasJsonWebToken = false;
@@ -113,7 +116,7 @@ public class ServletTest extends Arquillian {
             .target(uri)
             ;
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         System.out.println(reply);
     }

@@ -27,7 +27,7 @@ import java.util.Set;
  * This enum represents the standardized claims that the MP-JWT specification allows for in terms of interoperability.
  * For every claim in this enum, an MP-JWT implementation must return a value of the indicated type from
  * {@link JsonWebToken#getClaim(String)} method. An implementation is free to include
- * any additional claims, and users of {@link JsonWebToken#getClaim(String)} can expect that the JSON-B corresponding
+ * any additional claims, and users of {@link JsonWebToken#getClaim(String)} can expect that the JSON-P corresponding
  * Java type is seen based on the JSON type of the claim.
  *
  * The set of included claims is defined by IANA, see https://www.iana.org/assignments/jwt/jwt.xhtml
@@ -36,7 +36,6 @@ public enum Claims {
     // The base set of required claims that MUST have non-null values in the JsonWebToken
     iss("Issuer", String.class),
     sub("Subject", String.class),
-    aud("Audience", Set.class),
     exp("Expiration Time", Long.class),
     iat("Issued At Time", Long.class),
     jti("JWT ID", String.class),
@@ -45,6 +44,7 @@ public enum Claims {
     raw_token("MP-JWT specific original bearer token", String.class),
 
     // The IANA registered, but MP-JWT optional claims
+    aud("Audience", Set.class),
     nbf("Not Before", Long.class),
     auth_time("Time when the authentication occurred", Long.class),
     updated_at("Time the information was last updated", Long.class),
@@ -87,7 +87,7 @@ public enum Claims {
     kid("Key identifier", String.class),
     jku("JWK Set URL", String.class),
 
-    UNKNOWN("A catch all for any unknown claim", Object.class)
+    UNKNOWN("A catch all for any unknown claim", Void.class)
     ;
 
     private String description;

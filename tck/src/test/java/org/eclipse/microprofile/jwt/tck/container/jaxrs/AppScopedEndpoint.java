@@ -19,20 +19,35 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import javax.enterprise.context.RequestScoped;
+import javax.annotation.security.RolesAllowed;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Response;
 
-@Path("/ping")
-@RequestScoped
-public class UnsecuredPingEndpoint {
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.Claims;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+/**
+ * Test that an attempt to inject a raw token value type into an @ApplicationScoped bean
+ * generates a DeploymentException
+ */
+@ApplicationScoped
+@RolesAllowed("Tester")
+@Path("/endp")
+public class AppScopedEndpoint {
+    @Inject
+    private JsonWebToken jwt;
+    @Inject
+    @Claim(standard = Claims.iss)
+    private String issuer;
+
     @GET
-    @Path("/echo")
-    public String echoInput(@Context SecurityContext sec, @QueryParam("input") String input) {
-        return "pinged, input="+input;
+    @Path("/verify")
+    public Response verifyInjectedIssuer(@QueryParam("iss") String iss) {
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     }
 }
-

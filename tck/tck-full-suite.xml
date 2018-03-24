@@ -18,32 +18,60 @@
     <!-- The required base JAX-RS and CDI based tests that all MP-JWT implementations
     must pass.
     -->
-    <test name="base-tests">
+    <test name="base-tests" verbose="10">
         <groups>
+            <define name="base-groups">
+                <include name="arquillian" description="Arquillian internal"/>
+                <include name="utils" description="Utility tests"/>
+                <include name="jwt" description="Base JsonWebToken tests"/>
+                <include name="jaxrs" description="JAX-RS invocation tests"/>
+                <include name="cdi" description="Base CDI injection of ClaimValues"/>
+                <include name="cdi-json" description="CDI injection of JSON-P values"/>
+                <include name="cdi-provider" description="CDI injection of javax.inject.Provider values"/>
+            </define>
+            <define name="excludes">
+                <include name="debug" description="Internal debugging tests" />
+            </define>
             <run>
-                <include name="arquillian" />
-                <include name="jwt" />
-                <include name="utils" />
-                <include name="jaxrs" />
-                <include name="cdi" />
-                <exclude name="debug" />
-                <include name="ejb-optional" />
-                <include name="servlet-optional" />
-                <include name="jacc-optional" />
+                <include name="base-groups" />
+                <exclude name="excludes" />
             </run>
         </groups>
         <classes>
             <class name="org.eclipse.microprofile.jwt.tck.parsing.TokenValidationTest" />
             <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PingTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.parsing.TestTokenClaimTypesTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.UnsecuredPingTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RequiredClaimsTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ClaimValueInjectionTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.JsonValueInjectionTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
-            <!-- Optional tests that validate integration with EJB, Servlet and JACC
-            container APIs.
-            -->
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest" />
+        </classes>
+    </test>
+    <test name="extended-tests" verbose="10">
+        <groups>
+            <define name="extended-groups">
+                <include name="arquillian" description="Arquillian internal"/>
+                <include name="ejb-optional" description="EJB container integration tests"/>
+                <include name="jacc-optional" description="JACC API integration tests"/>
+                <include name="servlet-optional" description="Servlet container integration tests"/>
+                <include name="ee-security-optional" description="Java EE security feature tests"/>
+            </define>
+            <define name="excludes">
+                <include name="debug" description="Internal debugging tests" />
+            </define>
+            <run>
+                <include name="extended-groups" />
+                <exclude name="excludes" />
+            </run>
+        </groups>
+        <classes>
             <class name="org.eclipse.microprofile.jwt.tck.container.ejb.EjbTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jacc.SubjectTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.servlet.ServletTest" />
         </classes>
-    </test>
 
+    </test>
 </suite>
