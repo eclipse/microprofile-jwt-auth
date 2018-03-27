@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Vetoed;
 
 import config.seimpl.converters.StringArrayConverter;

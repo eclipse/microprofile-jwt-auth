@@ -24,7 +24,6 @@ package config.seimpl.cdi;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.Vetoed;
 import javax.enterprise.inject.spi.InjectionPoint;
 
 import org.eclipse.microprofile.config.Config;
