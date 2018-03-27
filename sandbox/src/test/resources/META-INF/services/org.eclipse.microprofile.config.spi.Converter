@@ -1,0 +1,2 @@
+org.eclipse.microprofile.auth.config.PrivateKeyConverter
+org.eclipse.microprofile.auth.config.PublicKeyConverter
