@@ -90,6 +90,7 @@
         <module>api</module>
         <module>tck</module>
         <module>spec</module>
+        <module>sandbox</module>
     </modules>
 
     <dependencyManagement>
@@ -209,7 +210,9 @@
                                 <module name="MethodName">
                                     <property name="format" value="${checkstyle.methodNameFormat}" />
                                 </module>
-                                <module name="PackageName" />
+                                <module name="PackageName">
+                                    <property name="format" value="^[a-z]+([a-z0-9])*(\.[a-z][a-z0-9]*)*$"/>
+                                </module>
                                 <module name="LocalFinalVariableName" />
                                 <module name="ParameterName" />
                                 <module name="StaticVariableName" />
