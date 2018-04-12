@@ -206,30 +206,6 @@
 
     <profiles>
         <profile>
-            <!-- The tokens profile is a base profile used to test the basics of a JWTPrincipal implementation
-            using an implementation provided org.eclipse.microprofile.jwt.tck.util.ITokenParser via a service provider
-            using the ServiceLoader pattern.
-            -->
-            <id>tokens-se</id>
-            <properties>
-                <tck.includes>org.eclipse.microprofile.jwt.tck.parsing.TokenValidationTest</tck.includes>
-            </properties>
-
-            <dependencies>
-                <dependency>
-                    <!--
-                    These need to be specified as system properties on mvn command line:
-                    mvn -Pcontainer -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck \
-                    -Dtck.container.version=1.0-SNAPSHOT test
-                    -->
-                    <groupId>${tck.container.groupId}</groupId>
-                    <artifactId>${tck.container.artifactId}</artifactId>
-                    <version>${tck.container.version}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>container</id>
             <properties>
                 <tck.testSuite>tck-base-suite.xml</tck.testSuite>
