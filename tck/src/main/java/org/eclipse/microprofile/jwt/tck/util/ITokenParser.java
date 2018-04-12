@@ -26,7 +26,9 @@ import java.security.PublicKey;
 /**
  * The TCK requires test harness integration code to bridge between the unit tests and vendor implementations.
  * An implementation ITokenParser interface
+ * @deprecated This will be removed in the 2.0 release as it is no longer used by the TCK.
  */
+@Deprecated()
 public interface ITokenParser {
     /**
      *
