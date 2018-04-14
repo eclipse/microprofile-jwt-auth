@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.auth.config;
+package org.eclipse.microprofile.authentication.config;
 
 import java.io.InputStream;
 import java.security.KeyFactory;

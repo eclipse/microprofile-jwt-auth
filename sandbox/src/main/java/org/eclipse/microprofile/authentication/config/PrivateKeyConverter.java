@@ -1,4 +1,4 @@
-package org.eclipse.microprofile.auth.config;
+package org.eclipse.microprofile.authentication.config;
 
 /*
  * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
@@ -23,7 +23,7 @@ import java.security.PrivateKey;
 
 import org.eclipse.microprofile.config.spi.Converter;
 
-import static org.eclipse.microprofile.auth.config.TokenUtils.decodePrivateKey;
+import static org.eclipse.microprofile.authentication.config.TokenUtils.decodePrivateKey;
 
 /**
  * A custom configuration converter for {@linkplain PrivateKey} injection using

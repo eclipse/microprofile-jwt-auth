@@ -29,7 +29,12 @@
     <description>Eclipse MicroProfile JWT Feature - Sandbox</description>
 
     <properties>
+        <version.jose4j>0.6.2</version.jose4j>
+        <version.numbusds>4.23</version.numbusds>
+        <version.auth0>3.0.1</version.auth0>
+        <version.jsonwebtoken>0.9.0</version.jsonwebtoken>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>javax.json</groupId>
@@ -59,6 +64,36 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth-api</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth-tck</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bitbucket.b_c</groupId>
+            <artifactId>jose4j</artifactId>
+            <version>${version.jose4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${version.numbusds}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${version.auth0}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${version.jsonwebtoken}</version>
         </dependency>
     </dependencies>
     <build>

@@ -22,7 +22,7 @@ package issue62;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.eclipse.microprofile.auth.JWTAuthenticationMechanismDefinition;
+import org.eclipse.microprofile.authentication.JWTAuthenticationMechanismDefinition;
 
 /**
  * An example JWTAuthenticationMechanism bean
