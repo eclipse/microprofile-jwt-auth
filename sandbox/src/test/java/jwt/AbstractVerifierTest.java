@@ -60,7 +60,8 @@ public abstract class AbstractVerifierTest {
         int expGracePeriodSecs = 60;
         validateToken(token, publicKey, TEST_ISSUER, expGracePeriodSecs);
     }
-    @Test(expectedExceptions = {BadJWSException.class, SignatureVerificationException.class, InvalidJwtSignatureException.class, SignatureException.class},
+    @Test(expectedExceptions = {BadJWSException.class, SignatureVerificationException.class,
+        InvalidJwtSignatureException.class, SignatureException.class},
         description = "Illustrate validation of signer")
     public void testFailSignature() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();

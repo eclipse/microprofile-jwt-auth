@@ -44,7 +44,8 @@ public class Jose4jVerifierTest extends AbstractVerifierTest {
 
         if (expGracePeriodSecs > 0) {
             builder.setAllowedClockSkewInSeconds(expGracePeriodSecs);
-        } else {
+        }
+        else {
             builder.setEvaluationTime(NumericDate.fromSeconds(0));
         }
 
