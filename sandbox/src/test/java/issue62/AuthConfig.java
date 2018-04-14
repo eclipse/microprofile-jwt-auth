@@ -36,19 +36,19 @@ public class AuthConfig {
     @Inject
     private Config config;
     @Inject
-    @ConfigProperty(name = "org.eclipse.microprofile.auth.JWT.signerPublicKey")
+    @ConfigProperty(name = "org.eclipse.microprofile.authentication.JWT.verifierPublicKey")
     private String testKey;
     @Inject
-    @ConfigProperty(name = "org.eclipse.microprofile.auth.JWT.signerPublicKey")
+    @ConfigProperty(name = "org.eclipse.microprofile.authentication.JWT.verifierPublicKey")
     private PublicKey keyFromPEM;
     @Inject
-    @ConfigProperty(name = "org.eclipse.microprofile.auth.JWT.issuer")
+    @ConfigProperty(name = "org.eclipse.microprofile.authentication.JWT.issuer")
     private String issuer;
     @Inject
-    @ConfigProperty(name = "org.eclipse.microprofile.auth.JWT.issuers")
+    @ConfigProperty(name = "org.eclipse.microprofile.authentication.JWT.issuers")
     private String[] issuers;
     @Inject
-    @ConfigProperty(name = "org.eclipse.microprofile.auth.JWT.clockSkew", defaultValue = "30")
+    @ConfigProperty(name = "org.eclipse.microprofile.authentication.JWT.clockSkew", defaultValue = "30")
     private int clockSkew;
 
     public Config getConfig() {

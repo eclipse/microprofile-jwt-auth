@@ -17,16 +17,18 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.auth;
+package org.eclipse.microprofile.authentication;
 
+
+import org.eclipse.microprofile.jwt.config.Names;
 
 /**
  * Annotation used to define a container AuthenticationMechanism that implements the MP-JWT authentication protocol as defined
  * by the Microprofile JWT RBAC spec and makes that implementation available as an enabled CDI bean.
  */
 public @interface JWTAuthenticationMechanismDefinition {
-    String publicKey() default  "#{MPConfig.config[\"org.eclipse.microprofile.auth.JWT.signerPublicKey\"]}";
-    String acceptedIssuer() default "#{MPConfig.config[\"org.eclipse.microprofile.auth.JWT.issuer\"]}";
-    String[] acceptedIssuers() default "#{MPConfig.config[\"org.eclipse.microprofile.auth.JWT.issuers\"]}";
+    String verifierKey() default  "#{MPConfig.config["+ Names.VERIFIER_PUBLIC_KEY +"]}";
+    String acceptedIssuer() default "#{MPConfig.config["+ Names.ISSUER +"]}";
+    String[] acceptedIssuers() default "#{MPConfig.config["+ Names.ISSUERS +"]}";
     int clockSkew() default 30;
 }

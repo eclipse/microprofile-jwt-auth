@@ -17,13 +17,13 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.auth.config;
+package org.eclipse.microprofile.authentication.config;
 
 import java.security.PublicKey;
 
 import org.eclipse.microprofile.config.spi.Converter;
 
-import static org.eclipse.microprofile.auth.config.TokenUtils.decodePublicKey;
+import static org.eclipse.microprofile.authentication.config.TokenUtils.decodePublicKey;
 
 /**
  * A custom configuration converter for {@linkplain PublicKey} injection using
@@ -32,7 +32,7 @@ import static org.eclipse.microprofile.auth.config.TokenUtils.decodePublicKey;
 public class PublicKeyConverter implements Converter<PublicKey> {
     /**
      * Converts a string to a PublicKey by loading it as a classpath resource
-     * @param value - the string value to convert
+     * @param value - the PEM encoded string value to convert
      * @return the PublicKey loaded as a resource
      * @throws IllegalArgumentException - on failure to load the key
      */
@@ -43,7 +43,7 @@ public class PublicKeyConverter implements Converter<PublicKey> {
             pk = decodePublicKey(value);
         }
         catch (Exception e) {
-            IllegalArgumentException ex = new IllegalArgumentException("Failed to parse ");
+            IllegalArgumentException ex = new IllegalArgumentException("Failed to parse: "+value);
             ex.initCause(e);
             throw ex;
         }
