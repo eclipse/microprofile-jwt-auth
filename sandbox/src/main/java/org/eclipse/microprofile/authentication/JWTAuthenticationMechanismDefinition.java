@@ -27,8 +27,8 @@ import org.eclipse.microprofile.jwt.config.Names;
  * by the Microprofile JWT RBAC spec and makes that implementation available as an enabled CDI bean.
  */
 public @interface JWTAuthenticationMechanismDefinition {
-    String verifierKey() default  "#{MPConfig.config["+ Names.verifierPublicKey+"]}";
-    String acceptedIssuer() default "#{MPConfig.config["+ Names.issuer +"]}";
-    String[] acceptedIssuers() default "#{MPConfig.config["+ Names.issuers +"]}";
+    String verifierKey() default  "#{MPConfig.config["+ Names.VERIFIER_PUBLIC_KEY +"]}";
+    String acceptedIssuer() default "#{MPConfig.config["+ Names.ISSUER +"]}";
+    String[] acceptedIssuers() default "#{MPConfig.config["+ Names.ISSUERS +"]}";
     int clockSkew() default 30;
 }
