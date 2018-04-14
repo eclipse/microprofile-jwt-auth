@@ -109,19 +109,29 @@ public class TokenUtils {
         }
         long currentTimeInSecs = currentTimeInSecs();
         long exp = currentTimeInSecs + 300;
+        long iat = currentTimeInSecs;
+        long authTime = currentTimeInSecs;
+        boolean expWasInput = false;
         // Check for an input exp to override the default of now + 300 seconds
         if (timeClaims != null && timeClaims.containsKey(Claims.exp.name())) {
             exp = timeClaims.get(Claims.exp.name());
+            expWasInput = true;
         }
-        jwtContent.put(Claims.iat.name(), currentTimeInSecs);
-        jwtContent.put(Claims.auth_time.name(), currentTimeInSecs);
+        // iat and auth_time should be before any input exp value
+        if(expWasInput) {
+            iat = exp - 5;
+            authTime = exp - 5;
+        }
+        jwtContent.put(Claims.iat.name(), iat);
+        jwtContent.put(Claims.auth_time.name(), authTime);
         // If the exp claim is not updated, it will be an old value that should be seen as expired
         if (!invalidClaims.contains(InvalidClaims.EXP)) {
             jwtContent.put(Claims.exp.name(), exp);
         }
+        // Return the token time values if requested
         if(timeClaims != null) {
-            timeClaims.put(Claims.iat.name(), currentTimeInSecs);
-            timeClaims.put(Claims.auth_time.name(), currentTimeInSecs);
+            timeClaims.put(Claims.iat.name(), iat);
+            timeClaims.put(Claims.auth_time.name(), authTime);
             timeClaims.put(Claims.exp.name(), exp);
         }
 
