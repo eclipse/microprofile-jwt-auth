@@ -20,10 +20,8 @@
 package jwt;
 
 import java.security.interfaces.RSAPublicKey;
-import java.util.Date;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtParser;
