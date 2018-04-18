@@ -61,6 +61,6 @@ public class JWKSResTest {
         URL signerJwk = new URL("pemjwks:/publicKey.pem?kid=pem-test");
         String signerJwkContent = signerJwk.getContent().toString();
         System.out.println(signerJwkContent);
-        Assert.assertTrue(signerJwkContent.length() > 450, "Expect more than 450 chars in publicKey.pem jwks");
+        Assert.assertTrue(signerJwkContent.length() > 400, "Expect more than 450 chars in publicKey.pem jwks");
     }
 }
