@@ -112,7 +112,8 @@ public class TokenUtils {
      * @return the JWT string
      * @throws Exception on parse failure
      */
-    public static String generateTokenString(PrivateKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
+    public static String generateTokenString(PrivateKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims,
+            Map<String, Long> timeClaims) throws Exception {
         if (invalidClaims == null) {
             invalidClaims = Collections.emptySet();
         }
