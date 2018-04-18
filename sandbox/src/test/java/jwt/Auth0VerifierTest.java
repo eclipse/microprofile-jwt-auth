@@ -25,12 +25,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.Verification;
 
 public class Auth0VerifierTest extends AbstractVerifierTest {
     @Override
     protected void validateToken(String token, RSAPublicKey publicKey, String issuer, int expGracePeriodSecs) throws Exception {
-        Algorithm algorithm = Algorithm.RSA256(publicKey);
-        JWTVerifier.Verification builder = JWT.require(algorithm)
+        Algorithm algorithm = Algorithm.RSA256(publicKey, null);
+        Verification builder = JWT.require(algorithm)
             .withIssuer(issuer);
         if(expGracePeriodSecs > 0) {
             builder = builder.acceptLeeway(expGracePeriodSecs);

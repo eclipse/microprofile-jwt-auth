@@ -26,6 +26,7 @@ import java.util.HashSet;
 import com.auth0.jwt.exceptions.AlgorithmMismatchException;
 import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJWSException;
 import com.nimbusds.jwt.proc.BadJWTException;
@@ -81,7 +82,7 @@ public abstract class AbstractVerifierTest {
         int expGracePeriodSecs = 60;
         validateToken(token, publicKey, TEST_ISSUER, expGracePeriodSecs);
     }
-    @Test(expectedExceptions = {BadJWTException.class, InvalidJwtException.class, InvalidClaimException.class, ExpiredJwtException.class},
+    @Test(expectedExceptions = {BadJWTException.class, InvalidJwtException.class, TokenExpiredException.class, ExpiredJwtException.class},
         description = "Illustrate validation of exp")
     public void testFailExpired() throws Exception {
         HashMap<String, Long> timeClaims = new HashMap<>();
@@ -105,10 +106,10 @@ public abstract class AbstractVerifierTest {
     }
     /**
      *
-     * @param token
-     * @param publicKey
-     * @param issuer
-     * @param expGracePeriodSecs
+     * @param token - the signed, base64 encoded header.content.sig JWT string
+     * @param publicKey - the public key to verify the expected signature
+     * @param issuer - the expected iss claim value
+     * @param expGracePeriodSecs - grace period in seconds for evaluating the exp claim
      * @throws Exception
      */
     abstract protected void validateToken(String token, RSAPublicKey publicKey, String issuer, int expGracePeriodSecs)

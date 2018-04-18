@@ -31,7 +31,7 @@
     <properties>
         <version.jose4j>0.6.2</version.jose4j>
         <version.numbusds>4.23</version.numbusds>
-        <version.auth0>3.0.1</version.auth0>
+        <version.auth0>3.3.0</version.auth0>
         <version.jsonwebtoken>0.9.0</version.jsonwebtoken>
     </properties>
 
@@ -89,6 +89,11 @@
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>${version.auth0}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>jwks-rsa</artifactId>
+            <version>0.3.0</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
