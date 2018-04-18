@@ -31,7 +31,11 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import org.eclipse.microprofile.jwt.Claims;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -92,6 +96,24 @@ public class TokenUtils {
      * @throws Exception on parse failure
      */
     public static String generateTokenString(String jsonResName, Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
+        // Use the test private key associated with the test public key for a valid signature
+        PrivateKey pk = readPrivateKey("/privateKey.pem");
+        return generateTokenString(pk, "/privateKey.pem", jsonResName, invalidClaims, timeClaims);
+    }
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
+     * test resource key, possibly with invalid fields.
+     *
+     * @param pk - the private key to sign the token with
+     * @param kid - the kid claim to assign to the token
+     * @param jsonResName   - name of test resources file
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
+     * @param timeClaims - used to return the exp, iat, auth_time claims
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String generateTokenString(PrivateKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims,
+            Map<String, Long> timeClaims) throws Exception {
         if (invalidClaims == null) {
             invalidClaims = Collections.emptySet();
         }
@@ -135,15 +157,10 @@ public class TokenUtils {
             timeClaims.put(Claims.exp.name(), exp);
         }
 
-        PrivateKey pk;
         if (invalidClaims.contains(InvalidClaims.SIGNER)) {
             // Generate a new random private key to sign with to test invalid signatures
             KeyPair keyPair = generateKeyPair(2048);
             pk = keyPair.getPrivate();
-        }
-        else {
-            // Use the test private key associated with the test public key for a valid signature
-            pk = readPrivateKey("/privateKey.pem");
         }
 
         // Create RSA-signer with the private key
@@ -157,13 +174,33 @@ public class TokenUtils {
             signer = new MACSigner(secret.toByteArray());
         }
         JWSHeader jwtHeader = new JWSHeader.Builder(alg)
-                .keyID("/privateKey.pem")
+                .keyID(kid)
                 .type(JOSEObjectType.JWT)
                 .build();
         SignedJWT signedJWT = new SignedJWT(jwtHeader, claimsSet);
         signedJWT.sign(signer);
         String jwt = signedJWT.serialize();
         return jwt;
+    }
+
+    /**
+     * Read a classpath resource into a string and return it.
+     * @param resName - classpath resource name
+     * @return the resource content as a string
+     * @throws IOException - on failure
+     */
+    public static String readResource(String resName) throws IOException {
+        InputStream is = TokenUtils.class.getResourceAsStream(resName);
+        StringWriter sw = new StringWriter();
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            String line = br.readLine();
+            while(line != null) {
+                sw.write(line);
+                sw.write('\n');
+                line = br.readLine();
+            }
+        }
+        return sw.toString();
     }
 
     /**

@@ -284,6 +284,7 @@
                         <exclude>.travis.yml.*</exclude>
                         <exclude>bnd.bnd</exclude>
                         <exclude>**/*.json</exclude>
+                        <exclude>**/*.jwk</exclude>
                         <exclude>**/META-INF/services/*</exclude>
                         <exclude>*.log</exclude>
                         <exclude>.checkstyle</exclude>
