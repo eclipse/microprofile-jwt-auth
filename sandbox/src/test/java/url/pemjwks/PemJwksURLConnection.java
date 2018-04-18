@@ -54,7 +54,8 @@ public class PemJwksURLConnection extends URLConnection {
         if(query != null) {
             String[] parts = query.split("=");
             kid = parts[1];
-        } else {
+        }
+        else {
             // Some random kid
             kid = Long.toHexString(Double.doubleToLongBits(Math.random()));
         }
@@ -91,21 +92,22 @@ public class PemJwksURLConnection extends URLConnection {
         RSAPublicKey publicKey;
         try {
             publicKey = (RSAPublicKey) TokenUtils.decodePublicKey(content.toString());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IOException(e);
         }
-/*
-    "keys": [
-        {
-            "kty": "RSA",
-            "e": "AQAB",
-            "use": "sig",
-            "kid": "jwk-test",
-            "alg": "RS256",
-            "n": "uGU_nmjYC7cKRR89NCAoLvMhsjKyJ1z22WhlKdHGIZfMZI8n9vvOLgx21fEAiR9MLyiy397UKjYCvVwvaB9d0Iwj4G8cP8keLpY_sn38mUiPm1OdcbruQDu6fN6JjNexbogAoI5agpBzj-NrRqLuk-UTHmKGVNyKPRjcPoiHSQNis0T0_ZJn-BDIYDIwbpnfm0pYMbhxtsULMCZn_DKwQL_0OWJ_lZ_zWBOO5r-WLD-M7QfjS52pHHkDwV0SybdMkAZ_eInkYc1m_SdhauemcNhbLt84sBpsl2-5rXgWM7w3w9hEt3qgpwfelNEFbkonR_qnQd0auRk6esvAQc25Ow"
-        }
-    ]
- */
+        /*
+            "keys": [
+                {
+                    "kty": "RSA",
+                    "e": "AQAB",
+                    "use": "sig",
+                    "kid": "jwk-test",
+                    "alg": "RS256",
+                    "n": "uGU_nmjYC7cK...
+                }
+            ]
+         */
         JsonObjectBuilder jwksBuilder = Json.createObjectBuilder();
         JsonObjectBuilder keyBuilder = Json.createObjectBuilder();
         BigInteger nBI = publicKey.getModulus();
