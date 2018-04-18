@@ -27,7 +27,11 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.security.PrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -38,6 +42,7 @@ import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwt.consumer.InvalidJwtException;
+import org.jose4j.keys.BigEndianBigInteger;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
@@ -90,6 +95,19 @@ public abstract class AbstractJWKSTest {
     static PrivateKey loadPrivateKey() throws Exception {
         String jwk = TokenUtils.readResource("/signer-keypair.jwk");
         RsaJsonWebKey rsaJsonWebKey = (RsaJsonWebKey) JsonWebKey.Factory.newJwk(jwk);
+        RSAPublicKey pk = rsaJsonWebKey.getRsaPublicKey();
+        String e = new String(Base64.getUrlEncoder().withoutPadding().encode(pk.getPublicExponent().toByteArray()));
+        byte[] nbytes = pk.getModulus().toByteArray();
+        if(nbytes[0] == 0 && nbytes.length > 1) {
+            byte[] tmp = new byte[nbytes.length-1];
+            System.arraycopy(nbytes, 1, tmp, 0, tmp.length);
+            nbytes = tmp;
+        }
+        String n = new String(Base64.getUrlEncoder().withoutPadding().encode(nbytes));
+        System.out.printf("e: %s\n", e);
+        System.out.printf("n: %s\n", n);
+        n = BigEndianBigInteger.toBase64Url(pk.getModulus());
+        System.out.printf("n: %s\n", n);
         return rsaJsonWebKey.getRsaPrivateKey();
     }
 

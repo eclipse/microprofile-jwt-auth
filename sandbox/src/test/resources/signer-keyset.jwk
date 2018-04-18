@@ -2,7 +2,6 @@
     "keys": [
         {
             "kty": "RSA",
-            "d": "rq-Mc3-TnJWM7yrHCoikSMYgV_ba-5uAZzoVDGckslJiWamdDMhD7S_1rHwiK8UwoUSHILqyeEKumcGpT5TXhWgd3NKmCm93Xl8MfQYJtRUepuGxuDqE1uk-pGkWGg2Ek9fX8EKr0CEUuW2TBVn5drZ_RDvGUsKTW4ofrEYfE7S4t3If2UXpxRb5-6QlmU7xCy7TOwBhaXaUde0Mllepncbl1FNTvRlDyuGWomNFBOqdZqqDkTUSdzQ7FjjufBWc-kvW5PLum_lECUf5ky3diyqM87U5v5K5b55TB0Y7kEUr782StmMg7kmimIswrMMifTj5R4VRprgyPF_rQanhcQ",
             "e": "AQAB",
             "use": "sig",
             "kid": "jwk-test",
