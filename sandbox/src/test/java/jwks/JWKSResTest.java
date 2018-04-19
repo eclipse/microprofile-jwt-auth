@@ -19,7 +19,12 @@
  */
 package jwks;
 
+import java.io.StringReader;
 import java.net.URL;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -46,21 +51,43 @@ public class JWKSResTest {
     }
 
     /**
-     *
-     * @throws Exception
+     * Validate that the jwks: protocol handler works
+     * @throws Exception on failure
      */
     @Test
     public void testJwksURL() throws Exception {
+        // Load the /signer-keyset.jwk resource from the classpath as a JWKS
         URL signerJwk = new URL("jwks:/signer-keyset.jwk");
-        String signerJwkContent = signerJwk.getContent().toString();
-        System.out.println(signerJwkContent);
-        Assert.assertTrue(signerJwkContent.length() > 450, "Expect more than 450 chars in signer.jwk");
+        String signerJwksContent = signerJwk.getContent().toString();
+        System.out.println(signerJwksContent);
+        JsonObject jwks = Json.createReader(new StringReader(signerJwksContent)).readObject();
+        JsonArray keys = jwks.getJsonArray("keys");
+        JsonObject key = keys.getJsonObject(0);
+        Assert.assertEquals(key.getJsonString("kty").getString(), "RSA");
+        Assert.assertEquals(key.getJsonString("use").getString(), "sig");
+        Assert.assertEquals(key.getJsonString("kid").getString(), "jwk-test");
+        Assert.assertEquals(key.getJsonString("alg").getString(), "RS256");
+        Assert.assertEquals(key.getJsonString("e").getString(), "AQAB");
+        Assert.assertTrue(key.getJsonString("n").getString().startsWith("uGU_nmjYC7cKRR89NCAo"));
     }
+    /**
+     * Validate that the pemjwks: protocol handler works
+     * @throws Exception on failure
+     */
     @Test
     public void testPemJwksURL() throws Exception {
+        // Load the /publicKey.pem resource from the classpath as a JWKS
         URL signerJwk = new URL("pemjwks:/publicKey.pem?kid=pem-test");
-        String signerJwkContent = signerJwk.getContent().toString();
-        System.out.println(signerJwkContent);
-        Assert.assertTrue(signerJwkContent.length() > 400, "Expect more than 450 chars in publicKey.pem jwks");
+        String signerJwksContent = signerJwk.getContent().toString();
+        System.out.println(signerJwksContent);
+        JsonObject jwks = Json.createReader(new StringReader(signerJwksContent)).readObject();
+        JsonArray keys = jwks.getJsonArray("keys");
+        JsonObject key = keys.getJsonObject(0);
+        Assert.assertEquals(key.getJsonString("kty").getString(), "RSA");
+        Assert.assertEquals(key.getJsonString("use").getString(), "sig");
+        Assert.assertEquals(key.getJsonString("kid").getString(), "pem-test");
+        Assert.assertEquals(key.getJsonString("alg").getString(), "RS256");
+        Assert.assertEquals(key.getJsonString("e").getString(), "AQAB");
+        Assert.assertTrue(key.getJsonString("n").getString().startsWith("livFI8qB4D0y2jy0Cf"));
     }
 }
