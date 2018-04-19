@@ -51,7 +51,7 @@ public class JWKSResTest {
      */
     @Test
     public void testJwksURL() throws Exception {
-        URL signerJwk = new URL("jwks:/signer.jwk");
+        URL signerJwk = new URL("jwks:/signer-keyset.jwk");
         String signerJwkContent = signerJwk.getContent().toString();
         System.out.println(signerJwkContent);
         Assert.assertTrue(signerJwkContent.length() > 450, "Expect more than 450 chars in signer.jwk");
