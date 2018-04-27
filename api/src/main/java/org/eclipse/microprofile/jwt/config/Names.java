@@ -23,45 +23,22 @@ package org.eclipse.microprofile.jwt.config;
  * Constants for the names of the MP-config properties that MP-JWT implementations must support externalization
  * of to ensure portable setup of MP-JWT implementations.
  */
-public class Names {
+public interface Names {
     /**
-     * The PEM encoded public key of the MP-JWT signer
-     * TODO: decide if this should be dropped. If not, a standard Converter&lt;PublicKey&gt;
-     *     should be provided with the appropriate META-INF/services/... definition
+     * The embedded key material of the public key for the MP-JWT signer in PKCS8 PEM or JWK(S) format.  If not found
+     * the {@linkplain #VERIFIER_PUBLIC_KEY_LOCATION} needs to be checked.
      */
-    public final static String VERIFIER_PUBLIC_KEY = "org.eclipse.microprofile.authentication.JWT.verifierPublicKey";
+    String VERIFIER_PUBLIC_KEY = "mp.jwt.verify.publickey";
 
     /**
-     * The expected iss claim value to validate against an MP-JWT
+     * The expected iss claim value to validate against an MP-JWT. If not provided, there will be no
+     * validation of the MP-JWT iss claim.
      */
-    public final static String ISSUER = "org.eclipse.microprofile.authentication.JWT.issuer";
-    /**
-     * The expected iss claim value(s) as an array to validate against an MP-JWT
-     * TODO: are both a single and array values needed?
-     */
-    public final static String ISSUERS = "org.eclipse.microprofile.authentication.JWT.issuers";
+    String ISSUER = "mp.jwt.issuer";
 
     /**
-     * The allowed clock skew in seconds to use when validate the MP-JWT exp claim
+     * The relative path or full URL of the public key.  All relative paths will be resolved within the archive using
+     * ClassLoader.getResource.  If the value is a URL it will be resolved using `new URL(“”).openStream()`
      */
-    public final static String CLOCK_SKEW = "org.eclipse.microprofile.authentication.JWT.clockSkew";
-
-    /**
-     * The URI of an endpoint providing a JSON Web Key Set (JWKS) for the allowed signers of the MP-JWT.
-     * The type of this property is a String or URI
-     * The keys in the returned key set must include the following parameters:
-     * "kty": "RSA",
-     * "use": "sig",
-     * "alg": "RS256",
-     * "n" (Modulus) Parameter
-     * "e" (Exponent) Parameter
-     */
-    public final static String VERIFIER_JWKS_URI = "org.eclipse.microprofile.authentication.JWT.VERIFIER_JWKS_URI";
-
-    /**
-     * The interval in minutes that the contents of the VERIFIER_JWKS_URI may be cached without reloading.
-     */
-    public final static String VERIFIER_JWKS_REFRESH_INTERVAL = "org.eclipse.microprofile.authentication.JWT.VERIFIER_JWKS_REFRESH_INTERVAL";
-
-    private Names(){}
+    String VERIFIER_PUBLIC_KEY_LOCATION = "mp.jwt.verify.publickey.location";
 }
