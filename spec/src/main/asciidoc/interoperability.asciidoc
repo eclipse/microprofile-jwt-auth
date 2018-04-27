@@ -454,7 +454,7 @@ public @interface Claim {
 
 with `@Dependent` scoping.
 
-MP-JWT implementation are required to throw a `DeploymentException` when detecting the ambiguous use of a
+MP-JWT implementations are required to throw a `DeploymentException` when detecting the ambiguous use of a
 `@Claim` qualifier that includes inconsistent non-default values for both the value and standard elements as
 is the case shown here:
 
