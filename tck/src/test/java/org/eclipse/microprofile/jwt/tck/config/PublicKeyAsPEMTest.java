@@ -30,7 +30,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -59,7 +58,7 @@ public class PublicKeyAsPEMTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive
+     * Create a CDI aware base web application archive that includes an embedded PEM public key
      * @return the base base web application archive
      * @throws IOException - on resource failure
      */
@@ -78,15 +77,21 @@ public class PublicKeyAsPEMTest extends Arquillian {
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
+    /**
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that
+     * is referenced via the mp.jwt.verify.publickey.location property.
+     * @return the base base web application archive
+     * @throws IOException - on resource failure
+     */
     @Deployment()
     public static WebArchive createLocationDeployment() throws IOException {
         URL publicKey = PublicKeyAsPEMTest.class.getResource("/publicKey.pem");
-        URL config = PublicKeyAsPEMTest.class.getResource("/META-INF/microprofile-config.properties");
+        URL config = PublicKeyAsPEMTest.class.getResource("/META-INF/microprofile-config-location.properties");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsPEMTest.war")
-            .addAsResource(publicKey, "/publicKey.pem")
+            .create(WebArchive.class, "PublicKeyAsPEMTest2.war")
+            .addAsResource(publicKey, "/publicKey4k.pem")
             .addClass(PublicKeyAsPEMEndpoint.class)
-            .addClass(TCKApplication.class)
+            .addClass(AltApplication.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
             .addAsManifestResource(config, "microprofile-config.properties")
             ;
@@ -98,15 +103,12 @@ public class PublicKeyAsPEMTest extends Arquillian {
     @Test(groups = TEST_GROUP_CONFIG,
         description = "Validate a request with MP-JWT succeeds with HTTP_OK, and replies with hello, user={token upn claim}")
     public void testKeyAsEmbeded() throws Exception {
-        Reporter.log("callEcho, expect HTTP_OK");
+        Reporter.log("testKeyAsEmbeded, expect HTTP_OK");
 
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         String kid = "/privateKey4k.pem";
         HashMap<String, Long> timeClaims = new HashMap<>();
         String token = TokenUtils.generateTokenString(privateKey, kid, "/Token1.json", null, timeClaims);
-        Long iatClaim = timeClaims.get(Claims.iat.name());
-        Long authTimeClaim = timeClaims.get(Claims.auth_time.name());
-        Long expClaim = timeClaims.get(Claims.exp.name());
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
@@ -120,7 +122,24 @@ public class PublicKeyAsPEMTest extends Arquillian {
         Assert.assertEquals(reply, "hello, user=jdoe@example.com");
     }
 
+    @Test
     public void testKeyAsLocation() throws Exception {
+        Reporter.log("testKeyAsEmbeded, expect HTTP_OK");
 
+        PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
+        String kid = "/privateKey4k.pem";
+        HashMap<String, Long> timeClaims = new HashMap<>();
+        String token = TokenUtils.generateTokenString(privateKey, kid, "/Token1.json", null, timeClaims);
+
+        String uri = baseURL.toExternalForm() + "alt/echo";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam("input", "hello")
+            ;
+        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String reply = response.readEntity(String.class);
+        // Must return hello, user={token upn claim}
+        Assert.assertEquals(reply, "hello, user=jdoe@example.com");
     }
 }
