@@ -1,0 +1,187 @@
+//
+// Copyright (c) 2016-2017 Eclipse Microprofile Contributors:
+// Red Hat, IBM, Tomitribe
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+## Configuration
+
+Verification of the MP-JWT is done with the RSA Public Key corresponding to the
+RSA Private Key held by the JWT issuer and used to sign the JWT.
+
+The goal if this chapter is to detail means of passing the Public Key to the MicroProfile
+JWT implementation as well as any standard configuration options for the verification
+itself.  MicroProfile JWT leverages the MicroProfile Config specification to provide a
+consistent means of passing all support configuration options.
+
+Prior to MicroProfile JWT 1.1 all configuration options for the Public Key and verification were vendor-specific.
+Any vendor-specific methods of configuration are still valid and shall be considered to override
+any standard configuration mechanisms.
+
+### Obtaining the Public Key
+
+In practice, the Public Key is often obtained manually from the Issuer and stored
+in or passed to the binary of the Microservice.  Public Keys do not rotate frequently
+and this is a realistic option for many environments.  For comparison, SSL/TLS Certificates
+to support HTTPS, which are also Public Key based, are usually configured in the JVM
+itself and last for up to two years.
+
+Alternatively, Public Keys may be obtained by the Microservice at runtime, directly from
+the Issuer via HTTPS request.  MicroProfile JWT implementations are required to support
+this method of fetching the Public Key from the Issuer via means defined here.  It should
+be noted, however, not all Issuers support downloading of the Public Key via HTTPS request.
+
+TODO: define the exact http method
+TODO: frequency of checking is not defined
+
+### Supported Public Key Formats
+
+Support for RSA Public Keys of 1024 or 2048 bits in length is required. Other key
+sizes are allowed, but should be considered vendor-specific.
+
+Other asymmetric signature algorithms are allowed, but should be considered vendor-specific.  This includes
+Digital Signature Algorithm (DSA), Diffie-Hellman (DS), Elliptical curve Digital Signature Algorithm (ECDSA),
+Edwards-curve Digital Signature Algorithm (EdDSA, aka ed25519)
+
+NOTE: Symmetrically signed JWTs such as HMAC-SHA256 (hs256) are explicitly not supported, deemed
+insecure for a distributed Microservice architecture where JWTs are expected to be passed around
+freely.  Use of symmetric signatures would require all microservices to share a secret, eliminating
+the ability to determine who created the JWT.
+
+Public Keys may be formatted in any of the following formats, specified in order of precedence:
+
+ - Public Key Cryptography Standards #8 (PKCS#8) PEM
+ - JSON Web Key (JWK)
+ - JSON Web Key Set (JWKS)
+
+Support for other public key formats such as PKCS#1, SSH2, or OpenSSH Public Key format is
+considered optional.
+
+MicroProfile JWT implementations are required to throw a `DeploymentException` when given a
+public key that cannot be parsed using either the standardly supported or vendor-specific key
+formats.
+
+MicroProfile JWT implementations are required to throw a `DeploymentException` when given a
+Private Key in any format.
+
+#### PCKS#8
+
+Public Key Cryptography Standards #8 (PKCS#8) PEM format is a plain text format and is the
+default format for OpenSSL, many public/private key tools and is natively supported in
+Java.
+
+The format consists of a Base64 encoded value wrapped in a standard `-----BEGIN PUBLIC KEY-----`
+header and footer.  The Base42 encoded data can be decoded and the resulting byte array passed
+ directly to `java.security.spec.PKCS8EncodedKeySpec`.
+
+The following is an example of a valid RSA 2048 bit Public Key in PKCS#8 PEM format.
+
+[source,text]
+----
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0440JtmhlywtkMvR6tTM
+s0U6e9Ja4xXj5+q+joWdT2xCHt91Ck9+5C5WOaRTco4CPFMBxoUPi1jktW5c+Oyk
+nOIACXu6grXexarFQLjsREE+dkDVrMu75f7Gb9/lC7mrVM73118wnMP2u5MOQIoX
+OqqC1y1gaoJaLp/OjTiJGCm4uxzubzUPN5IDAFaTfK+QErhtcGeBDwWjvikGfUfX
++WVq74DOoggLiGbB4jsT8iVXEm53JcoEY8nVr2ygr92TuU1+xLAGisjRSYJVe7V1
+tpdRG1CiyCIkqhDFfFBGhFnWlu4gKMiT0KToA9GJfOuCz67XZEAhQYizcXbn1uxa
+OQIDAQAB
+-----END PUBLIC KEY-----
+----
+
+MicroProfile JWT implementations must inspect supplied public key text for
+the `-----BEGIN PUBLIC KEY-----` header and parse the key as PCKS#8 if the
+header if found.
+
+Support for legacy PKCS#1 format is not required and should be considered
+vendor-specific.  PKCS#1 formatted keys can be identified by the use of
+`-----BEGIN RSA PUBLIC KEY-----` header and footer.
+
+MicroProfile JWT implementations are required to throw a `DeploymentException` if
+given a Private Key in any format such as `-----BEGIN PRIVATE KEY-----` or
+`-----BEGIN RSA PRIVATE KEY-----`
+
+#### JSON Web Key (JWK)
+
+JSON Web Key (JWK) allows for a Public Key to be formatted in json and optionally
+Base64 encoded.
+
+At minimum `JWK` formatted Public Keys must contain the `kty` field.  RSA public
+keys must contain the `n` and `e` fields.
+
+The following example is the previously shown PKCS#8 PEM formatted Public Key converted
+to JWK format.
+
+[source,json]
+----
+{
+  "kty": "RSA",
+  "n": "sszbq1NfZap2IceUCO9rCF9ZYfHE3oU5m6Avgyxu1LmlB6rNPejO-eB7T9iIhxXCEKsGDcx4Cpo5nxnW5PSQZM_wzXg1bAOZ3O6k57EoFC108cB0hdvOiCXXKOZGrGiZuF7q5Zt1ftqIk7oK2gbItSdB7dDrR4CSJSGhsSu5mP0",
+  "e": "AQAB"
+}
+----
+
+MicroProfile JWT implementations are required to throw a `DeploymentException` if
+the JWK `kty` field is missing or JSON text is found, but does not follow either
+JWK or JWKS format.
+
+See https://tools.ietf.org/html/rfc7517[RFC-7517] for further details on JWK format and optional fields.
+
+#### JSON Web Key Set (JWKS)
+
+The JSON Web Key Set (JWKS) format allows for multiple keys to supplied, which can be useful for either key rotation or supporting environments that have multiple JWT Issuers and therefore multiple Public Keys.
+
+An example of a valid JWKS:
+
+[source,json]
+----
+{
+  "keys": [
+    {
+      "kid": "orange-1234",
+      "kty": "RSA",
+      "n": "sszbq1NfZap2IceUCO9rCF9ZYfHE3oU5m6Avgyxu1LmlB6rNPejO-eB7T9iIhxXCEKsGDcx4Cpo5nxnW5PSQZM_wzXg1bAOZ3O6k57EoFC108cB0hdvOiCXXKOZGrGiZuF7q5Zt1ftqIk7oK2gbItSdB7dDrR4CSJSGhsSu5mP0",
+      "e": "AQAB"
+    },
+    {
+      "kid": "orange-5678",
+      "kty": "RSA",
+      "n": "xC7RfPpTo7362rzATBu45Jv0updEZcr3IqymjbZRkpgTR8B19b_rS4dIficnyyU0plefkE2nJJyJbeW3Fon9BLe4_srfXtqiBKcyqINeg0GrzIqoztZBmmmdo13lELSrGP91oHL-UtCd1u5C1HoJc4bLpjUYxqOrJI4mmRC3Ksk5DV2OS1L5P4nBWIcR1oi6RQaFXy3zam3j1TbCD5urkE1CfUATFwfXfFSPTGo7shNqsgaWgy6B205l5Lq5UmMUBG0prK79ymjJemODwrB445z-lk3CTtlMN7bcQ3nC8xh-Mb2XmRB0uoU4K3kHTsofXG4dUHWJ8wGXEXgJNOPzOQ",
+      "e": "AQAB"
+    }
+  ]
+}
+----
+
+If the incoming JWT uses the `kid` header field and there is a key in the supplied JWK set with the same `kid`,
+only that key is considered for verification of the JWT's digital signature.
+
+For example, the following decoded JWT would involve a check on only the `orange-5678` key.
+
+[source,json]
+----
+{
+  "alg": "RS256",
+  "typ": "JWT",
+  "kid": "orange-5678"
+}.
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "admin": true,
+  "iat": 1516239022
+}
+----
+
+In the absense of a matching `kid`, all keys in the set will be tried in the order listed.
