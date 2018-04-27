@@ -54,10 +54,12 @@ import java.util.Set;
 import static net.minidev.json.parser.JSONParser.DEFAULT_PERMISSIVE_MODE;
 
 /**
- * Utiltities for generating a JWT for testing
+ * Utilities for generating a JWT for testing
  */
 public class TokenUtils {
+
     private TokenUtils() {
+        // no-op: utility class
     }
 
     /**
@@ -68,7 +70,7 @@ public class TokenUtils {
      * @return the JWT string
      * @throws Exception on parse failure
      */
-    public static String generateTokenString(String jsonResName) throws Exception {
+    public static String generateTokenString(final String jsonResName) throws Exception {
         return generateTokenString(jsonResName, Collections.emptySet());
     }
 
@@ -81,7 +83,7 @@ public class TokenUtils {
      * @return the JWT string
      * @throws Exception on parse failure
      */
-    public static String generateTokenString(String jsonResName, Set<InvalidClaims> invalidClaims) throws Exception {
+    public static String generateTokenString(final String jsonResName, final Set<InvalidClaims> invalidClaims) throws Exception {
         return generateTokenString(jsonResName, invalidClaims, null);
     }
 
@@ -179,8 +181,7 @@ public class TokenUtils {
                 .build();
         SignedJWT signedJWT = new SignedJWT(jwtHeader, claimsSet);
         signedJWT.sign(signer);
-        String jwt = signedJWT.serialize();
-        return jwt;
+        return signedJWT.serialize();
     }
 
     /**
@@ -209,12 +210,11 @@ public class TokenUtils {
      * @return PrivateKey
      * @throws Exception on decode failure
      */
-    public static PrivateKey readPrivateKey(String pemResName) throws Exception {
+    public static PrivateKey readPrivateKey(final String pemResName) throws Exception {
         InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
         byte[] tmp = new byte[4096];
         int length = contentIS.read(tmp);
-        PrivateKey privateKey = decodePrivateKey(new String(tmp, 0, length));
-        return privateKey;
+        return decodePrivateKey(new String(tmp, 0, length));
     }
     /**
      * Read a PEM encoded public key from the classpath
@@ -222,12 +222,11 @@ public class TokenUtils {
      * @return PublicKey
      * @throws Exception on decode failure
      */
-    public static PublicKey readPublicKey(String pemResName) throws Exception {
+    public static PublicKey readPublicKey(final String pemResName) throws Exception {
         InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
         byte[] tmp = new byte[4096];
         int length = contentIS.read(tmp);
-        PublicKey publicKey = decodePublicKey(new String(tmp, 0, length));
-        return publicKey;
+        return decodePublicKey(new String(tmp, 0, length));
     }
 
     /**
@@ -236,11 +235,10 @@ public class TokenUtils {
      * @return KeyPair
      * @throws NoSuchAlgorithmException on failure to load RSA key generator
      */
-    public static KeyPair generateKeyPair(int keySize) throws NoSuchAlgorithmException {
+    public static KeyPair generateKeyPair(final int keySize) throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(keySize);
-        KeyPair keyPair = keyPairGenerator.genKeyPair();
-        return keyPair;
+        return keyPairGenerator.genKeyPair();
     }
 
     /**
@@ -249,16 +247,12 @@ public class TokenUtils {
      * @return PrivateKey
      * @throws Exception on decode failure
      */
-    public static PrivateKey decodePrivateKey(String pemEncoded) throws Exception {
-        pemEncoded = removeBeginEnd(pemEncoded);
-        byte[] pkcs8EncodedBytes = Base64.getDecoder().decode(pemEncoded);
+    public static PrivateKey decodePrivateKey(final String pemEncoded) throws Exception {
+        byte[] encodedBytes = toEncodedBytes(pemEncoded);
 
-        // extract the private key
-
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(pkcs8EncodedBytes);
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        PrivateKey privKey = kf.generatePrivate(keySpec);
-        return privKey;
+        return kf.generatePrivate(keySpec);
     }
 
     /**
@@ -268,12 +262,16 @@ public class TokenUtils {
      * @throws Exception on decode failure
      */
     public static PublicKey decodePublicKey(String pemEncoded) throws Exception {
-        pemEncoded = removeBeginEnd(pemEncoded);
-        byte[] encodedBytes = Base64.getDecoder().decode(pemEncoded);
+        byte[] encodedBytes = toEncodedBytes(pemEncoded);
 
         X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePublic(spec);
+    }
+
+    private static byte[] toEncodedBytes(final String pemEncoded) {
+        final String normalizedPem = removeBeginEnd(pemEncoded);
+        return Base64.getDecoder().decode(normalizedPem);
     }
 
     private static String removeBeginEnd(String pem) {
@@ -289,8 +287,7 @@ public class TokenUtils {
      */
     public static int currentTimeInSecs() {
         long currentTimeMS = System.currentTimeMillis();
-        int currentTimeSec = (int) (currentTimeMS / 1000);
-        return currentTimeSec;
+        return (int) (currentTimeMS / 1000);
     }
 
     /**
