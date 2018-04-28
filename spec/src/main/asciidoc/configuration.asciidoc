@@ -23,10 +23,10 @@ JWT Issuer.
 
 At the time of JWT creation, the Issuer will sign the JWT with its Private Key before
 passing it to the user.  Upon receiving the JWT in future HTTP requests, Microservices can
-than use the matching Public Key to verify JWT and trust the user information (claims) it
-contains.
+then use the matching Public Key to verify the JWT and trust the user information (claims)
+it contains.
 
-The goal if this chapter is to detail means of passing the Public Key from the JWT Issuer
+The goal of this chapter is to detail means of passing the Public Key from the JWT Issuer
 to the MicroProfile JWT implementation as well as any standard configuration options for
 the verification itself.
 
