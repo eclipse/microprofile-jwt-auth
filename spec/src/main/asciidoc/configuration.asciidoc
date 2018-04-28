@@ -74,7 +74,7 @@ precedence:
  - JSON Web Key (JWK) Base64 URL encoded
  - JSON Web Key Set (JWKS) Base64 URL encoded
 
-Attempts to parse the Public Key material will proceed in the order specified above until
+Attempts to parse the Public Key text will proceed in the order specified above until
 a valid Public Key can be derived.
 
 Support for other Public Key formats such as PKCS#1, SSH2, or OpenSSH Public Key format is
@@ -93,8 +93,8 @@ Public Key Cryptography Standards #8 (PKCS#8) PEM format is a plain text format 
 default format for OpenSSL, many public/private key tools and is natively supported in
 Java.
 
-The format consists of a Base64 encoded value wrapped in a standard `-----BEGIN PUBLIC
-KEY-----` header and footer.  The Base42 encoded data can be decoded and the resulting
+The format consists of a Base64 URL encoded value wrapped in a standard `-----BEGIN PUBLIC
+KEY-----` header and footer.  The Base64 URL encoded data can be decoded and the resulting
 byte array passed directly to `java.security.spec.PKCS8EncodedKeySpec`.
 
 The following is an example of a valid RSA 2048 bit Public Key in PKCS#8 PEM format.
@@ -112,11 +112,11 @@ OQIDAQAB
 -----END PUBLIC KEY-----
 ----
 
-MicroProfile JWT implementations must inspect supplied public key text for the `-----BEGIN
-PUBLIC KEY-----` header and parse the key as PCKS#8 if the header if found.
+MicroProfile JWT implementations must inspect the supplied Public Key body for the
+`-----BEGIN PUBLIC KEY-----` header and parse the key as PCKS#8 if found.
 
-Support for legacy PKCS#1 format is not required and should be considered vendor-specific.
-PKCS#1 formatted keys can be identified by the use of `-----BEGIN RSA PUBLIC KEY-----`
+Support for the legacy PKCS#1 format is not required and should be considered vendor-specific.
+PKCS#1 formatted keys can be identified by the use of the `-----BEGIN RSA PUBLIC KEY-----`
 header and footer.
 
 MicroProfile JWT implementations are required to throw a `DeploymentException` if given a
@@ -128,7 +128,7 @@ KEY-----`
 JSON Web Key (JWK) allows for a Public Key to be formatted in json and optionally Base64
 encoded.
 
-At minimum `JWK` formatted Public Keys must contain the `kty` field.  RSA public keys must
+At minimum JWK formatted Public Keys must contain the `kty` field.  RSA Public Keys must
 contain the `n` and `e` fields.
 
 The following example is the previously shown PKCS#8 PEM formatted Public Key converted to
@@ -147,7 +147,7 @@ MicroProfile JWT implementations are required to throw a `DeploymentException` i
 `kty` field is missing or JSON text is found, but does not follow either JWK or JWKS
 format.
 
-The JWK maybe supplied in plain JSON or Base64 encoded JSON format.
+The JWK may be supplied in plain JSON or Base64 URL encoded JSON format.
 
 See https://tools.ietf.org/html/rfc7517[RFC-7517] for further details on JWK format and
 optional fields.
@@ -204,7 +204,7 @@ key.
 
 In the absence of a matching `kid`, all keys in the set will be tried in the order listed.
 
-The JWKS maybe supplied in plain JSON or Base64 encoded JSON format.
+The JWKS maybe supplied in plain JSON or Base64 URL encoded JSON format.
 
 ### Configuration Parameters
 
@@ -217,13 +217,14 @@ or via command-line via -D properties as follows:
 java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=orange.pem
 ----
 
-By convention, property names are always lowercase and begin with `mp.jwt.`
+By convention of the MicroProfile JWT specification, property names are always lowercase
+and begin with `mp.jwt.`
 
 #### `mp.jwt.verify.publickey`
 
-The `mp.jwt.verify.publickey` config property allows the Public Key material itself to be
+The `mp.jwt.verify.publickey` config property allows the Public Key text itself to be
 supplied as a string.  The Public Key will be parsed from the supplied string in the order
-defined in section "Supported Public Key Formats"
+defined in section <<Supported Public Key Formats>>.
 
 The following example shows a Base 64 URL encoded JWK passed via system property.
 
@@ -274,14 +275,14 @@ Microservice's binary or locally on disk.
 java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=orange.pem
 ----
 
-Any non URL is treated identically and may be a path inside or outside the archive.
+Any non-URL is treated identically and may be a path inside or outside the archive.
 
 [source,bash]
 ----
 java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=/META-INF/orange.pem
 ----
 
-Parsing of the file contents occurs as defined in "Supported Public Key Formats"
+Parsing of the file contents occurs as defined in <<Supported Public Key Formats>>
 
 ##### file: URL Scheme
 
@@ -293,15 +294,15 @@ file via full url.
 java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=file:///opt/keys/orange.pem
 ----
 
-Parsing of the file contents occurs as defined in "Supported Public Key Formats"
+Parsing of the file contents occurs as defined in <<Supported Public Key Formats>>
 
 ##### http: URL Scheme
 
 HTTP and HTTPS URL paths allow for the Public Key to be fetched from a remote host, which
 may be the JWT Issuer or some other trusted internet or intranet location.
 
-The location supplied must respond to an HTTP GET.  Parsing of the http message body
-occurs as defined in "Supported Public Key Formats"
+The location supplied must respond to an HTTP GET.  Parsing of the HTTP message body
+occurs as defined in <<Supported Public Key Formats>>
 
 [source,bash]
 ----
@@ -352,8 +353,8 @@ public class Handler extends URLStreamHandler {
 See https://docs.oracle.com/javase/8/docs/api/java/net/URL.html[java.net.URL] javadoc for
 more details.
 
-Parsing of the `InputStream` occurs as defined in "Supported Public Key Formats" and must
-return Public Key material in one of the supported formats.
+Parsing of the `InputStream` occurs as defined in <<Supported Public Key Formats>> and must
+return Public Key text in one of the supported formats.
 
 #### `mp.jwt.verify.issuer` (optional)
 
@@ -364,4 +365,5 @@ of `mp.jwt.verify.issuer`.
 
 If the `mp.jwt.verify.issuer` config property has not been set, any issuer is allowed.
 
-NOTE: In most cases relying on the Public Key signature check alone is sufficient to establish trust.
+NOTE: In most cases relying on the digital signature check via the Public Key alone is
+sufficient to establish trust.
