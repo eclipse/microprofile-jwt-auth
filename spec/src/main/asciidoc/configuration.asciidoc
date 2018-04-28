@@ -17,63 +17,75 @@
 
 ## Configuration
 
-Verification of the MP-JWT is done with the RSA Public Key corresponding to the
-RSA Private Key held by the JWT issuer and used to sign the JWT.
+Verification of JSon Web Tokens (JWT) passed to the Microservice in HTTP requests at
+runtime is done with the RSA Public Key corresponding to the RSA Private Key held by the
+JWT Issuer.
 
-The goal if this chapter is to detail means of passing the Public Key to the MicroProfile
-JWT implementation as well as any standard configuration options for the verification
-itself.  MicroProfile JWT leverages the MicroProfile Config specification to provide a
-consistent means of passing all support configuration options.
+At the time of JWT creation, the Issuer will sign the JWT with its Private Key before
+passing it to the user.  Upon receiving the JWT in future HTTP requests, Microservices can
+than use the matching Public Key to verify JWT and trust the user information (claims) it
+contains.
 
-Prior to MicroProfile JWT 1.1 all configuration options for the Public Key and verification were vendor-specific.
-Any vendor-specific methods of configuration are still valid and shall be considered to override
-any standard configuration mechanisms.
+The goal if this chapter is to detail means of passing the Public Key from the JWT Issuer
+to the MicroProfile JWT implementation as well as any standard configuration options for
+the verification itself.
+
+MicroProfile JWT leverages the MicroProfile Config specification to provide a consistent
+means of passing all supported configuration options.  Prior to MicroProfile JWT 1.1 all
+configuration options for the Public Key and verification were vendor-specific. Any
+vendor-specific methods of configuration are still valid and shall be considered to
+override any standard configuration mechanisms.
 
 ### Obtaining the Public Key
 
-In practice, the Public Key is often obtained manually from the Issuer and stored
-in or passed to the binary of the Microservice.  Public Keys do not rotate frequently
-and this is a realistic option for many environments.  For comparison, SSL/TLS Certificates
-to support HTTPS, which are also Public Key based, are usually configured in the JVM
-itself and last for up to two years.
+In practice, the Public Key is often obtained manually from the JWT Issuer and stored in
+or passed to the binary of the Microservice.  Public Keys do not rotate frequently and
+storing them in the binary image or on disk is a realistic option for many environments.
+For reference, SSL/TLS Certificates to support HTTPS, which are also Public Key based, are
+usually configured in the JVM itself and last for up to two years.
 
 Alternatively, Public Keys may be obtained by the Microservice at runtime, directly from
-the Issuer via HTTPS request.  MicroProfile JWT implementations are required to support
-this method of fetching the Public Key from the Issuer via means defined here.  It should
-be noted, however, not all Issuers support downloading of the Public Key via HTTPS request.
-
-TODO: define the exact http method
-TODO: frequency of checking is not defined
+the JWT Issuer via HTTPS request.  MicroProfile JWT implementations are required to
+support this method of fetching the Public Key from the JWT Issuer via means defined here.
+It should be noted, however, not all JWT Issuers support downloading of the Public Key via
+HTTPS request.
 
 ### Supported Public Key Formats
 
-Support for RSA Public Keys of 1024 or 2048 bits in length is required. Other key
-sizes are allowed, but should be considered vendor-specific.
+Support for RSA Public Keys of 1024 or 2048 bits in length is required. Other key sizes
+are allowed, but should be considered vendor-specific.
 
-Other asymmetric signature algorithms are allowed, but should be considered vendor-specific.  This includes
-Digital Signature Algorithm (DSA), Diffie-Hellman (DS), Elliptical curve Digital Signature Algorithm (ECDSA),
-Edwards-curve Digital Signature Algorithm (EdDSA, aka ed25519)
+Other asymmetric signature algorithms are allowed, but should be considered
+vendor-specific.  This includes Digital Signature Algorithm (DSA), Diffie-Hellman (DS),
+Elliptical curve Digital Signature Algorithm (ECDSA), Edwards-curve Digital Signature
+Algorithm (EdDSA, aka ed25519)
 
-NOTE: Symmetrically signed JWTs such as HMAC-SHA256 (hs256) are explicitly not supported, deemed
-insecure for a distributed Microservice architecture where JWTs are expected to be passed around
-freely.  Use of symmetric signatures would require all microservices to share a secret, eliminating
-the ability to determine who created the JWT.
+NOTE: Symmetrically signed JWTs such as HMAC-SHA256 (hs256) are explicitly not supported,
+deemed insecure for a distributed Microservice architecture where JWTs are expected to be
+passed around freely.  Use of symmetric signatures would require all microservices to
+share a secret, eliminating the ability to determine who created the JWT.
 
-Public Keys may be formatted in any of the following formats, specified in order of precedence:
+Public Keys may be formatted in any of the following formats, specified in order of
+precedence:
 
  - Public Key Cryptography Standards #8 (PKCS#8) PEM
  - JSON Web Key (JWK)
  - JSON Web Key Set (JWKS)
+ - JSON Web Key (JWK) Base64 URL encoded
+ - JSON Web Key Set (JWKS) Base64 URL encoded
 
-Support for other public key formats such as PKCS#1, SSH2, or OpenSSH Public Key format is
+Attempts to parse the Public Key material will proceed in the order specified above until
+a valid Public Key can be derived.
+
+Support for other Public Key formats such as PKCS#1, SSH2, or OpenSSH Public Key format is
 considered optional.
 
-MicroProfile JWT implementations are required to throw a `DeploymentException` when given a
-public key that cannot be parsed using either the standardly supported or vendor-specific key
-formats.
+MicroProfile JWT implementations are required to throw a `DeploymentException` when given
+a public key that cannot be parsed using either the standardly supported or
+vendor-specific key formats.
 
-MicroProfile JWT implementations are required to throw a `DeploymentException` when given a
-Private Key in any format.
+MicroProfile JWT implementations are required to throw a `DeploymentException` when given
+a Private Key in any format.
 
 #### PCKS#8
 
@@ -81,9 +93,9 @@ Public Key Cryptography Standards #8 (PKCS#8) PEM format is a plain text format 
 default format for OpenSSL, many public/private key tools and is natively supported in
 Java.
 
-The format consists of a Base64 encoded value wrapped in a standard `-----BEGIN PUBLIC KEY-----`
-header and footer.  The Base42 encoded data can be decoded and the resulting byte array passed
- directly to `java.security.spec.PKCS8EncodedKeySpec`.
+The format consists of a Base64 encoded value wrapped in a standard `-----BEGIN PUBLIC
+KEY-----` header and footer.  The Base42 encoded data can be decoded and the resulting
+byte array passed directly to `java.security.spec.PKCS8EncodedKeySpec`.
 
 The following is an example of a valid RSA 2048 bit Public Key in PKCS#8 PEM format.
 
@@ -100,28 +112,27 @@ OQIDAQAB
 -----END PUBLIC KEY-----
 ----
 
-MicroProfile JWT implementations must inspect supplied public key text for
-the `-----BEGIN PUBLIC KEY-----` header and parse the key as PCKS#8 if the
-header if found.
+MicroProfile JWT implementations must inspect supplied public key text for the `-----BEGIN
+PUBLIC KEY-----` header and parse the key as PCKS#8 if the header if found.
 
-Support for legacy PKCS#1 format is not required and should be considered
-vendor-specific.  PKCS#1 formatted keys can be identified by the use of
-`-----BEGIN RSA PUBLIC KEY-----` header and footer.
+Support for legacy PKCS#1 format is not required and should be considered vendor-specific.
+PKCS#1 formatted keys can be identified by the use of `-----BEGIN RSA PUBLIC KEY-----`
+header and footer.
 
-MicroProfile JWT implementations are required to throw a `DeploymentException` if
-given a Private Key in any format such as `-----BEGIN PRIVATE KEY-----` or
-`-----BEGIN RSA PRIVATE KEY-----`
+MicroProfile JWT implementations are required to throw a `DeploymentException` if given a
+Private Key in any format such as `-----BEGIN PRIVATE KEY-----` or `-----BEGIN RSA PRIVATE
+KEY-----`
 
 #### JSON Web Key (JWK)
 
-JSON Web Key (JWK) allows for a Public Key to be formatted in json and optionally
-Base64 encoded.
+JSON Web Key (JWK) allows for a Public Key to be formatted in json and optionally Base64
+encoded.
 
-At minimum `JWK` formatted Public Keys must contain the `kty` field.  RSA public
-keys must contain the `n` and `e` fields.
+At minimum `JWK` formatted Public Keys must contain the `kty` field.  RSA public keys must
+contain the `n` and `e` fields.
 
-The following example is the previously shown PKCS#8 PEM formatted Public Key converted
-to JWK format.
+The following example is the previously shown PKCS#8 PEM formatted Public Key converted to
+JWK format.
 
 [source,json]
 ----
@@ -132,15 +143,20 @@ to JWK format.
 }
 ----
 
-MicroProfile JWT implementations are required to throw a `DeploymentException` if
-the JWK `kty` field is missing or JSON text is found, but does not follow either
-JWK or JWKS format.
+MicroProfile JWT implementations are required to throw a `DeploymentException` if the JWK
+`kty` field is missing or JSON text is found, but does not follow either JWK or JWKS
+format.
 
-See https://tools.ietf.org/html/rfc7517[RFC-7517] for further details on JWK format and optional fields.
+The JWK maybe supplied in plain JSON or Base64 encoded JSON format.
+
+See https://tools.ietf.org/html/rfc7517[RFC-7517] for further details on JWK format and
+optional fields.
 
 #### JSON Web Key Set (JWKS)
 
-The JSON Web Key Set (JWKS) format allows for multiple keys to supplied, which can be useful for either key rotation or supporting environments that have multiple JWT Issuers and therefore multiple Public Keys.
+The JSON Web Key Set (JWKS) format allows for multiple keys to supplied, which can be
+useful for either key rotation or supporting environments that have multiple JWT Issuers
+and therefore multiple Public Keys.
 
 An example of a valid JWKS:
 
@@ -164,10 +180,12 @@ An example of a valid JWKS:
 }
 ----
 
-If the incoming JWT uses the `kid` header field and there is a key in the supplied JWK set with the same `kid`,
-only that key is considered for verification of the JWT's digital signature.
+If the incoming JWT uses the `kid` header field and there is a key in the supplied JWK set
+with the same `kid`, only that key is considered for verification of the JWT's digital
+signature.
 
-For example, the following decoded JWT would involve a check on only the `orange-5678` key.
+For example, the following decoded JWT would involve a check on only the `orange-5678`
+key.
 
 [source,json]
 ----
@@ -184,4 +202,166 @@ For example, the following decoded JWT would involve a check on only the `orange
 }
 ----
 
-In the absense of a matching `kid`, all keys in the set will be tried in the order listed.
+In the absence of a matching `kid`, all keys in the set will be tried in the order listed.
+
+The JWKS maybe supplied in plain JSON or Base64 encoded JSON format.
+
+### Configuration Parameters
+
+Parameters are passed using the MicroProfile Config specification.  This specification
+allows at minimum configuration options to be specified in the microservice binary itself
+or via command-line via -D properties as follows:
+
+[source,bash]
+----
+java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=orange.pem
+----
+
+By convention, property names are always lowercase and begin with `mp.jwt.`
+
+#### `mp.jwt.verify.publickey`
+
+The `mp.jwt.verify.publickey` config property allows the Public Key material itself to be
+supplied as a string.  The Public Key will be parsed from the supplied string in the order
+defined in section "Supported Public Key Formats"
+
+The following example shows a Base 64 URL encoded JWK passed via system property.
+
+[source,bash]
+----
+java -jar movieservice.jar -Dmp.jwt.verify.publickey=eyJrdHkiOiJSU0EiLCJuI\
+joieEM3UmZQcFRvNzM2MnJ6QVRCdTQ1SnYwdXBkRVpjcjNJcXltamJaUmtwZ1RSOEIxOWJfclM\
+0ZElmaWNueXlVMHBsZWZrRTJuSkp5SmJlVzNGb245QkxlNF9zcmZYdHFpQktjeXFJTmVnMEdye\
+klxb3p0WkJtbW1kbzEzbEVMU3JHUDkxb0hMLVV0Q2QxdTVDMUhvSmM0YkxwalVZeHFPckpJNG1\
+tUkMzS3NrNURWMk9TMUw1UDRuQldJY1Ixb2k2UlFhRlh5M3phbTNqMVRiQ0Q1dXJrRTFDZlVBV\
+EZ3ZlhmRlNQVEdvN3NoTnFzZ2FXZ3k2QjIwNWw1THE1VW1NVUJHMHBySzc5eW1qSmVtT0R3ckI\
+0NDV6LWxrM0NUdGxNTjdiY1EzbkM4eGgtTWIyWG1SQjB1b1U0SzNrSFRzb2ZYRzRkVUhXSjh3R\
+1hFWGdKTk9Qek9RIiwiZSI6IkFRQUIifQo
+----
+
+When supplied, `mp.jwt.verify.publickey` will override other standard means to supply the
+Public Key such as `mp.jwt.verify.publickey.location`.  Vendor-specific options for
+supplying the key will always take precedence.
+
+MicroProfile JWT implementations are required to throw a `DeploymentException` if neither
+`mp.jwt.verify.publickey` nor `mp.jwt.verify.publickey.location` are supplied.
+
+MicroProfile JWT implementations are required to throw a `DeploymentException` if both
+`mp.jwt.verify.publickey` and `mp.jwt.verify.publickey.location` are supplied.
+
+#### `mp.jwt.verify.publickey.location`
+
+The `mp.jwt.verify.publickey` config property allows for an external or internal location
+of Public Key to be specified.  The value may be a relative path or a URL.
+
+MicroProfile JWT implementations are required to check the path at startup or deploy time.
+Reloading the Public Key from the location at runtime as well as the frequency of any such
+reloading is beyond the scope of this specification and any such feature should be
+considered vendor-specific.
+
+##### Relative Path
+
+Relative or non-URL paths supplied as the location are resolved in the following order:
+
+ - `new File(location)`
+ - `Thread.currentThread().getContextClassLoader().getResource(location)`
+
+The following example shows the file `orange.pem` supplied as either a file in the
+Microservice's binary or locally on disk.
+
+[source,bash]
+----
+java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=orange.pem
+----
+
+Any non URL is treated identically and may be a path inside or outside the archive.
+
+[source,bash]
+----
+java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=/META-INF/orange.pem
+----
+
+Parsing of the file contents occurs as defined in "Supported Public Key Formats"
+
+##### file: URL Scheme
+
+File URL paths supplied as the location allow for explicit externalization of the
+file via full url.
+
+[source,bash]
+----
+java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=file:///opt/keys/orange.pem
+----
+
+Parsing of the file contents occurs as defined in "Supported Public Key Formats"
+
+##### http: URL Scheme
+
+HTTP and HTTPS URL paths allow for the Public Key to be fetched from a remote host, which
+may be the JWT Issuer or some other trusted internet or intranet location.
+
+The location supplied must respond to an HTTP GET.  Parsing of the http message body
+occurs as defined in "Supported Public Key Formats"
+
+[source,bash]
+----
+java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=https://location.dev/widget/issuer
+----
+
+Other forms of HTTP requests and responses may be supported, but should be considered
+vendor-specific.
+
+##### Other URL Schemes
+
+All other locations containing a colon will be considered as URLs and be resolved using
+the following method:
+
+ - `new URL(location).openStream()`
+
+Thus additional vendor-specific or user-defined options can easily be added.
+
+Example custom "smb:" location
+
+[source,bash]
+----
+java -jar movieservice.jar -Dmp.jwt.verify.publickey.location=smb://Host/orange.pem -Djava.protocol.handler.pkgs=org.foo
+----
+
+Example stub for custom "smb:" URL Handler
+
+[source,java]
+----
+package org.foo.smb;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
+
+/**
+ * The smb: URL protocol handler
+ */
+public class Handler extends URLStreamHandler {
+    @Override
+    protected URLConnection openConnection(URL u) throws IOException {
+        return // your URLConnection implementation
+    }
+}
+----
+
+See https://docs.oracle.com/javase/8/docs/api/java/net/URL.html[java.net.URL] javadoc for
+more details.
+
+Parsing of the `InputStream` occurs as defined in "Supported Public Key Formats" and must
+return Public Key material in one of the supported formats.
+
+#### `mp.jwt.verify.issuer` (optional)
+
+The `mp.jwt.verify.issuer` config property allows for the expected value of the `iss`
+claim to be optionally specified.  When specified, the MicroProfile JWT implementation
+must verify the `iss` claim of incoming JWTs is present and matches the configured value
+of `mp.jwt.verify.issuer`.
+
+If the `mp.jwt.verify.issuer` config property has not been set, any issuer is allowed.
+
+NOTE: In most cases relying on the Public Key signature check alone is sufficient to establish trust.
