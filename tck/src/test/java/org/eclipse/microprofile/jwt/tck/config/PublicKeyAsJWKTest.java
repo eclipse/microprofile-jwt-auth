@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2018 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -17,17 +17,18 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.authentication;
+package org.eclipse.microprofile.jwt.tck.config;
 
-
-import org.eclipse.microprofile.jwt.config.Names;
+import org.jboss.arquillian.testng.Arquillian;
+import org.testng.annotations.Test;
 
 /**
- * Annotation used to define a container AuthenticationMechanism that implements the MP-JWT authentication protocol as defined
- * by the Microprofile JWT RBAC spec and makes that implementation available as an enabled CDI bean.
+ * Validate that the bundled mp.jwt.verify.publickey config property as a literal JWK
+ * is used to validate the JWT which is signed with privateKey4k.pem
  */
-public @interface JWTAuthenticationMechanismDefinition {
-    String verifierKey() default  "#{MPConfig.config["+ Names.VERIFIER_PUBLIC_KEY +"]}";
-    String acceptedIssuer() default "#{MPConfig.config["+ Names.ISSUER +"]}";
-    int clockSkew() default 30;
+public class PublicKeyAsJWKTest extends Arquillian {
+    @Test
+    public void noop() {
+
+    }
 }

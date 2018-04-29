@@ -33,6 +33,7 @@ import java.util.Base64;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.nimbusds.jose.proc.BadJOSEException;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -71,7 +72,7 @@ public abstract class AbstractJWKSTest {
         // Start a server listening on 8080 with a /jwks context that returns the JWKS json data
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
         endpoint = "http://localhost:8080/jwks";
-        httpServer.createContext("/jwks", new HttpHandler() {
+        HttpContext context = httpServer.createContext("/jwks", new HttpHandler() {
             public void handle(HttpExchange exchange) throws IOException {
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
@@ -81,6 +82,9 @@ public abstract class AbstractJWKSTest {
             }
         });
         httpServer.start();
+
+        System.out.printf("Started HttpServer at: %s\n", httpServer.getAddress());
+        System.out.printf("path: %s\n", context.getPath());
         System.out.printf("Started HttpServer at: %s\n", endpoint);
     }
 
@@ -114,7 +118,7 @@ public abstract class AbstractJWKSTest {
      * @throws IOException - on failure
      */
     @Test
-    public void validateGet() throws IOException {
+    public void validateGet() throws Exception {
         URL jwksURL = new URL(endpoint);
         InputStream is = jwksURL.openStream();
         try(BufferedReader br = new BufferedReader(new InputStreamReader(is))) {

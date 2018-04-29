@@ -20,9 +20,14 @@
 package jwks;
 
 import java.net.URL;
+import java.security.PublicKey;
+import java.util.Base64;
+import java.util.List;
 
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwk.HttpsJwks;
+import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwt.consumer.JwtConsumer;
@@ -47,6 +52,15 @@ public class Jose4jJWKSTest extends AbstractJWKSTest {
                                          AlgorithmIdentifiers.RSA_USING_SHA256));
 
         HttpsJwks keySource = new HttpsJwks(jwksURL.toExternalForm());
+        List<JsonWebKey> keys = keySource.getJsonWebKeys();
+        JsonWebKey key = keys.get(0);
+        if(key instanceof PublicJsonWebKey) {
+            PublicJsonWebKey publicJsonWebKey = (PublicJsonWebKey) key;
+            PublicKey pk = publicJsonWebKey.getPublicKey();
+            byte[] encoded = pk.getEncoded();
+            String pem = Base64.getEncoder().encodeToString(encoded);
+            System.out.printf("pk.pem: %s\n", pem);
+        }
         builder.setVerificationKeyResolver(new HttpsJwksVerificationKeyResolver(keySource));
 
         if (expGracePeriodSecs > 0) {
