@@ -19,11 +19,16 @@
  */
 package jwks;
 
+import java.io.StringReader;
 import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
@@ -96,5 +101,27 @@ public class JWKxPEMTest {
         JsonObject jwks = jwksBuilder.build();
         String json = jwks.toString();
         System.out.printf("jwks=%s\n", json);
+    }
+
+    @Test
+    public void generatePublicKeyFromJWKs() throws Exception {
+        String jsonJwk = TokenUtils.readResource("/signer-keyset4k.jwk");
+        System.out.printf("jwk: %s\n", jsonJwk);
+        JsonObject jwks = Json.createReader(new StringReader(jsonJwk)).readObject();
+        JsonArray keys = jwks.getJsonArray("keys");
+        JsonObject jwk = keys.getJsonObject(0);
+        String e = jwk.getString("e");
+        String n = jwk.getString("n");
+
+        byte[] ebytes = Base64.getUrlDecoder().decode(e);
+        BigInteger publicExponent = new BigInteger(1, ebytes);
+        byte[] nbytes = Base64.getUrlDecoder().decode(n);
+        BigInteger modulus = new BigInteger(1, nbytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, publicExponent);
+        PublicKey publicKey = kf.generatePublic(rsaPublicKeySpec);
+        System.out.printf("publicKey=%s\n", publicKey);
+        String pem = new String(Base64.getEncoder().encode(publicKey.getEncoded()));
+        System.out.printf("pem: %s\n", pem);
     }
 }
