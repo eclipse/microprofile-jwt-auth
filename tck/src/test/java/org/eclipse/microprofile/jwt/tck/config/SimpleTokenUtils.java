@@ -23,14 +23,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+
 /**
- * Scaled down version of tck TokenUtils that has no JWT library dependencies
+ * Scaled down version of tck TokenUtils that has no JWT library dependencies so that it
+ * can be embedded in the tck wars without needing a JWT library on the server side.
  */
 public class SimpleTokenUtils {
     private SimpleTokenUtils(){}
@@ -48,6 +56,29 @@ public class SimpleTokenUtils {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePublic(spec);
     }
+
+    /**
+     * Decode a JWKS encoded public key string to an RSA PublicKey
+     * @param jwksValue - JWKS string value
+     * @return PublicKey from RSAPublicKeySpec
+     */
+    public static PublicKey decodeJWKSPublicKey(String jwksValue) throws Exception {
+        JsonObject jwks = Json.createReader(new StringReader(jwksValue)).readObject();
+        JsonArray keys = jwks.getJsonArray("keys");
+        JsonObject jwk = keys.getJsonObject(0);
+        String e = jwk.getString("e");
+        String n = jwk.getString("n");
+
+        byte[] ebytes = Base64.getUrlDecoder().decode(e);
+        BigInteger publicExponent = new BigInteger(1, ebytes);
+        byte[] nbytes = Base64.getUrlDecoder().decode(n);
+        BigInteger modulus = new BigInteger(1, nbytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, publicExponent);
+        PublicKey publicKey = kf.generatePublic(rsaPublicKeySpec);
+        return publicKey;
+    }
+
     private static byte[] toEncodedBytes(final String pemEncoded) {
         final String normalizedPem = removeBeginEnd(pemEncoded);
         return Base64.getDecoder().decode(normalizedPem);
