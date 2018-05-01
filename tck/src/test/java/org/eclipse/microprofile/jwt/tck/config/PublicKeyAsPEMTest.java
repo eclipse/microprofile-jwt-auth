@@ -37,7 +37,6 @@ import javax.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
@@ -47,7 +46,7 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 
 /**
@@ -69,9 +68,10 @@ public class PublicKeyAsPEMTest extends Arquillian {
      * @return the base base web application archive
      * @throws IOException - on resource failure
      */
-    @Deployment(name = "default")
+    @Deployment()
     public static WebArchive createDeployment() throws IOException {
         URL publicKey = PublicKeyAsPEMTest.class.getResource("/publicKey4k.pem");
+        // This mp.jwt.verify.publickey value is an embedded PEM key
         URL config = PublicKeyAsJWKLocationURLTest.class.getResource("/META-INF/microprofile-config.properties");
 
         WebArchive webArchive = ShrinkWrap
@@ -88,9 +88,8 @@ public class PublicKeyAsPEMTest extends Arquillian {
     }
 
     @RunAsClient
-    @OperateOnDeployment("default")
     @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate a request with MP-JWT succeeds with HTTP_OK, and replies with hello, user={token upn claim}")
+        description = "Validate that the embedded PEM key is used to sign the JWT")
     public void testKeyAsPEM() throws Exception {
         Reporter.log("testKeyAsPEM, expect HTTP_OK");
 
@@ -103,7 +102,7 @@ public class PublicKeyAsPEMTest extends Arquillian {
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -112,27 +111,4 @@ public class PublicKeyAsPEMTest extends Arquillian {
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
 
-    @RunAsClient
-    @OperateOnDeployment("location")
-    @Test
-    public void testKeyAsLocationUrl() throws Exception {
-        Reporter.log("testKeyAsLocationUrl, expect HTTP_OK");
-
-        PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
-        String kid = "/privateKey4k.pem";
-        HashMap<String, Long> timeClaims = new HashMap<>();
-        String token = TokenUtils.generateTokenString(privateKey, kid, "/Token1.json", null, timeClaims);
-
-        String uri = baseURL.toExternalForm() + "endp/verifyKeyLocationAsPEMResource";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        String replyString = response.readEntity(String.class);
-        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
-        JsonObject reply = jsonReader.readObject();
-        Reporter.log(reply.toString());
-        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
-    }
 }

@@ -78,7 +78,7 @@ public class PublicKeyAsPEMLocationURLTest extends Arquillian {
         URL publicKey = PublicKeyAsPEMLocationURLTest.class.getResource("/publicKey4k.pem");
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
-        // Location points to the JWKS bundled in the deployment
+        // Location points to an endpoint that returns a PEM key
         configProps.setProperty("mp.jwt.verify.publickey.location", "http://localhost:8080/pem/endp/publicKey4k");
         configProps.setProperty("mp.jwt.verify.publickey.issuer", TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
