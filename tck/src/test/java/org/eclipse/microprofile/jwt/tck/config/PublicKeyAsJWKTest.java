@@ -19,7 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -65,7 +67,7 @@ public class PublicKeyAsJWKTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key
+     * Create a CDI aware base web application archive that includes an embedded JWKS public key
      * that is included as the mp.jwt.verify.publickey property.
      * The root url is /jwks
      * @return the base base web application archive
@@ -73,11 +75,20 @@ public class PublicKeyAsJWKTest extends Arquillian {
      */
     @Deployment()
     public static WebArchive createDeployment() throws IOException {
+        // Read in the JWKS
         URL publicKey = PublicKeyAsPEMTest.class.getResource("/signer-keyset4k.jwk");
+        StringWriter jwksContents = new StringWriter();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(publicKey.openStream()))) {
+            String line = reader.readLine();
+            while (line != null) {
+                jwksContents.write(line);
+                line = reader.readLine();
+            }
+        }
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the PEM bundled in the deployment
-        configProps.setProperty("mp.jwt.verify.publickey.location", "/signer-keyset4k.jwk");
+        configProps.setProperty("mp.jwt.verify.publickey", jwksContents.toString());
         configProps.setProperty("mp.jwt.verify.publickey.issuer", TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "PublicKeyAsJWKTest microprofile-config.properties");
@@ -98,7 +109,7 @@ public class PublicKeyAsJWKTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that the embedded JWK key is used to sign the JWT")
+        description = "Validate that the embedded JWK key is used to verify the JWT signature")
     public void testKeyAsJWKS() throws Exception {
         Reporter.log("testKeyAsJWKS, expect HTTP_OK");
 
