@@ -97,7 +97,7 @@ public class PublicKeyAsJWKLocationTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG, dependsOnMethods = { "validateLocationUrlContents" },
+    @Test(groups = TEST_GROUP_CONFIG,
         description = "Validate specifying the mp.jwt.verify.publickey.location as resource path to a JWKS key")
     public void testKeyAsLocation() throws Exception {
         Reporter.log("testKeyAsLocation, expect HTTP_OK");
