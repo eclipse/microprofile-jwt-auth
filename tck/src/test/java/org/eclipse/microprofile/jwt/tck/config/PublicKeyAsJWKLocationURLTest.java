@@ -52,11 +52,11 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 
 /**
- * Validate that config property values of type JWKS work to validate the JWT
+ * Validate that config property values of type resource path to JWKS work to validate the JWT
  * which is signed with privateKey4k.pem
  */
 public class PublicKeyAsJWKLocationURLTest extends Arquillian {
@@ -70,7 +70,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
     /**
      * Create a CDI aware base web application archive that includes an embedded PEM public key that
      * is referenced via the mp.jwt.verify.publickey.location as a URL resource property.
-     * The root url is /alt
+     * The root url is /jwks
      * @return the base base web application archive
      * @throws IOException - on resource failure
      */
@@ -80,7 +80,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the JWKS bundled in the deployment
-        configProps.setProperty("mp.jwt.verify.publickey.location", "http://localhost:8080/jwks/endp/publicKey4kAsJWKS");
+        configProps.setProperty("mp.jwt.verify.publickey.location", "http://localhost:8080/jwks/endp/publicKey4kAsJWKS?kid=publicKey4k");
         configProps.setProperty("mp.jwt.verify.publickey.issuer", TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "PublicKeyAsJWKLocationURLTest microprofile-config.properties");
@@ -103,7 +103,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
     @Test(groups = TEST_GROUP_CONFIG,
         description = "Validate the http://localhost:8080/jwks/endp/publicKey4kAsJWKS JWKS endpoint")
     public void validateLocationUrlContents() throws Exception {
-        URL locationURL = new URL("http://localhost:8080/jwks/endp/publicKey4kAsJWKS");
+        URL locationURL = new URL("http://localhost:8080/jwks/endp/publicKey4kAsJWKS?kid=publicKey4k");
         Reporter.log("Begin validateLocationUrlContents");
 
         StringWriter content = new StringWriter();
@@ -122,7 +122,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
         JsonObject key = keys.getJsonObject(0);
         Assert.assertEquals(key.getJsonString("kty").getString(), "RSA");
         Assert.assertEquals(key.getJsonString("use").getString(), "sig");
-        Assert.assertEquals(key.getJsonString("kid").getString(), "pem-test");
+        Assert.assertEquals(key.getJsonString("kid").getString(), "publicKey4k");
         Assert.assertEquals(key.getJsonString("alg").getString(), "RS256");
         Assert.assertEquals(key.getJsonString("e").getString(), "AQAB");
         Assert.assertTrue(key.getJsonString("n").getString().startsWith("tL6HShqY5H4y56rsCo7VdhT9"));
@@ -130,20 +130,21 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG, dependsOnMethods = { "validateLocationUrlContents" },
-        description = "Validate a request with MP-JWT succeeds with HTTP_OK, and replies with hello, user={token upn claim}")
+        description = "Validate specifying the mp.jwt.verify.publickey.location as remote URL to a JWKS key")
     public void testKeyAsLocationUrl() throws Exception {
         Reporter.log("testKeyAsLocationUrl, expect HTTP_OK");
 
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
-        String kid = "/privateKey4k.pem";
+        String kid = "publicKey4k";
         HashMap<String, Long> timeClaims = new HashMap<>();
         String token = TokenUtils.generateTokenString(privateKey, kid, "/Token1.json", null, timeClaims);
 
-        String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyLocationAsPEMResource";
+        String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyLocationAsJWKSUrl";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
+            .queryParam("kid", kid)
             ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

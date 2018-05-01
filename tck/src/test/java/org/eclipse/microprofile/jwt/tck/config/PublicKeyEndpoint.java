@@ -22,6 +22,7 @@ package org.eclipse.microprofile.jwt.tck.config;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -36,12 +37,14 @@ import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -50,7 +53,7 @@ import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.config.Names;
 
 /**
- * The endpoint used with the {@linkplain PublicKeyAsPEMTest}
+ * The common endpoint used by the various PublicKeyAs... tests
  */
 @RequestScoped
 @Path("/endp")
@@ -69,6 +72,10 @@ public class PublicKeyEndpoint {
     @Claim(standard = Claims.iss)
     private String iss;
 
+    /**
+     * Verify that the injected key is a PEM public key
+     * @return json object for test result
+     */
     @GET
     @Path("/verifyKeyAsPEM")
     @Produces(MediaType.APPLICATION_JSON)
@@ -195,6 +202,137 @@ public class PublicKeyEndpoint {
     }
 
     /**
+     * Verify that the injected key is a JWKS public key
+     * @return json object for test result
+     */
+    @GET
+    @Path("/verifyKeyAsJWKS")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyKeyAsJWKS(@QueryParam("kid") String kid) {
+        boolean pass = false;
+        String msg;
+
+        // Check that the key exists and is a valid JWKS public key
+        try {
+            String jsonJwk = key.get();
+            StringBuilder msgBuilder = new StringBuilder();
+            pass = verifyJWKS(jsonJwk, kid, msgBuilder);
+            msg = msgBuilder.toString();
+        }
+        catch (Exception e) {
+            msg = String.format("Failed to read key with exception: %s", e.getMessage());
+        }
+
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
+    @GET
+    @Path("/verifyKeyLocationAsJWKSResource")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyKeyLocationAsJWKSResource(@QueryParam("kid") String kid) {
+        boolean pass = false;
+        String msg;
+        // Check the location exists and is a valid PEM public key
+        if(location.isPresent()) {
+            String locationValue = location.get();
+            System.out.printf("verifyKeyLocationAsJWKSResource, location=%s", locationValue);
+            try {
+                String jwksValue = SimpleTokenUtils.readResource(locationValue);
+                System.out.printf("verifyKeyLocationAsJWKSResource, locationValue=%s", jwksValue);
+                StringBuilder msgBuilder = new StringBuilder();
+                if(verifyJWKS(jwksValue, kid, msgBuilder)) {
+                    PublicKey publicKey = SimpleTokenUtils.decodeJWKSPublicKey(jwksValue);
+                    System.out.printf("verifyKeyLocationAsJWKSResource, publicKey=%s", publicKey);
+                    msg = "key location as resource to JWKS PASS";
+                    pass = true;
+                }
+                else {
+                    msg = msgBuilder.toString();
+                }
+            }
+            catch (Exception e) {
+                msg = String.format("Failed to read key with exception: %s", e.getMessage());
+            }
+        }
+        else {
+            msg = "no location property injected";
+        }
+
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
+    /**
+     * Check the location exists and is a URL whose contents are valid JWKS public key
+     * @param kid - expected kid of JWKS
+     * @return result of validation test
+     */
+    @GET
+    @Path("/verifyKeyLocationAsJWKSUrl")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyKeyLocationAsJWKSUrl(@QueryParam("kid") String kid) {
+        boolean pass = false;
+        String msg;
+        if(location.isPresent()) {
+            String locationValue = location.get();
+            System.out.printf("verifyKeyLocationAsJWKSUrl, location=%s", locationValue);
+            try {
+                // Read the pem contents from the URL
+                URL locationURL = new URL(locationValue);
+                StringWriter jwksContents = new StringWriter();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(locationURL.openStream()))) {
+                    String line = reader.readLine();
+                    while (line != null) {
+                        jwksContents.write(line);
+                        jwksContents.write('\n');
+                        line = reader.readLine();
+                    }
+                }
+                System.out.printf("verifyKeyLocationAsJWKSUrl, locationValue=%s", jwksContents.toString());
+                StringBuilder msgBuilder = new StringBuilder();
+                if(verifyJWKS(jwksContents.toString(), kid, msgBuilder)) {
+                    PublicKey publicKey = SimpleTokenUtils.decodeJWKSPublicKey(jwksContents.toString());
+                    System.out.printf("verifyKeyLocationAsJWKSResource, publicKey=%s", publicKey);
+                    msg = "key location as URL to JWKS PASS";
+                    pass = true;
+                }
+                else {
+                    msg = msgBuilder.toString();
+                }
+            }
+            catch (MalformedURLException e) {
+                msg = String.format("Failed to read location contents: %s", e.getMessage());
+            }
+            catch (IOException e) {
+                msg = String.format("Failed to parse location as URL: %s", e.getMessage());
+            }
+            catch (Exception e) {
+                msg = String.format("Failed to read key with exception: %s", e.getMessage());
+            }
+        }
+        else {
+            msg = "no location property injected";
+        }
+
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
+    /**
+     * An endpoint that returns the contents of the bundled /publicKey4k.pem key
      * @return the /publicKey4k.pem classpath resource contents a PEM string
      */
     @GET
@@ -205,13 +343,15 @@ public class PublicKeyEndpoint {
         return SimpleTokenUtils.readResource("/publicKey4k.pem");
     }
     /**
+     * An endpoint that converts the bundled /publicKey4k.pem key in the corresponding JWKS format
+     * @param kid - the kid to use in the JWKS
      * @return the /publicKey4k.pem classpath resource contents a JWKS object
      */
     @GET
     @Path("/publicKey4kAsJWKS")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
-    public JsonObject publicKey4kAsJWKS() throws Exception {
+    public JsonObject publicKey4kAsJWKS(@QueryParam("kid") String kid) throws Exception {
         String pem = SimpleTokenUtils.readResource("/publicKey4k.pem");
         RSAPublicKey publicKey = (RSAPublicKey) SimpleTokenUtils.decodePublicKey(pem);
         JsonObjectBuilder jwksBuilder = Json.createObjectBuilder();
@@ -237,7 +377,7 @@ public class PublicKeyEndpoint {
             .add("kty", "RSA")
             .add("use", "sig")
             .add("alg", "RS256")
-            .add("kid", "pem-to-jwks")
+            .add("kid", kid)
             .add("e", e)
             .add("n", n);
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
@@ -245,5 +385,53 @@ public class PublicKeyEndpoint {
         jwksBuilder.add("keys", arrayBuilder);
         JsonObject jwks = jwksBuilder.build();
         return jwks;
+    }
+
+    private boolean verifyJWKS(String jwksJson, String kid, StringBuilder msg) {
+        boolean pass;
+        JsonObject jwks = Json.createReader(new StringReader(jwksJson)).readObject();
+        JsonArray keys = jwks.getJsonArray("keys");
+        if(keys != null) {
+            JsonObject key = keys.getJsonObject(0);
+            StringBuilder msgBuilder = new StringBuilder();
+            pass = verifyJWK(key, kid, msgBuilder);
+        }
+        else {
+            msg.append("No keys member found in: "+jwks);
+            pass = false;
+        }
+        return pass;
+    }
+    private boolean verifyJWK(JsonObject key, String kid, StringBuilder msg) {
+
+        boolean pass = true;
+        if(!key.getJsonString("kty").getString().equals("RSA")) {
+            msg.append("key != RSA");
+            pass = false;
+        }
+        if(!key.getJsonString("use").getString().equals("sig")) {
+            msg.append("use != sig");
+            pass = false;
+        }
+        if(!key.getJsonString("kid").getString().equals(kid)) {
+            msg.append("kid != jwks4k-test");
+            pass = false;
+        }
+        if(!key.getJsonString("alg").getString().equals("RS256")) {
+            msg.append("alg != RS256");
+            pass = false;
+        }
+        if(!key.getJsonString("e").getString().equals("AQAB")) {
+            msg.append("e != AQAB");
+            pass = false;
+        }
+        if(!key.getJsonString("n").getString().startsWith("tL6HShqY5H4y56rsCo7VdhT9")) {
+            msg.append("n != tL6HShqY5H4y56rsCo7VdhT9...");
+            pass = false;
+        }
+        if(pass) {
+            msg.append("key as JWKS PASS");
+        }
+        return pass;
     }
 }
