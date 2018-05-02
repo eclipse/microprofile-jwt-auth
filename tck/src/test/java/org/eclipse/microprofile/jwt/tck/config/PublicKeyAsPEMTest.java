@@ -79,7 +79,7 @@ public class PublicKeyAsPEMTest extends Arquillian {
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(PublicKeyEndpoint.class)
             .addClass(TCKApplication.class)
-            .addClass(TokenUtils.class)
+            .addClass(SimpleTokenUtils.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
             .addAsManifestResource(config, "microprofile-config.properties")
             ;

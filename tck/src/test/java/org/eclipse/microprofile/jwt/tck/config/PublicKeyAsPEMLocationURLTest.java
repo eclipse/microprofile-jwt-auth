@@ -38,6 +38,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.jwt.config.Names;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -79,8 +80,8 @@ public class PublicKeyAsPEMLocationURLTest extends Arquillian {
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to an endpoint that returns a PEM key
-        configProps.setProperty("mp.jwt.verify.publickey.location", "http://localhost:8080/pem/endp/publicKey4k");
-        configProps.setProperty("mp.jwt.verify.publickey.issuer", TCKConstants.TEST_ISSUER);
+        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "http://localhost:8080/pem/endp/publicKey4k");
+        configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "PublicKeyAsPEMLocationURLTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());

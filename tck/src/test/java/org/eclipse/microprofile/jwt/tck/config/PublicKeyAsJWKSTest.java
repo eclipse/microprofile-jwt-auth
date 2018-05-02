@@ -38,6 +38,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.jwt.config.Names;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -52,21 +53,20 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.config.Names.ISSUER;
-import static org.eclipse.microprofile.jwt.config.Names.VERIFIER_PUBLIC_KEY;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 
 /**
- * Validate that the bundled mp.jwt.verify.publickey config property as a literal JWK
+ * Validate that the bundled mp.jwt.verify.publickey config property as a literal JWKS
  * is used to validate the JWT which is signed with privateKey4k.pem
  */
-public class PublicKeyAsJWKTest extends Arquillian {
+public class PublicKeyAsJWKSTest extends Arquillian {
 
     /**
      * The base URL for the container under test
      */
     @ArquillianResource
     private URL baseURL;
+
 
     /**
      * Create a CDI aware base web application archive that includes an embedded JWKS public key
@@ -75,10 +75,10 @@ public class PublicKeyAsJWKTest extends Arquillian {
      * @return the base base web application archive
      * @throws IOException - on resource failure
      */
-    @Deployment(name = "jwk")
-    public static WebArchive createDeploymentJWK() throws IOException {
+    @Deployment(name = "jwks")
+    public static WebArchive createDeploymentJWKS() throws IOException {
         // Read in the JWKS
-        URL publicKey = PublicKeyAsJWKTest.class.getResource("/signer-key4k.jwk");
+        URL publicKey = PublicKeyAsJWKSTest.class.getResource("/signer-keyset4k.jwk");
         StringWriter jwksContents = new StringWriter();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(publicKey.openStream()))) {
             String line = reader.readLine();
@@ -89,15 +89,15 @@ public class PublicKeyAsJWKTest extends Arquillian {
         }
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
-        System.out.printf("jwk: %s\n", jwksContents.toString());
-        configProps.setProperty(VERIFIER_PUBLIC_KEY, jwksContents.toString());
-        configProps.setProperty(ISSUER, TCKConstants.TEST_ISSUER);
+        System.out.printf("jwks: %s\n", jwksContents.toString());
+        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY, jwksContents.toString());
+        configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "PublicKeyAsJWKTest JWK microprofile-config.properties");
+        configProps.store(configSW, "PublicKeyAsJWKSTest JWKS microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsJWKTest.war")
+            .create(WebArchive.class, "PublicKeyAsJWKSTest.war")
             .addAsResource(publicKey, "/signer-keyset4k.jwk")
             .addClass(PublicKeyEndpoint.class)
             .addClass(JwksApplication.class)
@@ -112,15 +112,15 @@ public class PublicKeyAsJWKTest extends Arquillian {
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG,
         description = "Validate that the embedded JWKS key is used to verify the JWT signature")
-    public void testKeyAsJWK() throws Exception {
-        Reporter.log("testKeyAsJWK, expect HTTP_OK");
+    public void testKeyAsJWKS() throws Exception {
+        Reporter.log("testKeyAsJWKS, expect HTTP_OK");
 
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         String kid = "publicKey4k";
         HashMap<String, Long> timeClaims = new HashMap<>();
         String token = TokenUtils.generateTokenString(privateKey, kid, "/Token1.json", null, timeClaims);
 
-        String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyAsJWK";
+        String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyAsJWKS";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("kid", kid)
@@ -133,5 +133,4 @@ public class PublicKeyAsJWKTest extends Arquillian {
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
-
 }
