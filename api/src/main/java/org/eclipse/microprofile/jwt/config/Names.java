@@ -34,7 +34,7 @@ public interface Names {
      * The expected iss claim value to validate against an MP-JWT. If not provided, there will be no
      * validation of the MP-JWT iss claim.
      */
-    String ISSUER = "mp.jwt.issuer";
+    String ISSUER = "mp.jwt.verify.issuer";
 
     /**
      * The relative path or full URL of the public key.  All relative paths will be resolved within the archive using
