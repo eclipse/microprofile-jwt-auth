@@ -83,6 +83,11 @@ public class PemJwksURLConnection extends URLConnection {
         return "application/json";
     }
 
+    /**
+     * Generate a JWKS with a single key
+     * @return
+     * @throws IOException
+     */
     @Override
     public Object getContent() throws IOException {
         if(content == null) {
@@ -123,7 +128,7 @@ public class PemJwksURLConnection extends URLConnection {
         if ((eBI.bitLength() % 8 == 0) && ebytes[0] == 0 && ebytes.length > 1) {
             byte[] tmp = new byte[nbytes.length-1];
             System.arraycopy(nbytes, 1, tmp, 0, tmp.length);
-            nbytes = tmp;
+            ebytes = tmp;
         }
         String e = new String(Base64.getUrlEncoder().withoutPadding().encode(ebytes));
 

@@ -19,6 +19,7 @@
  */
 package jwt;
 
+import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +49,14 @@ public abstract class AbstractVerifierTest {
     public void testValidToken() throws Exception {
         String token = TokenUtils.generateTokenString("/Token1.json");
         RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");
+        int expGracePeriodSecs = 60;
+        validateToken(token, publicKey, TEST_ISSUER, expGracePeriodSecs);
+    }
+    @Test
+    public void testValidToken4k() throws Exception {
+        PrivateKey signer = TokenUtils.readPrivateKey("/privateKey4k.pem");
+        String token = TokenUtils.generateTokenString(signer, "4k-test", "/Token1.json", null, null);
+        RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey4k.pem");
         int expGracePeriodSecs = 60;
         validateToken(token, publicKey, TEST_ISSUER, expGracePeriodSecs);
     }
