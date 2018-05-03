@@ -58,14 +58,20 @@ public class SimpleTokenUtils {
     }
 
     /**
-     * Decode a JWKS encoded public key string to an RSA PublicKey
+     * Decode a JWK(S) encoded public key string to an RSA PublicKey
      * @param jwksValue - JWKS string value
      * @return PublicKey from RSAPublicKeySpec
      */
     public static PublicKey decodeJWKSPublicKey(String jwksValue) throws Exception {
         JsonObject jwks = Json.createReader(new StringReader(jwksValue)).readObject();
         JsonArray keys = jwks.getJsonArray("keys");
-        JsonObject jwk = keys.getJsonObject(0);
+        JsonObject jwk;
+        if(keys != null) {
+            jwk = keys.getJsonObject(0);
+        }
+        else {
+            jwk = jwks;
+        }
         String e = jwk.getString("e");
         String n = jwk.getString("n");
 
@@ -97,6 +103,10 @@ public class SimpleTokenUtils {
      * @throws IOException - on failure
      */
     public static String readResource(String resName) throws IOException {
+        // Strip any classpath: prefix
+        if(resName.startsWith("classpath:")) {
+            resName = resName.substring(10);
+        }
         InputStream is = SimpleTokenUtils.class.getResourceAsStream(resName);
         StringWriter sw = new StringWriter();
         try(BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
