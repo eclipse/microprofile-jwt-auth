@@ -70,6 +70,22 @@ public class JWKSResTest {
         Assert.assertEquals(key.getJsonString("e").getString(), "AQAB");
         Assert.assertTrue(key.getJsonString("n").getString().startsWith("uGU_nmjYC7cKRR89NCAo"));
     }
+    @Test
+    public void testJwks4kURL() throws Exception {
+        // Load the /signer-keyset.jwk resource from the classpath as a JWKS
+        URL signerJwk = new URL("jwks:/signer-keyset4k.jwk");
+        String signerJwksContent = signerJwk.getContent().toString();
+        System.out.println(signerJwksContent);
+        JsonObject jwks = Json.createReader(new StringReader(signerJwksContent)).readObject();
+        JsonArray keys = jwks.getJsonArray("keys");
+        JsonObject key = keys.getJsonObject(0);
+        Assert.assertEquals(key.getJsonString("kty").getString(), "RSA");
+        Assert.assertEquals(key.getJsonString("use").getString(), "sig");
+        Assert.assertEquals(key.getJsonString("kid").getString(), "jwks4k-test");
+        Assert.assertEquals(key.getJsonString("alg").getString(), "RS256");
+        Assert.assertEquals(key.getJsonString("e").getString(), "AQAB");
+        Assert.assertTrue(key.getJsonString("n").getString().startsWith("tL6HShqY5H4y56rsCo7VdhT9"));
+    }
     /**
      * Validate that the pemjwks: protocol handler works
      * @throws Exception on failure
@@ -89,5 +105,25 @@ public class JWKSResTest {
         Assert.assertEquals(key.getJsonString("alg").getString(), "RS256");
         Assert.assertEquals(key.getJsonString("e").getString(), "AQAB");
         Assert.assertTrue(key.getJsonString("n").getString().startsWith("livFI8qB4D0y2jy0Cf"));
+    }
+    /**
+     * Validate that the pemjwks: protocol handler against the publicKey4k.pem resource
+     * @throws Exception on failure
+     */
+    @Test
+    public void testPem4kJwksURL() throws Exception {
+        // Load the /publicKey.pem resource from the classpath as a JWKS
+        URL signerJwk = new URL("pemjwks:/publicKey4k.pem?kid=pem4k-key");
+        String signerJwksContent = signerJwk.getContent().toString();
+        System.out.println(signerJwksContent);
+        JsonObject jwks = Json.createReader(new StringReader(signerJwksContent)).readObject();
+        JsonArray keys = jwks.getJsonArray("keys");
+        JsonObject key = keys.getJsonObject(0);
+        Assert.assertEquals(key.getJsonString("kty").getString(), "RSA");
+        Assert.assertEquals(key.getJsonString("use").getString(), "sig");
+        Assert.assertEquals(key.getJsonString("kid").getString(), "pem4k-key");
+        Assert.assertEquals(key.getJsonString("alg").getString(), "RS256");
+        Assert.assertEquals(key.getJsonString("e").getString(), "AQAB");
+        Assert.assertTrue(key.getJsonString("n").getString().startsWith("tL6HShqY5H4y56rsCo7VdhT9_eLQwsJp"));
     }
 }

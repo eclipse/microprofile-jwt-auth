@@ -17,17 +17,18 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.authentication;
+package org.eclipse.microprofile.jwt.tck.config;
 
 
-import org.eclipse.microprofile.jwt.config.Names;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+
+import org.eclipse.microprofile.auth.LoginConfig;
 
 /**
- * Annotation used to define a container AuthenticationMechanism that implements the MP-JWT authentication protocol as defined
- * by the Microprofile JWT RBAC spec and makes that implementation available as an enabled CDI bean.
+ * A JAX-RS application marked as requiring MP-JWT authentication with /jwks root path
  */
-public @interface JWTAuthenticationMechanismDefinition {
-    String verifierKey() default  "#{MPConfig.config["+ Names.VERIFIER_PUBLIC_KEY +"]}";
-    String acceptedIssuer() default "#{MPConfig.config["+ Names.ISSUER +"]}";
-    int clockSkew() default 30;
+@LoginConfig(authMethod = "MP-JWT", realmName = "TCK-MP-JWT")
+@ApplicationPath("/jwks")
+public class JwksApplication extends Application {
 }

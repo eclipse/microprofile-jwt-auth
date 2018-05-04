@@ -16,7 +16,7 @@
 //
 
 = Eclipse MicroProfile Interoperable JWT RBAC
-:author: Scott Stark; Pedro Igor Silva
+:author: Scott Stark; David Blevins; Pedro Igor Silva
 :email: microprofile@googlegroups.com
 :version-label!:
 :sectanchors:
@@ -37,6 +37,8 @@ include::license-alv2.asciidoc[]
 include::background.asciidoc[]
 
 include::interoperability.asciidoc[]
+
+include::configuration.asciidoc[]
 
 include::future-directions.asciidoc[]
 

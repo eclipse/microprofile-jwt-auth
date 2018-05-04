@@ -19,9 +19,10 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -38,6 +39,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.jwt.config.Names;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -52,15 +54,13 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.config.Names.ISSUER;
-import static org.eclipse.microprofile.jwt.config.Names.VERIFIER_PUBLIC_KEY;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 
 /**
- * Validate that the bundled mp.jwt.verify.publickey config property as a literal JWK
- * is used to validate the JWT which is signed with privateKey4k.pem
+ * Validate that config property values of type file URL to PEM works to validate the JWT
+ * which is signed with privateKey4k.pem
  */
-public class PublicKeyAsJWKTest extends Arquillian {
+public class PublicKeyAsFileLocationURLTest extends Arquillian {
 
     /**
      * The base URL for the container under test
@@ -69,38 +69,41 @@ public class PublicKeyAsJWKTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded JWKS public key
-     * that is included as the mp.jwt.verify.publickey property.
-     * The root url is /jwks
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that
+     * is referenced via the mp.jwt.verify.publickey.location as a URL resource property.
+     * The root url is /pem
      * @return the base base web application archive
      * @throws IOException - on resource failure
      */
-    @Deployment(name = "jwk")
-    public static WebArchive createDeploymentJWK() throws IOException {
-        // Read in the JWKS
-        URL publicKey = PublicKeyAsJWKTest.class.getResource("/signer-key4k.jwk");
-        StringWriter jwksContents = new StringWriter();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(publicKey.openStream()))) {
-            String line = reader.readLine();
-            while (line != null) {
-                jwksContents.write(line);
-                line = reader.readLine();
-            }
+    @Deployment()
+    public static WebArchive createLocationURLDeployment() throws IOException {
+        File tmp = File.createTempFile("tck", "pem");
+        FileOutputStream writer = new FileOutputStream(tmp);
+        URL publicKey = PublicKeyAsFileLocationURLTest.class.getResource("/publicKey4k.pem");
+        InputStream reader = publicKey.openStream();
+        byte[] data = new byte[1024];
+        int bytes = reader.read(data);
+        while(bytes > 0) {
+            writer.write(data, 0, bytes);
+            bytes = reader.read(data);
         }
+        reader.close();
+        writer.close();
+
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
-        System.out.printf("jwk: %s\n", jwksContents.toString());
-        configProps.setProperty(VERIFIER_PUBLIC_KEY, jwksContents.toString());
-        configProps.setProperty(ISSUER, TCKConstants.TEST_ISSUER);
+        // Location points to the PEM file
+        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, tmp.toURI().toASCIIString());
+        configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "PublicKeyAsJWKTest JWK microprofile-config.properties");
+        configProps.store(configSW, "PublicKeyAsJWKLocationURLTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
-
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsJWKTest.war")
-            .addAsResource(publicKey, "/signer-keyset4k.jwk")
+            .create(WebArchive.class, "PublicKeyAsJWKLocationURLTest.war")
+            .addAsResource(publicKey, "/publicKey4k.pem")
+            .addAsResource(publicKey, "/publicKey.pem")
             .addClass(PublicKeyEndpoint.class)
-            .addClass(JwksApplication.class)
+            .addClass(PEMApplication.class)
             .addClass(SimpleTokenUtils.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
             .addAsManifestResource(configAsset, "microprofile-config.properties")
@@ -111,16 +114,16 @@ public class PublicKeyAsJWKTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that the embedded JWKS key is used to verify the JWT signature")
-    public void testKeyAsJWK() throws Exception {
-        Reporter.log("testKeyAsJWK, expect HTTP_OK");
+        description = "Validate specifying the mp.jwt.verify.publickey.location as file URL to a PEM key")
+    public void testKeyAsLocationUrl() throws Exception {
+        Reporter.log("testKeyAsLocationUrl, expect HTTP_OK");
 
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         String kid = "publicKey4k";
         HashMap<String, Long> timeClaims = new HashMap<>();
         String token = TokenUtils.generateTokenString(privateKey, kid, "/Token1.json", null, timeClaims);
 
-        String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyAsJWK";
+        String uri = baseURL.toExternalForm() + "pem/endp/verifyKeyLocationAsPEMUrl";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("kid", kid)
@@ -133,5 +136,4 @@ public class PublicKeyAsJWKTest extends Arquillian {
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
-
 }

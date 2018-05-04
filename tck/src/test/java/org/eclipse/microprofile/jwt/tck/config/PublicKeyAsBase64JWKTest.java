@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.PrivateKey;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -57,10 +58,10 @@ import static org.eclipse.microprofile.jwt.config.Names.VERIFIER_PUBLIC_KEY;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 
 /**
- * Validate that the bundled mp.jwt.verify.publickey config property as a literal JWK
+ * Validate that the bundled mp.jwt.verify.publickey config property as a base64 encoded literal JWK
  * is used to validate the JWT which is signed with privateKey4k.pem
  */
-public class PublicKeyAsJWKTest extends Arquillian {
+public class PublicKeyAsBase64JWKTest extends Arquillian {
 
     /**
      * The base URL for the container under test
@@ -78,7 +79,7 @@ public class PublicKeyAsJWKTest extends Arquillian {
     @Deployment(name = "jwk")
     public static WebArchive createDeploymentJWK() throws IOException {
         // Read in the JWKS
-        URL publicKey = PublicKeyAsJWKTest.class.getResource("/signer-key4k.jwk");
+        URL publicKey = PublicKeyAsBase64JWKTest.class.getResource("/signer-key4k.jwk");
         StringWriter jwksContents = new StringWriter();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(publicKey.openStream()))) {
             String line = reader.readLine();
@@ -90,15 +91,15 @@ public class PublicKeyAsJWKTest extends Arquillian {
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         System.out.printf("jwk: %s\n", jwksContents.toString());
-        configProps.setProperty(VERIFIER_PUBLIC_KEY, jwksContents.toString());
+        String base64Contents = Base64.getEncoder().encodeToString(jwksContents.toString().getBytes());
+        configProps.setProperty(VERIFIER_PUBLIC_KEY, base64Contents);
         configProps.setProperty(ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "PublicKeyAsJWKTest JWK microprofile-config.properties");
+        configProps.store(configSW, "PublicKeyAsBase64JWKTest JWK microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsJWKTest.war")
-            .addAsResource(publicKey, "/signer-keyset4k.jwk")
+            .create(WebArchive.class, "PublicKeyAsBase64JWKTest.war")
             .addClass(PublicKeyEndpoint.class)
             .addClass(JwksApplication.class)
             .addClass(SimpleTokenUtils.class)
@@ -111,16 +112,16 @@ public class PublicKeyAsJWKTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that the embedded JWKS key is used to verify the JWT signature")
-    public void testKeyAsJWK() throws Exception {
-        Reporter.log("testKeyAsJWK, expect HTTP_OK");
+        description = "Validate that the embedded base64 JWK key is used to verify the JWT signature")
+    public void testKeyAsBase64JWK() throws Exception {
+        Reporter.log("testKeyAsBase64JWK, expect HTTP_OK");
 
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         String kid = "publicKey4k";
         HashMap<String, Long> timeClaims = new HashMap<>();
         String token = TokenUtils.generateTokenString(privateKey, kid, "/Token1.json", null, timeClaims);
 
-        String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyAsJWK";
+        String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyAsBase64JWK";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("kid", kid)
