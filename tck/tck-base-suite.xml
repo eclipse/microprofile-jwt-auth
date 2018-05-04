@@ -55,6 +55,10 @@
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKLocationTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKLocationURLTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKSTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKSLocationTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsBase64JWKTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsFileLocationURLTest" />
         </classes>
     </test>
 

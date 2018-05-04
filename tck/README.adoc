@@ -65,6 +65,10 @@ invalid tokens. A summary of the tck/resources directory contents is:
 ** The test issuer public key that MP-JWT implementations under test use to validate the token signature in the org.eclipse.microprofile.jwt.tck.container.jaxrs.* package tests.
 * publicKey4k.pem
 ** The test issuer public key that MP-JWT implementations under test use to validate the token signature in the org.eclipse.microprofile.jwt.tck.config.* package tests.
+* RequiredClaims.json
+** Used by the RequiredClaimsTest to generate a MP-JWT with the minimum required claims.
+* signer-key4k.jwk
+** A JWK representation of the signer public key used by some of the org.eclipse.microprofile.jwt.tck.config.* package tests.
 * signer-keyset4k.jwk
 ** A JWKS representation of the signer public key used by some of the org.eclipse.microprofile.jwt.tck.config.* package tests.
 
@@ -420,6 +424,10 @@ your build root:
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKLocationTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKLocationURLTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKSTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKSLocationTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsBase64JWKTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsFileLocationURLTest" />
         </classes>
     </test>
 
