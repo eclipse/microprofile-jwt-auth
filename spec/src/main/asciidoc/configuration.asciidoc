@@ -378,32 +378,3 @@ is allowed.
 
 NOTE: In most cases relying on the digital signature check via the Public Key alone is
 sufficient to establish trust.
-
-### Future Direction
-
-Not all considerations discussed during the specification process make it into the
-specification.  This section serves as an abridged version for the purposes of soliciting
-feedback and interest.  By convention we will leave items in the Future Direction for
-at most two revisions.
-
-#### `classpath:` URL Scheme
-
-The option to have a built-in `classpath:` URL Scheme was discussed with the intended
-benefit of providing some way to explicitly state a Public Key file is inside the archive
-and to remove potential a similarly named file existed on disk.
-
-For the moment this was deemed an edge-case that could be solved with a custom URL Scheme
-and consensus that this would add to the complexity of the specification.  In practice,
-this may be very useful so those who find themselves with this scenario are encouraged
-to contact the MicroProfile discussion lists.
-
-#### Expiration tolerance
-
-Relaxing or potentially ignoring the expiration time of a JWT was discussed and deemed
-an attractive option for future standardization.  It was omitted in efforts to keep the
-first revision of the configuration as simple as possible.
-
-Users who find themselves with this need are encouraged to both request support from their
-respective implementation and to detail their use case the MicroProfile discussion lists,
-so any future standardization work accounts for all scenarios.
-
