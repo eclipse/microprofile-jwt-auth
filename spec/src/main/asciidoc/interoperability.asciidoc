@@ -625,10 +625,22 @@ The `java.security.Principal` returned from these methods MUST be an instance of
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "groups" claim.
 
-### Mapping from `@RolesAllowed`
-Any role names used in @RolesAllowed or equivalent security constraint metadata that match names in
-the role names that have been mapped to group names in the MP-JWT "groups" claim, MUST result
-in an allowing authorization decision wherever the security constraint has been applied.
+### Using the Common Security Annotations for the Java Platform (https://jcp.org/en/jsr/detail?id=250[JSR-250])
+
+The expectations for use of the various security annotations described in sections 2.9 - 2.12 of JSR-250 (@RolesAllowed, @PermitAll, @DenyAll), is that MP-JWT containers support the behavior as described in those sections. In particular, the interaction between the annotations should be as described in section 2.12 of JSR-250.
+
+#### Mapping the `@RolesAllowed` to the MP-JWT group claim
+
+In terms of mapping between the MP-JWT claims and role names used in @RolesAllowed, the role names that have been mapped to group names in the MP-JWT "groups" claim, MUST result in an allowing authorization decision wherever the security constraint has been applied.
+
+### Recommendations for Cookies
+Implementations that support the transport of MP-JWT tokens using cookies SHOULD recognize the cookie name MPJWT, and the cookie value format being the JWS Compact Serialization as described in section 7.1 of https://www.rfc-editor.org/rfc/rfc7515.txt[JSON Web Signature (RFC-7515)].
+
+There are a number of security considerations when using cookies to transfer security information such as tokens in cookies. Issues related to CSRF, XSS, storage need to be considered. The following links present material on these issues:
+
+* https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage[Cookie Storage]
+* https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)[XSS]
+* https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)[CSRF]
 
 ### Recommendations for Optional Container Integration
 This section describes the expected behaviors for Java EE container APIs other than JAX-RS.
