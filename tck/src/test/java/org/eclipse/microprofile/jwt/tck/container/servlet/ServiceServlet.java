@@ -30,6 +30,7 @@ import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HttpConstraint;
+import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +39,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.container.ejb.IService;
 
-@HttpConstraint(rolesAllowed={"Tester"})
+@ServletSecurity(
+    @HttpConstraint(rolesAllowed={"Tester"})
+)
 @WebServlet("/ServiceServlet/*")
 public class ServiceServlet extends HttpServlet {
     @EJB
