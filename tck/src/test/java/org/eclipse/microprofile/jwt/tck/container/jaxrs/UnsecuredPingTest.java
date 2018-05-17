@@ -71,7 +71,7 @@ public class UnsecuredPingTest extends Arquillian {
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Basic test of an unsecured JAX-RS endpoint")
     public void callEchoNoAuth() throws Exception {
-        String uri = baseURL.toExternalForm() + "/ping/echo";
+        String uri = baseURL.toExternalForm() + "ping/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")

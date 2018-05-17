@@ -104,7 +104,7 @@ public class RequiredClaimsTest extends Arquillian {
             description = "Verify that the token issuer claim is as expected")
     public void verifyIssuerClaim() throws Exception {
         Reporter.log("Begin verifyIssuerClaim");
-        String uri = baseURL.toExternalForm() + "/endp/verifyIssuer";
+        String uri = baseURL.toExternalForm() + "endp/verifyIssuer";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.iss.name(), TEST_ISSUER)
@@ -123,7 +123,7 @@ public class RequiredClaimsTest extends Arquillian {
             description = "Verify that the token sub claim is as expected")
     public void verifySubClaim() throws Exception {
         Reporter.log("Begin verifySubClaim");
-        String uri = baseURL.toExternalForm() + "/endp/verifySUB";
+        String uri = baseURL.toExternalForm() + "endp/verifySUB";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.sub.name(), "24400320")
@@ -142,7 +142,7 @@ public class RequiredClaimsTest extends Arquillian {
             description = "Verify that the jti claim is as expected")
     public void verifyJTI() throws Exception {
         Reporter.log("Begin verifyJTI\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyJTI";
+        String uri = baseURL.toExternalForm() + "endp/verifyJTI";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.jti.name(), "a-f2b2180c")
@@ -161,7 +161,7 @@ public class RequiredClaimsTest extends Arquillian {
             description = "Verify that the uPN claim is as expected")
     public void verifyUPN() throws Exception {
         Reporter.log("Begin verifyUPN\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyUPN";
+        String uri = baseURL.toExternalForm() + "endp/verifyUPN";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.upn.name(), "jdoe@example.com")
@@ -180,7 +180,7 @@ public class RequiredClaimsTest extends Arquillian {
             description = "Verify that the aud claim is as expected")
     public void verifyAudience() throws Exception {
         Reporter.log("Begin verifyAudience\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyAudience";
+        String uri = baseURL.toExternalForm() + "endp/verifyAudience";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.aud.name(), null)
@@ -199,7 +199,7 @@ public class RequiredClaimsTest extends Arquillian {
             description = "Verify that the aud claim is as expected")
     public void verifyOptionalAudience() throws Exception {
         Reporter.log("Begin verifyOptionalAudience\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyOptionalAudience";
+        String uri = baseURL.toExternalForm() + "endp/verifyOptionalAudience";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.aud.name(), null)
@@ -218,7 +218,7 @@ public class RequiredClaimsTest extends Arquillian {
             description = "Verify that the iat claim is as expected")
     public void verifyIssuedAt() throws Exception {
         Reporter.log("Begin verifyIssuedAt\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyIssuedAt";
+        String uri = baseURL.toExternalForm() + "endp/verifyIssuedAt";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.iat.name(), iatClaim)
@@ -237,7 +237,7 @@ public class RequiredClaimsTest extends Arquillian {
             description = "Verify that the exp claim is as expected")
     public void verifyExpiration() throws Exception {
         Reporter.log("Begin verifyExpiration\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyExpiration";
+        String uri = baseURL.toExternalForm() + "endp/verifyExpiration";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.exp.name(), expClaim)

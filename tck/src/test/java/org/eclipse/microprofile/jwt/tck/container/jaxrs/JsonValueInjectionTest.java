@@ -104,7 +104,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected token issuer claim is as expected")
     public void verifyIssuerClaim() throws Exception {
         Reporter.log("Begin verifyIssuerClaim");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuer";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedIssuer";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.iss.name(), TCKConstants.TEST_ISSUER)
@@ -122,7 +122,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected raw token claim is as expected")
     public void verifyInjectedRawToken() throws Exception {
         Reporter.log("Begin verifyInjectedRawToken\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedRawToken";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedRawToken";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.raw_token.name(), token)
@@ -140,7 +140,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected jti claim is as expected")
     public void verifyInjectedJTI() throws Exception {
         Reporter.log("Begin verifyInjectedJTI\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedJTI";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedJTI";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.jti.name(), "a-123")
@@ -158,7 +158,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected aud claim is as expected")
     public void verifyInjectedAudience() throws Exception {
         Reporter.log("Begin verifyInjectedAudience\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAudience";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedAudience";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.aud.name(), "s6BhdRkqt3")
@@ -176,7 +176,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected raw token claim is as expected")
     public void verifyInjectedAuthTime() throws Exception {
         Reporter.log("Begin verifyInjectedAuthTime\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAuthTime";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedAuthTime";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
@@ -193,7 +193,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected iat claim is as expected")
     public void verifyInjectedIssuedAt() throws Exception {
         Reporter.log("Begin verifyInjectedIssuedAt\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuedAt";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedIssuedAt";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.iat.name(), iatClaim)
@@ -211,7 +211,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected customString claim is as expected")
     public void verifyInjectedCustomString() throws Exception {
         Reporter.log("Begin verifyInjectedCustomString\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomString";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomString";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", "customStringValue")
@@ -229,7 +229,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected customInteger claim is as expected")
     public void verifyInjectedCustomInteger() throws Exception {
         Reporter.log("Begin verifyInjectedCustomInteger\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomInteger";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomInteger";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", 123456789)
@@ -247,7 +247,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected customDouble claim is as expected")
     public void verifyInjectedCustomDouble() throws Exception {
         Reporter.log("Begin verifyInjectedCustomDouble\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomDouble";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomDouble";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", 3.141592653589793)
@@ -266,7 +266,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected customStringArray claim is as expected")
     public void verifyInjectedCustomStringArray() throws Exception {
         Reporter.log("Begin verifyInjectedCustomStringArray\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomStringArray";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomStringArray";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", "value0", "value1", "value2")
@@ -285,7 +285,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected customIntegerArray claim is as expected")
     public void verifyInjectedCustomIntegerArray() throws Exception {
         Reporter.log("Begin verifyInjectedCustomIntegerArray\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomIntegerArray";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomIntegerArray";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", 0, 1, 2, 3)
@@ -304,7 +304,7 @@ public class JsonValueInjectionTest extends Arquillian {
         description = "Verify that the injected customDoubleArray claim is as expected")
     public void verifyInjectedCustomDoubleArray() throws Exception {
         Reporter.log("Begin verifyInjectedCustomIntegerArray\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomDoubleArray";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomDoubleArray";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", 0.1, 1.1, 2.2, 3.3, 4.4)
@@ -325,7 +325,7 @@ public class JsonValueInjectionTest extends Arquillian {
     public void verifyIssuerClaim2() throws Exception {
         Reporter.log("Begin verifyIssuerClaim2");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuer";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedIssuer";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.iss.name(), TCKConstants.TEST_ISSUER)
@@ -344,7 +344,7 @@ public class JsonValueInjectionTest extends Arquillian {
     public void verifyInjectedRawToken2() throws Exception {
         Reporter.log("Begin verifyInjectedRawToken2\n");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedRawToken";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedRawToken";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.raw_token.name(), token2)
@@ -363,7 +363,7 @@ public class JsonValueInjectionTest extends Arquillian {
     public void verifyInjectedJTI2() throws Exception {
         Reporter.log("Begin verifyInjectedJTI2\n");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedJTI";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedJTI";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.jti.name(), "a-123.2")
@@ -382,7 +382,7 @@ public class JsonValueInjectionTest extends Arquillian {
     public void verifyInjectedAudience2() throws Exception {
         Reporter.log("Begin verifyInjectedAudience2\n");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAudience";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedAudience";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.aud.name(), "s6BhdRkqt3.2")
@@ -404,7 +404,7 @@ public class JsonValueInjectionTest extends Arquillian {
         String token2 = TokenUtils.generateTokenString("/Token2.json", null, timeClaims);
         Long iatClaim = timeClaims.get(Claims.auth_time.name());
         Long authTimeClaim = timeClaims.get(Claims.auth_time.name());
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuedAt";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedIssuedAt";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.iat.name(), iatClaim)
@@ -426,7 +426,7 @@ public class JsonValueInjectionTest extends Arquillian {
         HashMap<String, Long> timeClaims = new HashMap<>();
         String token2 = TokenUtils.generateTokenString("/Token2.json", null, timeClaims);
         Long authTimeClaim = timeClaims.get(Claims.auth_time.name());
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAuthTime";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedAuthTime";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.auth_time.name(), authTimeClaim);
@@ -444,7 +444,7 @@ public class JsonValueInjectionTest extends Arquillian {
     public void verifyInjectedCustomString2() throws Exception {
         Reporter.log("Begin verifyInjectedCustomString2\n");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomString";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomString";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", "customStringValue2")
@@ -463,7 +463,7 @@ public class JsonValueInjectionTest extends Arquillian {
     public void verifyInjectedCustomInteger2() throws Exception {
         Reporter.log("Begin verifyInjectedCustomInteger2\n");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomInteger";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomInteger";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", 1234567892)
@@ -482,7 +482,7 @@ public class JsonValueInjectionTest extends Arquillian {
     public void verifyInjectedCustomDouble2() throws Exception {
         Reporter.log("Begin verifyInjectedCustomDouble2\n");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomDouble";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomDouble";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", 3.241592653589793)

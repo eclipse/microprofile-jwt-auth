@@ -101,7 +101,7 @@ public class RolesAllowedTest extends Arquillian {
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with no token fails with HTTP_UNAUTHORIZED")
     public void callEchoNoAuth() throws Exception {
         Reporter.log("callEchoNoAuth, expect HTTP_UNAUTHORIZED");
-        String uri = baseURL.toExternalForm() + "/endp/echo";
+        String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -119,7 +119,7 @@ public class RolesAllowedTest extends Arquillian {
         String token = new String(tokenb);
         System.out.printf("basic: %s\n", token);
 
-        String uri = baseURL.toExternalForm() + "/endp/echo";
+        String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -136,7 +136,7 @@ public class RolesAllowedTest extends Arquillian {
     public void callEcho() throws Exception {
         Reporter.log("callEcho, expect HTTP_OK");
 
-        String uri = baseURL.toExternalForm() + "/endp/echo";
+        String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -153,7 +153,7 @@ public class RolesAllowedTest extends Arquillian {
     public void callEcho2() throws Exception {
         Reporter.log("callEcho2, expect HTTP_FORBIDDEN");
 
-        String uri = baseURL.toExternalForm() + "/endp/echo2";
+        String uri = baseURL.toExternalForm() + "endp/echo2";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -168,7 +168,7 @@ public class RolesAllowedTest extends Arquillian {
     public void checkIsUserInRole() throws Exception {
         Reporter.log("checkIsUserInRole, expect HTTP_OK");
 
-        String uri = baseURL.toExternalForm() + "/endp/checkIsUserInRole";
+        String uri = baseURL.toExternalForm() + "endp/checkIsUserInRole";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
@@ -182,7 +182,7 @@ public class RolesAllowedTest extends Arquillian {
         Reporter.log("checkIsUserInRoleToken2, expect HTTP_FORBIDDEN");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
 
-        String uri = baseURL.toExternalForm() + "/endp/checkIsUserInRole";
+        String uri = baseURL.toExternalForm() + "endp/checkIsUserInRole";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
@@ -197,7 +197,7 @@ public class RolesAllowedTest extends Arquillian {
         Reporter.log("echoNeedsToken2Role, expect HTTP_FORBIDDEN");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
 
-        String uri = baseURL.toExternalForm() + "/endp/echoNeedsToken2Role";
+        String uri = baseURL.toExternalForm() + "endp/echoNeedsToken2Role";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -213,7 +213,7 @@ public class RolesAllowedTest extends Arquillian {
         Reporter.log("echoWithToken2, expect HTTP_FORBIDDEN");
         String token2 = TokenUtils.generateTokenString("/Token2.json");
 
-        String uri = baseURL.toExternalForm() + "/endp/echo";
+        String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -228,7 +228,7 @@ public class RolesAllowedTest extends Arquillian {
         description = "Validate a request with MP-JWT SecurityContext.getUserPrincipal() is a JsonWebToken")
     public void getPrincipalClass() throws Exception {
         Reporter.log("getPrincipalClass, expect HTTP_OK");
-        String uri = baseURL.toExternalForm() + "/endp/getPrincipalClass";
+        String uri = baseURL.toExternalForm() + "endp/getPrincipalClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
@@ -247,7 +247,7 @@ public class RolesAllowedTest extends Arquillian {
         description = "Validate a request without an MP-JWT to endpoint requiring role mapping has HTTP_OK")
     public void testNeedsGroup1Mapping() {
         Reporter.log("testNeedsGroup1Mapping, expect HTTP_OK");
-        String uri = baseURL.toExternalForm() + "/endp/needsGroup1Mapping";
+        String uri = baseURL.toExternalForm() + "endp/needsGroup1Mapping";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
@@ -262,7 +262,7 @@ public class RolesAllowedTest extends Arquillian {
         description = "Validate that accessing secured method has HTTP_OK and injected JsonWebToken principal")
     public void getInjectedPrincipal() throws Exception {
         Reporter.log("getInjectedPrincipal, expect HTTP_OK");
-        String uri = baseURL.toExternalForm() + "/endp/getInjectedPrincipal";
+        String uri = baseURL.toExternalForm() + "endp/getInjectedPrincipal";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
@@ -277,7 +277,7 @@ public class RolesAllowedTest extends Arquillian {
         description = "Validate a request without an MP-JWT to unsecured endpoint has HTTP_OK with expected response")
     public void callHeartbeat() throws Exception {
         Reporter.log("callHeartbeat, expect HTTP_OK");
-        String uri = baseURL.toExternalForm() + "/endp/heartbeat";
+        String uri = baseURL.toExternalForm() + "endp/heartbeat";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")

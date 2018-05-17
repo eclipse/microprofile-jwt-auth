@@ -99,7 +99,7 @@ public class PrincipalInjectionTest extends Arquillian {
         description = "Verify that the injected authenticated principal is as expected")
     public void verifyInjectedPrincipal() throws Exception {
         Reporter.log("Begin verifyInjectedPrincipal, baseURL="+baseURL.toExternalForm() );
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedPrincipal";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedPrincipal";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();

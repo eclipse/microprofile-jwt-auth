@@ -93,7 +93,7 @@ public class ServletTest extends Arquillian {
     @Test(groups = TCKConstants.TEST_GROUP_SERVLET,
         description = "Validate a request with MP-JWT SecurityContext.getUserPrincipal() is a JsonWebToken")
     public void getServletPrincipalClass() throws Exception {
-        String uri = baseURL.toExternalForm() + "/ServiceServlet/getPrincipalClass";
+        String uri = baseURL.toExternalForm() + "ServiceServlet/getPrincipalClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
@@ -111,7 +111,7 @@ public class ServletTest extends Arquillian {
     @Test(groups = TCKConstants.TEST_GROUP_SERVLET,
         description = "Validate a request with MP-JWT PolicyContext.getContext() Subject has a JsonWebToken")
     public void getServletSubjectClass() throws Exception {
-        String uri = baseURL.toExternalForm() + "/ServiceServlet/getSubject";
+        String uri = baseURL.toExternalForm() + "ServiceServlet/getSubject";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;

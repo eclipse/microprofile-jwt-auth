@@ -103,7 +103,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected token issuer claim is as expected")
     public void verifyIssuerClaim() throws Exception {
         Reporter.log("Begin verifyIssuerClaim");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuer";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedIssuer";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.iss.name(), TCKConstants.TEST_ISSUER)
@@ -121,7 +121,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected raw token claim is as expected")
     public void verifyInjectedRawToken() throws Exception {
         Reporter.log("Begin verifyInjectedRawToken\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedRawToken";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedRawToken";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.raw_token.name(), token)
@@ -139,7 +139,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected jti claim is as expected")
     public void verifyInjectedJTI() throws Exception {
         Reporter.log("Begin verifyInjectedJTI\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedJTI";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedJTI";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.jti.name(), "a-123")
@@ -157,7 +157,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected upn claim is as expected")
     public void verifyInjectedUPN() throws Exception {
         Reporter.log("Begin verifyInjectedUPN\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedUPN";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedUPN";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.upn.name(), "jdoe@example.com")
@@ -175,7 +175,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected sub claim is as expected")
     public void verifyInjectedSUB() throws Exception {
         Reporter.log("Begin verifyInjectedSUB\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedSUB";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedSUB";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.sub.name(), "24400320")
@@ -193,7 +193,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected aud claim is as expected")
     public void verifyInjectedAudience() throws Exception {
         Reporter.log("Begin verifyInjectedAudience\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedAudience";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedAudience";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.aud.name(), new String[]{"s6BhdRkqt3"})
@@ -211,7 +211,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected groups claim is as expected")
     public void verifyInjectedGroups() throws Exception {
         Reporter.log("Begin verifyInjectedGroups\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedGroups";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedGroups";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.groups.name(), new String[]{
@@ -230,7 +230,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected iat claim is as expected")
     public void verifyInjectedIssuedAt() throws Exception {
         Reporter.log("Begin verifyInjectedIssuedAt\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedIssuedAt";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedIssuedAt";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.iat.name(), iatClaim)
@@ -248,7 +248,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected exp claim is as expected")
     public void verifyInjectedExpiration() throws Exception {
         Reporter.log("Begin verifyInjectedExpiration\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedExpiration";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedExpiration";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam(Claims.exp.name(), expClaim)
@@ -266,7 +266,7 @@ public class PrimitiveInjectionTest extends Arquillian {
         description = "Verify that the injected customString claim is as expected")
     public void verifyInjectedCustomString() throws Exception {
         Reporter.log("Begin verifyInjectedCustomString\n");
-        String uri = baseURL.toExternalForm() + "/endp/verifyInjectedCustomString";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomString";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("value", "customStringValue")

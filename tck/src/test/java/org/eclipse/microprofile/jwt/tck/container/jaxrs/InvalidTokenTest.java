@@ -79,7 +79,7 @@ public class InvalidTokenTest extends Arquillian {
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
-        String uri = baseURL.toExternalForm() + "/endp/echo";
+        String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -99,7 +99,7 @@ public class InvalidTokenTest extends Arquillian {
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
-        String uri = baseURL.toExternalForm() + "/endp/echo";
+        String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -119,7 +119,7 @@ public class InvalidTokenTest extends Arquillian {
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
-        String uri = baseURL.toExternalForm() + "/endp/echo";
+        String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")
@@ -139,7 +139,7 @@ public class InvalidTokenTest extends Arquillian {
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         System.out.printf("jwt: %s\n", token);
 
-        String uri = baseURL.toExternalForm() + "/endp/echo";
+        String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello")

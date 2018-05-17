@@ -86,7 +86,7 @@ public class SubjectTest  extends Arquillian {
     @Test(groups = TCKConstants.TEST_GROUP_JACC,
         description = "Validate a request with MP-JWT PolicyContext.getContext(javax.security.auth.Subject.containe) has a JsonWebToken")
     public void getSubjectClass() throws Exception {
-        String uri = baseURL.toExternalForm() + "/endp/getSubjectClass";
+        String uri = baseURL.toExternalForm() + "endp/getSubjectClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;

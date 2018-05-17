@@ -89,7 +89,7 @@ public class EjbTest extends Arquillian {
     @Test(groups = TCKConstants.TEST_GROUP_EJB,
         description = "Validate a request with MP-JWT to a secured method propagates to a secured ejb method")
     public void callEjbEcho() throws Exception {
-        String uri = baseURL.toExternalForm() + "/endp/getEJBEcho";
+        String uri = baseURL.toExternalForm() + "endp/getEJBEcho";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
@@ -103,7 +103,7 @@ public class EjbTest extends Arquillian {
     @Test(groups = TCKConstants.TEST_GROUP_EJB,
         description = "Validate a request with MP-JWT PolicyContext.getContext() Subject has a JsonWebToken")
     public void getSubjectClass() throws Exception {
-        String uri = baseURL.toExternalForm() + "/endp/getEJBSubjectClass";
+        String uri = baseURL.toExternalForm() + "endp/getEJBSubjectClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
@@ -117,7 +117,7 @@ public class EjbTest extends Arquillian {
     @Test(groups = TCKConstants.TEST_GROUP_EJB,
         description = "Validate a request with MP-JWT SecurityContext.getUserPrincipal() is a JsonWebToken")
     public void testEJBPrincipalClass() throws Exception {
-        String uri = baseURL.toExternalForm() + "/endp/getEJBPrincipalClass";
+        String uri = baseURL.toExternalForm() + "endp/getEJBPrincipalClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
