@@ -393,15 +393,6 @@ A future MP-JWT specification may define how an MP-JWT implementation makes use 
 specification to allow for configuration of the issuer, issuer public key and expiration clock
 skew. Additional requirements for validation of the required MP-JWT claims may also be defined.
 
-## Recommendations for Cookies
-Implementations that support the transport of MP-JWT tokens using cookies SHOULD recognize the cookie name MPJWT, and the cookie value format being the JWS Compact Serialization as described in section 7.1 of https://www.rfc-editor.org/rfc/rfc7515.txt[JSON Web Signature (RFC-7515)].
-
-There are a number of security considerations when using cookies to transfer security information such as tokens in cookies. Issues related to CSRF, XSS, storage need to be considered. The following links present material on these issues:
-
-* https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage[Cookie Storage]
-* https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)[XSS]
-* https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)[CSRF]
-
 ## Mapping MP-JWT Tokens to Java EE Container APIs
 
 The requirements of how a JWT should be exposed via the various Java EE container

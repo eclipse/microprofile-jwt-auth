@@ -201,18 +201,6 @@ key.
 }
 ----
 
-When there are multiple JSON Web Keys (JWK) in the JSON Web Key Set (JWKS), the `kid` field
-is required in each JWK and incoming JWT being authenticated.
-
-MicroProfile JWT implementations are required to throw a `DeploymentException` if a JWKS
-is supplied via static configuration and contains multiple keys, but no `kid`.
-
-MicroProfile JWT implementations are required to return a 401 at runtime in situations
-where a `kid` is either required or does not match.
-
-Options to relax the `kid` requirement may be supported, but should be considered
-vendor-specific.
-
 The JWKS may be supplied in plain JSON or Base64 URL encoded JSON format.
 
 ### Configuration Parameters

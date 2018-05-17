@@ -77,3 +77,29 @@ Users who find themselves with this need are encouraged to both request support 
 respective implementation and to detail their use case the MicroProfile discussion lists,
 so any future standardization work accounts for all scenarios.
 
+### Passing JWTs as Cookies
+
+Semantics for passing JWTs via HTTP `Cookie` headers instead of the HTTP `Authorization` header
+were discussed and deemed a valuable addition for interoperability purposes.
+
+It is likely to be a future recommendation that MicroProfile JWT implementation supporting the
+transport of MP-JWT tokens using cookies SHOULD recognize the cookie name `Bearer`, and the cookie value format being the JWS Compact Serialization as described in section 7.1 of https://www.rfc-editor.org/rfc/rfc7515.txt[JSON Web Signature (RFC-7515)].
+
+There are a number of security considerations when using cookies to transfer security information such as tokens in
+cookies. Issues related to CSRF, XSS, storage need to be considered. The following links present material on these issues:
+
+* https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage[Cookie Storage]
+* https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)[XSS]
+* https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)[CSRF]
+
+The motivation for using `Bearer` as the Cookie name is to establish a pattern of using the `Authorization`
+scheme as the cookie name.  Bearer token example would look as follows:
+
+ - `Authorization: Bearer as14efgscd31qrewtadg`
+ - `Cookie: Bearer=as14efgscd31qrewtadg`
+
+Basic auth would look as follows:
+
+ - `Authorization: Basic gasdqwe198abg313ffd`
+ - `Cookie: Basic=gasdqwe198abg313ffd`
+
