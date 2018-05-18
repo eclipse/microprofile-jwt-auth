@@ -241,8 +241,8 @@ When supplied, `mp.jwt.verify.publickey` will override other standard means to s
 Public Key such as `mp.jwt.verify.publickey.location`.  Vendor-specific options for
 supplying the key will always take precedence.
 
-MicroProfile JWT implementations are required to throw a `DeploymentException` if neither
-`mp.jwt.verify.publickey` nor `mp.jwt.verify.publickey.location` are supplied.
+If neither the `mp.jwt.verify.publickey` nor `mp.jwt.verify.publickey.location` are supplied configuration are supplied, the MP-JWT signer configuration will
+default to a vendor specific behavior as was the case for MP-JWT 1.0.
 
 MicroProfile JWT implementations are required to throw a `DeploymentException` if both
 `mp.jwt.verify.publickey` and `mp.jwt.verify.publickey.location` are supplied.
