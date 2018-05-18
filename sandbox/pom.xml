@@ -20,11 +20,11 @@
         <!-- This is just for now and will not work if the API has a separate release cycle than the rest. -->
         <groupId>org.eclipse.microprofile.jwt</groupId>
         <artifactId>microprofile-jwt-auth-parent</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1-RC1</version>
     </parent>
 
     <artifactId>microprofile-jwt-auth-sandbox</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1-RC1</version>
     <name>MicroProfile JWT Auth Sandbox</name>
     <description>Eclipse MicroProfile JWT Feature - Sandbox</description>
 
@@ -73,12 +73,12 @@
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-api</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1-RC1</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-tck</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1-RC1</version>
         </dependency>
         <dependency>
             <groupId>org.bitbucket.b_c</groupId>
