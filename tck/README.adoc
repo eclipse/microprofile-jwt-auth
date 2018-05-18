@@ -290,6 +290,32 @@ RolesAllowedTest::
 UnsecuredPingTest::
     No authentication required
 
+=== Information Available to the Harness ApplicationArchiveProcessor
+The TCK harness `ApplicationArchiveProcessor` implementation has access to information added to the archive during the deployment creation. Some of the key items are shown by this implementation fragment:
+
+[source,java]
+----
+public class WFSwarmWarArchiveProcessor implements ApplicationArchiveProcessor {
+    private static Logger log = Logger.getLogger(WFSwarmWarArchiveProcessor.class.getName());
+
+    @Override
+    public void process(Archive<?> appArchive, TestClass testClass) {
+        if (!(appArchive instanceof WebArchive)) {
+            return;
+        }
+        WebArchive war = WebArchive.class.cast(appArchive);
+        Node configProps = war.get("/META-INF/microprofile-config.properties");<1>
+        Node publicKeyNode = war.get("/WEB-INF/classes/publicKey.pem");<2>
+        Node publicKey4kNode = war.get("/WEB-INF/classes/publicKey4k.pem");<3>
+        Node mpJWT = war.get("MP-JWT");<4>
+----
+<1> The optional microprofile-config.properties. Only the config related tests currently have this asset.
+<2> The optional public key content of the token signer. 
+<3> The optional 4096 bit public key content of the token signer.
+<4> The optional base64 encoded string of the MP-JWT that will be passed by the test. Currently only the `OptionalIssTest` passes this in.
+
+You can use this information to set vendor specific settings that are need to support proper operation of your MP-JWT implementation.
+
 == Running Your Implementation With the TCK
 Once you have built and installed your TCK harness artifact, you can run the
 TCK tests against it by using either the `tokens-se` or `container` profiles.
