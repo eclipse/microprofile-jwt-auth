@@ -51,6 +51,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.ClaimValue;
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.config.Names;
 
@@ -73,7 +74,7 @@ public class PublicKeyEndpoint {
     private Optional<String> issuer;
     @Inject
     @Claim(standard = Claims.iss)
-    private String iss;
+    private ClaimValue<Optional<String>> iss;
 
     @PostConstruct
     private void init() {
@@ -441,6 +442,42 @@ public class PublicKeyEndpoint {
             msg = "no location property injected";
         }
 
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+
+    /**
+     * Check a token without an iss can be used when no mp.jwt.verify.issuer was provided
+     * @return result of validation test
+     */
+    @GET
+    @Path("/verifyMissingIssIsOk")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyMissingIssIsOk() {
+        boolean pass = false;
+        String msg;
+
+        if(iss.getValue().isPresent()) {
+            msg = String.format("MP-JWT has iss(%s) claim", iss.getValue().get());
+        }
+        else if(issuer.isPresent()) {
+            // Double check this as I have seen ConfigProperty.UNCONFIGURED_VALUE leak through
+            if(!issuer.get().equals(ConfigProperty.UNCONFIGURED_VALUE)) {
+                msg = String.format("mp.jwt.verify.issuer was provided(%s) but there was no iss in MP-JWT", issuer.get());
+            }
+            else {
+                msg = "endpoint accessed without iss as expected PASS";
+                pass = true;
+            }
+        }
+        else {
+            msg = "endpoint accessed without iss as expected PASS";
+            pass = true;
+        }
         JsonObject result = Json.createObjectBuilder()
             .add("pass", pass)
             .add("msg", msg)
