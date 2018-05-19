@@ -56,6 +56,24 @@ The "aud" claim defined in RFC 7519 section 4.1.3 was considered for addition.  
 Though a "aud" claim is not required, implementations that support it and applications that use it should do so as
 detailed in this section to ensure alignment for any future standardization.
 
+### `mp.jwt.verify.issuer` configuration option
+
+Discussion of a standard configuration option for enabling the explicit checking of the
+issuer was discussed.  Discussion is still ongoing as to what the default behavior of
+the property should be if no explicit value is supplied.  The definition as last phrased
+is below.
+
+The `mp.jwt.verify.issuer` config property allows for the expected value of the `iss`
+claim to be optionally specified.  When specified, the MicroProfile JWT implementation
+must verify the `iss` claim of incoming JWTs is present and matches the configured value
+of `mp.jwt.verify.issuer`.
+
+If the `mp.jwt.verify.issuer` config property has not been set, any issuer or none at all
+is allowed.
+
+NOTE: In most cases relying on the digital signature check via the Public Key alone is
+sufficient to establish trust.
+
 ### `classpath:` URL Scheme
 
 The option to have a built-in `classpath:` URL Scheme was discussed with the intended

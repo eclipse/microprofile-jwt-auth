@@ -353,15 +353,3 @@ more details.
 Parsing of the `InputStream` occurs as defined in <<Supported Public Key Formats>> and must
 return Public Key text in one of the supported formats.
 
-#### `mp.jwt.verify.issuer` (optional)
-
-The `mp.jwt.verify.issuer` config property allows for the expected value of the `iss`
-claim to be optionally specified.  When specified, the MicroProfile JWT implementation
-must verify the `iss` claim of incoming JWTs is present and matches the configured value
-of `mp.jwt.verify.issuer`.
-
-If the `mp.jwt.verify.issuer` config property has not been set, any issuer or none at all
-is allowed.
-
-NOTE: In most cases relying on the digital signature check via the Public Key alone is
-sufficient to establish trust.
