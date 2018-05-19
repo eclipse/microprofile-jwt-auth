@@ -88,7 +88,6 @@
         <module>api</module>
         <module>tck</module>
         <module>spec</module>
-        <module>sandbox</module>
     </modules>
 
     <dependencyManagement>
@@ -289,6 +288,7 @@
                         <exclude>.checkstyle</exclude>
                         <exclude>.factorypath</exclude>
                         <exclude>.editorconfig</exclude>
+                        <exclude>sandbox/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
