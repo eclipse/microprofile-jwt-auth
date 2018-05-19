@@ -18,7 +18,7 @@
 
     <groupId>org.eclipse.microprofile.jwt</groupId>
     <artifactId>microprofile-jwt-auth-parent</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1-RC2-SNAPSHOT</version>
     <name>MicroProfile JWT Auth Parent</name>
     <description>Eclipse MicroProfile JWT Feature - Parent POM</description>
     <packaging>pom</packaging>
@@ -210,7 +210,7 @@
                                     <property name="format" value="${checkstyle.methodNameFormat}" />
                                 </module>
                                 <module name="PackageName">
-                                    <property name="format" value="^[a-z]+([a-z0-9])*(\.[a-z][a-z0-9]*)*$"/>
+                                    <property name="format" value="^[a-z]+([a-z0-9])*(\.[a-z][a-z0-9]*)*$" />
                                 </module>
                                 <module name="LocalFinalVariableName" />
                                 <module name="ParameterName" />

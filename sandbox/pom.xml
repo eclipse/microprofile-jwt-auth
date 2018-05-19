@@ -20,15 +20,17 @@
         <!-- This is just for now and will not work if the API has a separate release cycle than the rest. -->
         <groupId>org.eclipse.microprofile.jwt</groupId>
         <artifactId>microprofile-jwt-auth-parent</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1-RC2-SNAPSHOT</version>
     </parent>
 
     <artifactId>microprofile-jwt-auth-sandbox</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1-RC2-SNAPSHOT</version>
     <name>MicroProfile JWT Auth Sandbox</name>
     <description>Eclipse MicroProfile JWT Feature - Sandbox</description>
 
     <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.install.skip>true</maven.install.skip>
         <version.jose4j>0.6.2</version.jose4j>
         <version.numbusds>4.23</version.numbusds>
         <version.auth0>3.3.0</version.auth0>
@@ -73,12 +75,12 @@
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-api</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1-RC2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-tck</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1-RC2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bitbucket.b_c</groupId>
