@@ -56,7 +56,7 @@ import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.config.Names;
 
 /**
- * The common endpoint used by the various PublicKeyAs... tests
+ * The common endpoint used by the various config tests
  */
 @RequestScoped
 @Path("/endp")
@@ -72,6 +72,9 @@ public class PublicKeyEndpoint {
     @Inject
     @ConfigProperty(name = Names.ISSUER)
     private Optional<String> issuer;
+    @Inject
+    @ConfigProperty(name = Names.REQUIRE_ISS)
+    private Optional<Boolean> requireISS;
     @Inject
     @Claim(standard = Claims.iss)
     private ClaimValue<Optional<String>> iss;
@@ -450,7 +453,7 @@ public class PublicKeyEndpoint {
     }
 
     /**
-     * Check a token without an iss can be used when no mp.jwt.verify.issuer was provided
+     * Check a token without an iss can be used when mp.jwt.verify.requireiss=false
      * @return result of validation test
      */
     @GET
@@ -462,6 +465,7 @@ public class PublicKeyEndpoint {
         String msg;
 
         if(iss.getValue().isPresent()) {
+            // The iss claim should not be provided for this endpoint
             msg = String.format("MP-JWT has iss(%s) claim", iss.getValue().get());
         }
         else if(issuer.isPresent()) {
@@ -477,6 +481,81 @@ public class PublicKeyEndpoint {
         else {
             msg = "endpoint accessed without iss as expected PASS";
             pass = true;
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+    /**
+     * Check a token with a bad iss can be used when mp.jwt.verify.requireiss=false
+     * @return result of validation test
+     */
+    @GET
+    @Path("/verifyBadIssIsOk")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyBadIssIsOk() {
+        boolean pass = false;
+        String msg;
+
+        if(!iss.getValue().isPresent()) {
+            // The iss claim should be provided for this endpoint
+            msg = String.format("MP-JWT missing iss claim");
+        }
+        else if(issuer.isPresent()) {
+            String claimIss = iss.getValue().get();
+            String configIss = issuer.get();
+            if(!configIss.equals(claimIss)) {
+                msg = String.format("endpoint accessed with bad iss(%s) != config.iss(%s) as expected PASS",
+                                    claimIss, configIss);
+                pass = true;
+            }
+            else {
+                msg = String.format("mp.jwt.verify.issuer(%s) == jwt.iss(%s)", configIss, claimIss);
+            }
+        }
+        else {
+            msg = "No mp.jwt.verify.issuer provided";
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }
+    /**
+     * Check a token with an iss when mp.jwt.verify.requireiss=true matches the
+     * mp.jwt.verify.issuer value
+     * @return result of validation test
+     */
+    @GET
+    @Path("/verifyIssIsOk")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyIssIsOk() {
+        boolean pass = false;
+        String msg;
+
+        if(!iss.getValue().isPresent()) {
+            // The iss claim should be provided for this endpoint
+            msg = String.format("MP-JWT missing iss claim");
+        }
+        else if(issuer.isPresent()) {
+            String claimIss = iss.getValue().get();
+            String configIss = issuer.get();
+            if(configIss.equals(claimIss)) {
+                msg = String.format("endpoint accessed with iss(%s) = config.iss(%s) as expected PASS",
+                                    claimIss, configIss);
+                pass = true;
+            }
+            else {
+                msg = String.format("mp.jwt.verify.issuer(%s) != jwt.iss(%s)", configIss, claimIss);
+            }
+        }
+        else {
+            msg = "No mp.jwt.verify.issuer provided";
         }
         JsonObject result = Json.createObjectBuilder()
             .add("pass", pass)

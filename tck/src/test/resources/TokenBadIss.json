@@ -1,0 +1,17 @@
+{
+    "jti": "a-123",
+    "iss": "https://bad-issuer",
+    "sub": "24400320",
+    "upn": "jdoe@example.com",
+    "preferred_username": "jdoe",
+    "aud": "s6BhdRkqt3",
+    "exp": 1311281970,
+    "iat": 1311280970,
+    "auth_time": 1311280969,
+    "groups": [
+        "Echoer",
+        "Tester",
+        "group1",
+        "group2"
+    ]
+}

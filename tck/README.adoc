@@ -67,6 +67,9 @@ invalid tokens. A summary of the tck/resources directory contents is:
 ** The test issuer public key that MP-JWT implementations under test use to validate the token signature in the org.eclipse.microprofile.jwt.tck.config.* package tests.
 * RequiredClaims.json
 ** Used by the RequiredClaimsTest to generate a MP-JWT with the minimum required claims.
+* TokenBadIss.json
+** Used by the IssNoValidationBadIssTest to validate that the iss claim is
+ignored when validation is disabled.
 * signer-key4k.jwk
 ** A JWK representation of the signer public key used by some of the org.eclipse.microprofile.jwt.tck.config.* package tests.
 * signer-keyset4k.jwk
@@ -312,7 +315,7 @@ public class WFSwarmWarArchiveProcessor implements ApplicationArchiveProcessor {
 <1> The optional microprofile-config.properties. Only the config related tests currently have this asset.
 <2> The optional public key content of the token signer. 
 <3> The optional 4096 bit public key content of the token signer.
-<4> The optional base64 encoded string of the MP-JWT that will be passed by the test. Currently only the `OptionalIssTest` passes this in.
+<4> The optional base64 encoded string of the MP-JWT that will be passed by the test. Currently only the `Iss*Validation*` tests pass this in.
 
 You can use this information to set vendor specific settings that are need to support proper operation of your MP-JWT implementation.
 
@@ -454,7 +457,12 @@ your build root:
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKSLocationTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsBase64JWKTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsFileLocationURLTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.OptionalIssTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.IssNoValidationNoIssTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.IssNoValidationBadIssTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationDefaultTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationFailTest" />
+
         </classes>
     </test>
 
@@ -466,11 +474,11 @@ can be found in the https://github.com/MicroProfileJWT/wfswarm-jwt-auth-tck repo
 Running
 
 ```bash
-[wfswarm-jwt-auth-tck 1316]$ mvn -Dswarm.resolver.offline=true test
+[wfswarm-jwt-auth-tck 664]$ mvn -Dswarm.resolver.offline=true test
 [INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
-[INFO] Building MicroProfile JWT Auth TCK Harness WFSwarm Implementation 1.0-SNAPSHOT
+[INFO] Building MicroProfile JWT Auth TCK Harness WFSwarm Implementation 1.1-SNAPSHOT
 [INFO] ------------------------------------------------------------------------
 [INFO]
 [INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ jwt-auth-tck ---
@@ -494,17 +502,17 @@ Running
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running TestSuite
-[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 49.95 s - in TestSuite
+[INFO] Tests run: 116, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 469.176 s - in TestSuite
 [INFO]
 [INFO] Results:
 [INFO]
-[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 116, Failures: 0, Errors: 0, Skipped: 0
 [INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 52.805 s
-[INFO] Finished at: 2017-08-23T17:23:41-07:00
-[INFO] Final Memory: 30M/619M
+[INFO] Total time: 07:51 min
+[INFO] Finished at: 2018-05-25T23:10:16-07:00
+[INFO] Final Memory: 73M/909M
 [INFO] ------------------------------------------------------------------------
 ```

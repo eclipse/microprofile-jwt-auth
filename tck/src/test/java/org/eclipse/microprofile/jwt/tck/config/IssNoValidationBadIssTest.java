@@ -53,10 +53,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 
 /**
- * Validate that a JWT that has not iss claim, and that has no mp.jwt.verify.issuer config
- * property is accepted for authentication and authorization
+ * Validate the handling of the JWT iss claim.
+ *
+ * Validate that if there is a {@linkplain Names#REQUIRE_ISS} property set to false, validation of
+ * the iss claim is not performed, and {@linkplain Names#ISSUER} property is ignored.
  */
-public class OptionalIssTest extends Arquillian {
+public class IssNoValidationBadIssTest extends Arquillian {
     /**
      * The base URL for the container under test
      */
@@ -82,18 +84,22 @@ public class OptionalIssTest extends Arquillian {
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         String kid = "publicKey4k";
         HashMap<String, Long> timeClaims = new HashMap<>();
-        token = TokenUtils.generateTokenString(privateKey, kid, "/TokenNoIss.json", null, timeClaims);
+        token = TokenUtils.generateTokenString(privateKey, kid, "/TokenBadIss.json", null, timeClaims);
 
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the PEM bundled in the deployment
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey4k.pem");
+        // Don't require validation of iss claim
+        configProps.setProperty(Names.REQUIRE_ISS, "false");
+        // The issuer config value should be ignored
+        configProps.setProperty(Names.ISSUER, "https://ignore-me");
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "OptionalIssTest microprofile-config.properties");
+        configProps.store(configSW, "IssNoValidationBadIssTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "OptionalIssTest.war")
+            .create(WebArchive.class, "IssNoValidationBadIssTest.war")
             .addAsResource(publicKey, "/publicKey.pem")
             .addAsResource(publicKey, "/publicKey4k.pem")
             // Include the token for inspection by ApplicationArchiveProcessor
@@ -110,11 +116,11 @@ public class OptionalIssTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that JWK without iss is accepted if there is no mp.jwt.verify.issuer config")
-    public void testMissingIssIsOk() throws Exception {
-        Reporter.log("testMissingIssIsOk, expect HTTP_OK");
+        description = "Validate that JWK with iss and mp.jwt.verify.requireiss=false returns HTTP_OK")
+    public void testNotRequiredIssIgnored() throws Exception {
+        Reporter.log("testNotRequiredIssIgnored, expect HTTP_OK");
 
-        String uri = baseURL.toExternalForm() + "endp/verifyMissingIssIsOk";
+        String uri = baseURL.toExternalForm() + "endp/verifyBadIssIsOk";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             ;
