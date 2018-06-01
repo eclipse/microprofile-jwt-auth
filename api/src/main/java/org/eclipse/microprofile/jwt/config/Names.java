@@ -37,13 +37,6 @@ public interface Names {
     String VERIFIER_PUBLIC_KEY_LOCATION = "mp.jwt.verify.publickey.location";
 
     /**
-     * A boolean flag that indicates whether or not validation of the iss claim will be done. If true, the MP-JWT
-     * MUST include an iss claim that matches the {@linkplain #ISSUER} value. If false, no validation of the
-     * iss claim is performed.
-     */
-    String REQUIRE_ISS = "mp.jwt.verify.requireiss";
-
-    /**
      * The expected iss claim value to validate against an MP-JWT.
      */
     String ISSUER = "mp.jwt.verify.issuer";

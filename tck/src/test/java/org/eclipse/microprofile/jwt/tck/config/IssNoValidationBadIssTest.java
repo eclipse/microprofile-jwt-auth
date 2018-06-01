@@ -116,7 +116,9 @@ public class IssNoValidationBadIssTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that JWK with iss and mp.jwt.verify.requireiss=false returns HTTP_OK")
+        description = "Validate that JWK with iss and no validation returns HTTP_OK",
+        enabled = false
+    )
     public void testNotRequiredIssIgnored() throws Exception {
         Reporter.log("testNotRequiredIssIgnored, expect HTTP_OK");
 

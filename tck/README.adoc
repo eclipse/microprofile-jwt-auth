@@ -460,7 +460,6 @@ your build root:
             <class name="org.eclipse.microprofile.jwt.tck.config.IssNoValidationNoIssTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.IssNoValidationBadIssTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationDefaultTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationFailTest" />
 
         </classes>

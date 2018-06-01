@@ -87,7 +87,7 @@ public class IssValidationFailTest extends Arquillian {
         Properties configProps = new Properties();
         // Location points to the PEM bundled in the deployment
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey4k.pem");
-        configProps.setProperty(Names.REQUIRE_ISS, "true");
+        //configProps.setProperty(Names.REQUIRE_ISS, "true");
         configProps.setProperty(Names.ISSUER, "https://IssValidationFailTest");
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "IssValidationFailTest microprofile-config.properties");

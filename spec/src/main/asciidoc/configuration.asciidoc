@@ -352,11 +352,7 @@ See https://docs.oracle.com/javase/8/docs/api/java/net/URL.html[java.net.URL] ja
 Parsing of the `InputStream` occurs as defined in <<Supported Public Key Formats>> and must
 return Public Key text in one of the supported formats.
 
-#### `mp.jwt.verify.requireiss` 
-The `mp.jwt.verify.requireiss` config property is a boolean flag that indicates whether `iss` claim values are required in the MP-JWT tokens. When true (the assumed default), MP-JWT tokens are required to have an `iss` claim value that will be validated against the `mp.jwt.verify.issuer` config property. If false, then
-any iss claim value, including none at all, is allowed, and validation of the `iss` claim MUST NOT be performed.
-
 #### `mp.jwt.verify.issuer`
 
 The `mp.jwt.verify.issuer` config property allows for the expected value of the `iss`
-claim to be specified.  When iss validation is enabled, the MicroProfile JWT implementation must verify the `iss` claim of incoming JWTs is present and matches the configured value of `mp.jwt.verify.issuer`.
+claim to be specified.  A MicroProfile JWT implementation must verify the `iss` claim of incoming JWTs is present and matches the configured value of `mp.jwt.verify.issuer`.
