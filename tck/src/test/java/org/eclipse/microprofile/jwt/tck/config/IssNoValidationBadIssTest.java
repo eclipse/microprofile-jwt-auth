@@ -55,7 +55,7 @@ import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 /**
  * Validate the handling of the JWT iss claim.
  *
- * Validate that if there is a {@linkplain Names#REQUIRE_ISS} property set to false, validation of
+ * Validate that if validation is disabled validation of
  * the iss claim is not performed, and {@linkplain Names#ISSUER} property is ignored.
  */
 public class IssNoValidationBadIssTest extends Arquillian {
@@ -91,7 +91,7 @@ public class IssNoValidationBadIssTest extends Arquillian {
         // Location points to the PEM bundled in the deployment
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey4k.pem");
         // Don't require validation of iss claim
-        configProps.setProperty(Names.REQUIRE_ISS, "false");
+        //configProps.setProperty(Names.REQUIRE_ISS, "false");
         // The issuer config value should be ignored
         configProps.setProperty(Names.ISSUER, "https://ignore-me");
         StringWriter configSW = new StringWriter();

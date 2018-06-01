@@ -73,9 +73,6 @@ public class PublicKeyEndpoint {
     @ConfigProperty(name = Names.ISSUER)
     private Optional<String> issuer;
     @Inject
-    @ConfigProperty(name = Names.REQUIRE_ISS)
-    private Optional<Boolean> requireISS;
-    @Inject
     @Claim(standard = Claims.iss)
     private ClaimValue<Optional<String>> iss;
 
