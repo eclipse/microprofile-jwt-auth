@@ -32,11 +32,11 @@ public interface ClaimValue<T> extends Principal {
      * @return The name of the claim as seen in the JsonWebToken content
      */
     @Override
-    public String getName();
+    String getName();
 
     /**
      * Access the value of the claim.
      * @return the value of the claim.
      */
-    public T getValue();
+    T getValue();
 }
