@@ -53,12 +53,12 @@ public @interface LoginConfig {
      *
      * @return the configured auth-method
      */
-    public String authMethod();
+    String authMethod();
 
     /**
      * The realm name element specifies the realm name to
      use in HTTP Basic authorization.
-     * @return
+     * @return the configured realm-name
      */
-    public String realmName() default "";
+    String realmName() default "";
 }
