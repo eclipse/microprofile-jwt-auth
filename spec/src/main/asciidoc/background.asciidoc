@@ -23,7 +23,7 @@ https://tools.ietf.org/html/rfc7519[JSON Web Tokens(JWT)] for role based access 
 ## Motivation
 MicroProfile is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers
 application portability across multiple MicroProfile runtimes. While Java EE is a very feature rich platform and is like a
-toolbox that can be used to to address a wide variety of application architectures, MicroProfile focuses on defining a small
+toolbox that can be used to address a wide variety of application architectures, MicroProfile focuses on defining a small
 and a minimum set of Java EE standards that can be used to deliver applications based on a microservice architecture, they are:
 
 * JAX-RS
@@ -116,6 +116,5 @@ as Nimbus, Jackson, etc.
 and authorization information. Defining this along with the Java API and mapping to JAX-RS APIs are the
 primary tasks of the MP-JWT specification.
 * Widely adopted by different Single Sign-On solutions and well known standards such as OpenID
-Connect given its small overhead and ability to be used across different different
-security domains (federation)
+Connect given its small overhead and ability to be used across different security domains (federation)
 
