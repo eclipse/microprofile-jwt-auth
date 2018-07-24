@@ -411,7 +411,7 @@ caller as a `JsonWebToken` with `@RequestScoped` scoping:
 ```java
 @Path("/endp")
 @DenyAll
-@ApplicationScoped
+@RequestScoped
 public class RolesEndpoint {
 
     @Inject
@@ -460,7 +460,7 @@ is the case shown here:
 
 [source,java]
 ----
-@ApplicationScoped
+@RequestScoped
 public class MyEndpoint {
     @Inject
     @Claim(value="exp", standard=Claims.iat)
@@ -469,7 +469,7 @@ public class MyEndpoint {
 }
 ----
 
-The set of types one my use for a claim value injection is:
+The set of types one may use for a claim value injection are:
 
 * java.lang.String
 * java.util.Set<java.lang.String>
