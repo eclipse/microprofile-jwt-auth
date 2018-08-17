@@ -56,14 +56,13 @@ public class UnsecuredPingTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL publicKey = UnsecuredPingTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PingTest.war")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(UnsecuredPingEndpoint.class)
-            .addClass(UnsecureTCKApplication.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            ;
+                .create(WebArchive.class, "UnsecuredPingTest.war")
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(UnsecuredPingEndpoint.class)
+                .addClass(UnsecureTCKApplication.class)
+                .addAsWebInfResource("beans.xml", "beans.xml");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }

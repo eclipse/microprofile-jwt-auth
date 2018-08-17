@@ -48,7 +48,7 @@ public class TokenUtilsTest {
     @Test(groups = TEST_GROUP_UTILS)
     public void testParseRolesEndpoint() throws Exception {
         JSONParser parser = new JSONParser(DEFAULT_PERMISSIVE_MODE);
-        InputStream contentIS = TokenUtils.class.getResourceAsStream("/Token1.json");
+        InputStream contentIS = TokenUtilsTest.class.getResourceAsStream("/Token1.json");
         byte[] tmp = new byte[4096];
         int length = contentIS.read(tmp);
         byte[] content = new byte[length];

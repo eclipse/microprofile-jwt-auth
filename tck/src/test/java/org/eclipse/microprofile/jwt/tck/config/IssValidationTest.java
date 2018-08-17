@@ -80,7 +80,7 @@ public class IssValidationTest extends Arquillian {
      */
     @Deployment()
     public static WebArchive createDeployment() throws Exception {
-        URL publicKey = PublicKeyAsPEMTest.class.getResource("/publicKey4k.pem");
+        URL publicKey = IssValidationTest.class.getResource("/publicKey4k.pem");
 
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         String kid = "publicKey4k";

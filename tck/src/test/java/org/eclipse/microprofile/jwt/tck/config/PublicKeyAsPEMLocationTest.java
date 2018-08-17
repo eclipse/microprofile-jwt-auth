@@ -74,7 +74,7 @@ public class PublicKeyAsPEMLocationTest extends Arquillian {
      */
     @Deployment()
     public static WebArchive createLocationDeployment() throws IOException {
-        URL publicKey = PublicKeyAsPEMTest.class.getResource("/publicKey4k.pem");
+        URL publicKey = PublicKeyAsPEMLocationTest.class.getResource("/publicKey4k.pem");
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the PEM bundled in the deployment
