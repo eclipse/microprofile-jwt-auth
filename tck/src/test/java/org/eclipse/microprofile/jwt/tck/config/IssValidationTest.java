@@ -56,8 +56,7 @@ import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 /**
  * Validate the handling of the JWT iss claim.
  *
- * Validate that if there is a {@linkplain Names#REQUIRE_ISS} property set to true, validation against
- * the {@linkplain Names#ISSUER} property is performed.
+ * Validate that validation against the {@linkplain Names#ISSUER} property is performed.
  */
 public class IssValidationTest extends Arquillian {
     /**
@@ -115,7 +114,7 @@ public class IssValidationTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that JWK without iss and mp.jwt.verify.requireiss=false returns HTTP_OK")
+        description = "Validate that JWK with iss that matches mp.jwt.verify.issuer returns HTTP_OK")
     public void testRequiredIss() throws Exception {
         Reporter.log("testRequiredIss, expect HTTP_OK");
 

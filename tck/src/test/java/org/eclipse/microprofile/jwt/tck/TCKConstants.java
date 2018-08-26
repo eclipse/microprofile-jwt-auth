@@ -33,7 +33,18 @@ public class TCKConstants {
     public static final String TEST_GROUP_JACC="jacc-optional";
     public static final String TEST_GROUP_CONFIG="config";
     public static final String TEST_GROUP_DEBUG="debug";
+    // The expected JWT iss value
     public static final String TEST_ISSUER = "https://server.example.com";
+
+    /**
+     * An enum used to identify which version of the MP-JWT a TCK test war is
+     * targeting. The target version can be found by loading the META-INF/MPJWTTESTVERSION
+     * resource from the test war and converting it to the MPJWTTESTVERSION value.
+     */
+    public static enum MPJWTTESTVERSION {
+        MPJWT_V_1_0,
+        MPJWT_V_1_1
+    }
 
     private TCKConstants() {}
 }
