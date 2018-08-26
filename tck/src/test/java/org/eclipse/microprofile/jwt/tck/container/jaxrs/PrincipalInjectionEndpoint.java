@@ -19,6 +19,8 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import java.security.Principal;
+
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.json.Json;
@@ -42,6 +44,8 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 @RequestScoped
 @RolesAllowed("Tester")
 public class PrincipalInjectionEndpoint {
+    @Inject
+    private Principal principal;
     @Context
     private SecurityContext context;
 
