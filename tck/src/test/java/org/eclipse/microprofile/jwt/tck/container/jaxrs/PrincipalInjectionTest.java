@@ -75,14 +75,13 @@ public class PrincipalInjectionTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = PrincipalInjectionEndpoint.class.getResource("/publicKey.pem");
+        URL publicKey = PrincipalInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PrincipalInjectionEndpoint.war")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(PrincipalInjectionEndpoint.class)
-            .addClass(TCKApplication.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            ;
+                .create(WebArchive.class, "PrincipalInjectionTest.war")
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(PrincipalInjectionEndpoint.class)
+                .addClass(TCKApplication.class)
+                .addAsWebInfResource("beans.xml", "beans.xml");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }

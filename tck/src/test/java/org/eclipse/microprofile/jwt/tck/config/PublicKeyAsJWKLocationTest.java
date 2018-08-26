@@ -82,19 +82,18 @@ public class PublicKeyAsJWKLocationTest extends Arquillian {
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "classpath:/signer-key4k.jwk");
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "PublicKeyAsJWKLocationURLTest microprofile-config.properties");
+        configProps.store(configSW, "PublicKeyAsJWKLocationTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsJWKLocationURLTest.war")
-            .addAsResource(publicKey, "/publicKey4k.pem")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addAsResource(signerJwk, "/signer-key4k.jwk")
-            .addClass(PublicKeyEndpoint.class)
-            .addClass(JwksApplication.class)
-            .addClass(SimpleTokenUtils.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(configAsset, "microprofile-config.properties")
-            ;
+                .create(WebArchive.class, "PublicKeyAsJWKLocationTest.war")
+                .addAsResource(publicKey, "/publicKey4k.pem")
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addAsResource(signerJwk, "/signer-key4k.jwk")
+                .addClass(PublicKeyEndpoint.class)
+                .addClass(JwksApplication.class)
+                .addClass(SimpleTokenUtils.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(configAsset, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }

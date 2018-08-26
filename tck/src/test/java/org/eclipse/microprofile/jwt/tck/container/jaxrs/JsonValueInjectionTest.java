@@ -77,14 +77,13 @@ public class JsonValueInjectionTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL publicKey = JsonValueInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "JsonValueInjectionTest.war")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(JsonValuejectionEndpoint.class)
-            .addClass(TCKApplication.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            ;
+                .create(WebArchive.class, "JsonValueInjectionTest.war")
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(JsonValuejectionEndpoint.class)
+                .addClass(TCKApplication.class)
+                .addAsWebInfResource("beans.xml", "beans.xml");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }

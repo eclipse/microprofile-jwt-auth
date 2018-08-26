@@ -76,7 +76,7 @@ public class IssValidationFailTest extends Arquillian {
      */
     @Deployment()
     public static WebArchive createDeployment() throws Exception {
-        URL publicKey = PublicKeyAsPEMTest.class.getResource("/publicKey4k.pem");
+        URL publicKey = IssValidationFailTest.class.getResource("/publicKey4k.pem");
 
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         String kid = "publicKey4k";
@@ -94,17 +94,16 @@ public class IssValidationFailTest extends Arquillian {
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "IssValidationTest.war")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addAsResource(publicKey, "/publicKey4k.pem")
-            // Include the token for inspection by ApplicationArchiveProcessor
-            .add(new StringAsset(token), "MP-JWT")
-            .addClass(PublicKeyEndpoint.class)
-            .addClass(TCKApplication.class)
-            .addClass(SimpleTokenUtils.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(configAsset, "microprofile-config.properties")
-            ;
+                .create(WebArchive.class, "IssValidationFailTest.war")
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addAsResource(publicKey, "/publicKey4k.pem")
+                // Include the token for inspection by ApplicationArchiveProcessor
+                .add(new StringAsset(token), "MP-JWT")
+                .addClass(PublicKeyEndpoint.class)
+                .addClass(TCKApplication.class)
+                .addClass(SimpleTokenUtils.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(configAsset, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }

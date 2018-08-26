@@ -78,7 +78,7 @@ public class RequiredClaimsTest extends Arquillian {
      */
     @Deployment(testable = true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL publicKey = RequiredClaimsTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "RequiredClaimsTest.war")
                 .addAsResource(publicKey, "/publicKey.pem")
