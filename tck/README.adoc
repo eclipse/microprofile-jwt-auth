@@ -311,11 +311,19 @@ public class WFSwarmWarArchiveProcessor implements ApplicationArchiveProcessor {
         Node publicKeyNode = war.get("/WEB-INF/classes/publicKey.pem");<2>
         Node publicKey4kNode = war.get("/WEB-INF/classes/publicKey4k.pem");<3>
         Node mpJWT = war.get("MP-JWT");<4>
+        Node testVersionNode = war.get(MpJwtTestVersion.VERSION_LOCATION);<5>
+        MpJwtTestVersion testVersion = MpJwtTestVersion.MPJWT_V_1_0;
+        if(testVersionNode != null) {
+            String content = readAsset(testVersionNode);
+            testVersion = MpJwtTestVersion.valueOf(content);
+        }
+
 ----
 <1> The optional microprofile-config.properties. Only the config related tests currently have this asset.
 <2> The optional public key content of the token signer. 
 <3> The optional 4096 bit public key content of the token signer.
 <4> The optional base64 encoded string of the MP-JWT that will be passed by the test. Currently only the `Iss*Validation*` tests pass this in.
+<5> A marker resource used to indicate the version of MP-JWT the test is targeting. It will be the string value of one of the MpJwtTestVersion enums. The absense of a marker should be treated as an MP-JWT 1.0 test as shown. For MpJwtTestVersion.MPJWT_V_1_0, there will be no bundled META-INF/microprofile-config.properties, and so your harness should set any vendor specific defaults such as the signer public key.
 
 You can use this information to set vendor specific settings that are need to support proper operation of your MP-JWT implementation.
 
@@ -515,3 +523,12 @@ Running
 [INFO] Final Memory: 73M/909M
 [INFO] ------------------------------------------------------------------------
 ```
+
+=== TCK System Properties
+There is one system property that may need to be set in order for the tests that attempt to load a public key from a JWKS URL:
+
+* mp.jwt.tck.jwks.baseURL : Set to the location of your container JAX-RS root. This defaults to "http://localhost:8080/", so it is only necessary to set this property if that default does not match your container's default.
+
+For example,
+
+`mvn -Pcontainer -Dmp.jwt.tck.jwks.baseURL=http://jwks-host:9090/ -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck -Dtck.container.version=1.0-SNAPSHOT`

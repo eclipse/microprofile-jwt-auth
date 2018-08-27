@@ -69,7 +69,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key that
+     * Create a CDI aware base web application archive that includes a JWKS endpoint that
      * is referenced via the mp.jwt.verify.publickey.location as a URL resource property.
      * The root url is /jwks
      * @return the base base web application archive
@@ -80,8 +80,13 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
         URL publicKey = PublicKeyAsJWKLocationURLTest.class.getResource("/publicKey4k.pem");
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
-        // Location points to the JWKS bundled in the deployment
-        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "http://localhost:8080/jwks/endp/publicKey4kAsJWKS?kid=publicKey4k");
+        // Read in the base URL of deployment since it cannot be injected for use by this method
+        String jwksBaseURL = System.getProperty("mp.jwt.tck.jwks.baseURL", "http://localhost:8080/");
+        // Location points to the JWKS endpoint of the deployment
+        System.out.printf("baseURL=%s\n", jwksBaseURL);
+        URL jwksURL = new URL(new URL(jwksBaseURL), "jwks/endp/publicKey4kAsJWKS?kid=publicKey4k");
+        System.out.printf("jwksURL=%s\n", jwksURL);
+        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, jwksURL.toExternalForm());
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "PublicKeyAsJWKLocationURLTest microprofile-config.properties");
@@ -104,7 +109,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
     @Test(groups = TEST_GROUP_CONFIG,
         description = "Validate the http://localhost:8080/jwks/endp/publicKey4kAsJWKS JWKS endpoint")
     public void validateLocationUrlContents() throws Exception {
-        URL locationURL = new URL("http://localhost:8080/jwks/endp/publicKey4kAsJWKS?kid=publicKey4k");
+        URL locationURL = new URL(baseURL, "jwks/endp/publicKey4kAsJWKS?kid=publicKey4k");
         Reporter.log("Begin validateLocationUrlContents");
 
         StringWriter content = new StringWriter();
