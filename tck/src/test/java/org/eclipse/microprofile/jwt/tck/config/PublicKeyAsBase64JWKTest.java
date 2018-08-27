@@ -40,6 +40,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
+import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -100,6 +101,7 @@ public class PublicKeyAsBase64JWKTest extends Arquillian {
 
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "PublicKeyAsBase64JWKTest.war")
+            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addClass(PublicKeyEndpoint.class)
             .addClass(JwksApplication.class)
             .addClass(SimpleTokenUtils.class)
