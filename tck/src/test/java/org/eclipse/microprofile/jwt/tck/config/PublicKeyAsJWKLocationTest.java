@@ -79,7 +79,7 @@ public class PublicKeyAsJWKLocationTest extends Arquillian {
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the JWKS bundled in the deployment
-        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "classpath:/signer-key4k.jwk");
+        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/signer-key4k.jwk");
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "PublicKeyAsJWKLocationTest microprofile-config.properties");
