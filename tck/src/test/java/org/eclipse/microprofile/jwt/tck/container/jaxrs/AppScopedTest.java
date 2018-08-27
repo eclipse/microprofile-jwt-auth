@@ -22,10 +22,12 @@ package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 import java.io.IOException;
 import java.net.URL;
 
+import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.jboss.arquillian.container.spi.client.container.DeploymentException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.ShouldThrowException;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -47,6 +49,7 @@ public class AppScopedTest {
         URL publicKey = AppScopedTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "AppScopedTest.war")
+            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(AppScopedEndpoint.class)
             .addClass(TCKApplication.class)

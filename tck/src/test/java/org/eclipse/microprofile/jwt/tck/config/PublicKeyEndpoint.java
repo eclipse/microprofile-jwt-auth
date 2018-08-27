@@ -523,8 +523,7 @@ public class PublicKeyEndpoint {
         return result;
     }
     /**
-     * Check a token with an iss when mp.jwt.verify.requireiss=true matches the
-     * mp.jwt.verify.issuer value
+     * Check a token with an iss matches the mp.jwt.verify.issuer value
      * @return result of validation test
      */
     @GET

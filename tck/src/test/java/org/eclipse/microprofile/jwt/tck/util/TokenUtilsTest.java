@@ -98,7 +98,7 @@ public class TokenUtilsTest {
         byte[] privateKeyEnc = privateKey.getEncoded();
         byte[] privateKeyPem = Base64.getEncoder().encode(privateKeyEnc);
         String privateKeyPemStr = new String(privateKeyPem);
-        System.out.println("-----BEGIN RSA PRIVATE KEY-----");
+        System.out.println("-----BEGIN PRIVATE KEY-----");
         int column = 0;
         for(int n = 0; n < privateKeyPemStr.length(); n ++) {
             System.out.print(privateKeyPemStr.charAt(n));
@@ -108,12 +108,12 @@ public class TokenUtilsTest {
                 column = 0;
             }
         }
-        System.out.println("\n-----END RSA PRIVATE KEY-----");
+        System.out.println("\n-----END PRIVATE KEY-----");
 
         byte[] publicKeyEnc = publicKey.getEncoded();
         byte[] publicKeyPem = Base64.getEncoder().encode(publicKeyEnc);
         String publicKeyPemStr = new String(publicKeyPem);
-        System.out.println("-----BEGIN RSA PUBLIC KEY-----");
+        System.out.println("-----BEGIN PUBLIC KEY-----");
         column = 0;
         for(int n = 0; n < publicKeyPemStr.length(); n ++) {
             System.out.print(publicKeyPemStr.charAt(n));
@@ -123,7 +123,7 @@ public class TokenUtilsTest {
                 column = 0;
             }
         }
-        System.out.println("\n-----END RSA PUBLIC KEY-----");
+        System.out.println("\n-----END PUBLIC KEY-----");
     }
 
     @Test(groups = TEST_GROUP_UTILS, description = "Test initial key validation")
