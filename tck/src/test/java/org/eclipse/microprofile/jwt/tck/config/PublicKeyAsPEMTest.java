@@ -34,6 +34,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -41,6 +42,7 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.Reporter;
@@ -76,6 +78,7 @@ public class PublicKeyAsPEMTest extends Arquillian {
 
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "PublicKeyAsPEMTest.war")
+                .addAsManifestResource(new StringAsset(TCKConstants.MPJWTTESTVERSION.MPJWT_V_1_1.name()), "MPJWTTESTVERSION")
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addClass(PublicKeyEndpoint.class)
                 .addClass(TCKApplication.class)
