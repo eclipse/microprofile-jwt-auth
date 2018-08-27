@@ -63,7 +63,7 @@ upn:: This MP-JWT custom claim is the user principal name in the java.security.P
     attempted, and if that claim is missing, fallback to the "sub" claim should be used.
 groups:: This MP-JWT custom claim is the list of group names that have been assigned to the principal of the MP-JWT.
     This typically will required a mapping at the application container level to application deployment roles, but a
-    a one-to-one between group names and application role names is required to be performed in addition to any
+    one-to-one between group names and application role names is required to be performed in addition to any
     other mapping.
 
 
@@ -384,7 +384,7 @@ invalid MP-JWT token if any of the following conditions are not met:
 2. The JWT must have an iss claim representing the token issuer that maps to an MP-JWT implementation
 container runtime configured value. Any issuer other than those issuers that have been whitelisted
 by the container configuration must be rejected with an HTTP_UNUATHENTICATED(401) error.
-3. The JWT signer must have a public key that that maps to an MP-JWT implementation container runtime
+3. The JWT signer must have a public key that maps to an MP-JWT implementation container runtime
 configured value. Any public key other than those that have been whitelisted by the container
 configuration must be rejected with an HTTP_UNUATHENTICATED(401) error.
 
