@@ -111,7 +111,7 @@ public class PublicKeyAsPEMLocationURLTest extends Arquillian {
     @Test(groups = TEST_GROUP_CONFIG,
         description = "Validate the http://localhost:8080/pem/endp/publicKey4k PEM endpoint")
     public void validateLocationUrlContents() throws Exception {
-        URL locationURL = new URL("http://localhost:8080/pem/endp/publicKey4k");
+        URL locationURL = new URL(baseURL, "pem/endp/publicKey4k");
         Reporter.log("Begin validateLocationUrlContents");
 
         StringWriter content = new StringWriter();
