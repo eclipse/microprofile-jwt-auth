@@ -16,8 +16,20 @@
 //
 ## Release Notes
 
+### Changes in 1.1.1-RC2
+
+This candidate patch release provides one additional TCK test fix, and information on how to use the MP-JWT
+configuration properties as environment variables on platforms that don't allow dots '.' in their names.
+
+There are no API changes.
+
+#### Closed Issues in 1.1.1-RC2
+https://github.com/eclipse/microprofile-jwt-auth/issues/104
+https://github.com/eclipse/microprofile-jwt-auth/issues/107
+
 ### Changes in 1.1.1-RC1
-This is a candidate patch release that provides fixes to the TCK tests that were seen to have issues in different implementations. The TCK tests WARs now include a META-INF/MPJWTTESTVERSION resource that contains the major/minor version string enum for the MP-JWT version the test WAR is targeting. Currently the versions enums are:
+This is a candidate patch release that provides fixes to the TCK tests that were seen to have issues in different implementations.
+The TCK tests WARs now include a META-INF/MPJWTTESTVERSION resource that contains the major/minor version string enum for the MP-JWT version the test WAR is targeting. Currently the versions enums are:
 
 ```java
 public enum MpJwtTestVersion {
