@@ -19,10 +19,25 @@
 
 # JWT RBAC for MicroProfile
 
+'''
+== How to contribute
+
+Do you want to contribute to this project? Here is what you can do:
+
+* Fork the repository, make changes, then do a pull request.
+* https://github.com/eclipse/microprofile-jwt-auth/issues[Create or fix an issues].
+* Join our https://calendar.google.com/calendar/embed?src=gbnbc373ga40n0tvbl88nkc3r4%40group.calendar.google.com[weekly meeting] on Thursdays at https://www.timeanddate.com/time/map/[16h00 GMT]. 
+** https://docs.google.com/document/d/13nIVDJ6uxen7d57rxyARX8-vqsf3HTvC6hHnhitGZ0w/edit[Minutes and Agenda].
+** https://bluejeans.com/2363391609[Meeting room].
+* Join the discussions on the https://groups.google.com/forum/#!forum/microprofile[MicroProfile Google Group]
+* https://microprofile.io/blog/[Contribute a blog post].
+
+'''
+
 ## Status
 
 MicroProfile JWT RBAC proposal in progress
-http://[]
+
 ## Introduction
 This specification outlines a proposal for using http://openid.net/connect/[OpenID Connect(OIDC)] based
 https://tools.ietf.org/html/rfc7519[JSON Web Tokens(JWT)] for role based access control(RBAC) of microservice endpoints.
