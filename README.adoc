@@ -20,12 +20,12 @@
 # JWT RBAC for MicroProfile
 
 '''
-== How to contribute
+## How to contribute
 
 Do you want to contribute to this project? Here is what you can do:
 
 * Fork the repository, make changes, then do a pull request.
-* https://github.com/eclipse/microprofile-jwt-auth/issues[Create or fix an issues].
+* https://github.com/eclipse/microprofile-jwt-auth/issues[Create or fix an issue].
 * Join our https://calendar.google.com/calendar/embed?src=gbnbc373ga40n0tvbl88nkc3r4%40group.calendar.google.com[weekly meeting] on Thursdays at https://www.timeanddate.com/time/map/[16h00 GMT]. 
 ** https://docs.google.com/document/d/13nIVDJ6uxen7d57rxyARX8-vqsf3HTvC6hHnhitGZ0w/edit[Minutes and Agenda].
 ** https://bluejeans.com/2363391609[Meeting room].
