@@ -1,5 +1,23 @@
 -exportcontents: \
     org.eclipse.microprofile.*
+
+Import-Package: \
+    javax.enterprise.*;-remove-attribute:=version, \
+    javax.inject;-remove-attribute:=version,\
+    javax.json;-remove-attribute:=version,\
+    *
+
+Require-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaCDI;\
+        filter:="(&(osgi.contract=JavaCDI)(version=${cdi.api.version}))",\
+    osgi.contract;\
+        osgi.contract=JavaInject;\
+        filter:="(&(osgi.contract=JavaInject)(version=${inject.api.version}))",\
+    osgi.contract;\
+        osgi.contract=JavaJSONP;\
+        filter:="(&(osgi.contract=JavaJSONP)(version=${jsonp.api.version}))"
+
 Bundle-SymbolicName: org.eclipse.microprofile.jwt
 Bundle-Name: MicroProfile JWT Auth Bundle
 Bundle-License: Apache License, Version 2.0
