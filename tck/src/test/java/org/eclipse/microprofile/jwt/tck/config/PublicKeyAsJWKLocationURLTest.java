@@ -44,6 +44,7 @@ import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
@@ -69,6 +70,21 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
     @ArquillianResource
     private URL baseURL;
 
+    @Deployment(name = "keyEndpoint", order = 1)
+    public static WebArchive createKeyEndpoint() throws Exception {
+        URL publicKey = PublicKeyAsPEMLocationURLTest.class.getResource("/publicKey4k.pem");
+
+        final WebArchive webArchive = ShrinkWrap
+            .create(WebArchive.class, "KeyEndpoint.war")
+            .addAsResource(publicKey, "/publicKey4k.pem")
+            .addAsResource(publicKey, "/publicKey.pem")
+            .addClass(PublicKeyEndpoint.class)
+            .addClass(KeyApplication.class)
+            .addClass(SimpleTokenUtils.class)
+            .addAsWebInfResource("beans.xml", "beans.xml");
+        return webArchive;
+    }
+
     /**
      * Create a CDI aware base web application archive that includes a JWKS endpoint that
      * is referenced via the mp.jwt.verify.publickey.location as a URL resource property.
@@ -76,7 +92,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
      * @return the base base web application archive
      * @throws IOException - on resource failure
      */
-    @Deployment()
+    @Deployment(name = "testApp", order = 2)
     public static WebArchive createLocationURLDeployment() throws IOException {
         URL publicKey = PublicKeyAsJWKLocationURLTest.class.getResource("/publicKey4k.pem");
         // Setup the microprofile-config.properties content
@@ -85,7 +101,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
         String jwksBaseURL = System.getProperty("mp.jwt.tck.jwks.baseURL", "http://localhost:8080/");
         // Location points to the JWKS endpoint of the deployment
         System.out.printf("baseURL=%s\n", jwksBaseURL);
-        URL jwksURL = new URL(new URL(jwksBaseURL), "jwks/endp/publicKey4kAsJWKS?kid=publicKey4k");
+        URL jwksURL = new URL(new URL(jwksBaseURL), "key/endp/publicKey4kAsJWKS?kid=publicKey4k");
         System.out.printf("jwksURL=%s\n", jwksURL);
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, jwksURL.toExternalForm());
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
@@ -108,6 +124,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
     }
 
     @RunAsClient()
+    @OperateOnDeployment("testApp")
     @Test(groups = TEST_GROUP_CONFIG,
         description = "Validate the http://localhost:8080/jwks/endp/publicKey4kAsJWKS JWKS endpoint")
     public void validateLocationUrlContents() throws Exception {
@@ -137,6 +154,7 @@ public class PublicKeyAsJWKLocationURLTest extends Arquillian {
     }
 
     @RunAsClient
+    @OperateOnDeployment("testApp")
     @Test(groups = TEST_GROUP_CONFIG, dependsOnMethods = { "validateLocationUrlContents" },
         description = "Validate specifying the mp.jwt.verify.publickey.location as remote URL to a JWKS key")
     public void testKeyAsLocationUrl() throws Exception {
