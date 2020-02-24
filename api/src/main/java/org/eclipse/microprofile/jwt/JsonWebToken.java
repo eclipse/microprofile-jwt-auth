@@ -140,6 +140,8 @@ public interface JsonWebToken extends Principal {
 
     /**
      * Access the value of the indicated claim.
+     * 
+     * @param <T> The claim type
      * @param claimName - the name of the claim
      * @return the value of the indicated claim if it exists, null otherwise.
      */
