@@ -32,7 +32,6 @@ public class TCKConstants {
     public static final String TEST_GROUP_EE_SECURITY="ee-security-optional";
     public static final String TEST_GROUP_JACC="jacc-optional";
     public static final String TEST_GROUP_CONFIG="config";
-    public static final String TEST_GROUP_DEBUG="debug";
     // The expected JWT iss value
     public static final String TEST_ISSUER = "https://server.example.com";
 
