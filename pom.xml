@@ -29,10 +29,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-
         <checkstyle.version>2.17</checkstyle.version>
         <checkstyle.methodNameFormat>^_?[a-z][a-zA-Z0-9]*$</checkstyle.methodNameFormat>
         <autorelease>false</autorelease>
+
+        <version.jakarta.api>8.0.0</version.jakarta.api>
+        <version.jakarta.annotation.api>1.3.5</version.jakarta.annotation.api>
+        <version.jakarta.enterprise.cdi.api>2.0.2</version.jakarta.enterprise.cdi.api>
+        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
+        <version.jakarta.ws.rs.api>2.1.6</version.jakarta.ws.rs.api>
+        <version.jakarta.ejb.api>3.2.6</version.jakarta.ejb.api>
+        <version.jakarta.security.jacc-api>1.6.1</version.jakarta.security.jacc-api>
+
     </properties>
 
     <licenses>
@@ -93,11 +101,39 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>javax</groupId>
-                <artifactId>javaee-api</artifactId>
-                <type>pom</type>
-                <version>7.0</version>
-                <scope>import</scope>
+                <groupId>jakarta.platform</groupId>
+                <artifactId>jakarta.jakartaee-api</artifactId>
+                <version>${version.jakarta.api}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.enterprise</groupId>
+                <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                <version>${version.jakarta.enterprise.cdi.api}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>${version.jakarta.ws.rs.api}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${version.jakarta.annotation.api}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.json</groupId>
+                <artifactId>jakarta.json-api</artifactId>
+                <version>${version.jakarta.json-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.ejb</groupId>
+                <artifactId>jakarta.ejb-api</artifactId>
+                <version>${version.jakarta.ejb.api}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.security.jacc</groupId>
+                <artifactId>jakarta.security.jacc-api</artifactId>
+                <version>${version.jakarta.security.jacc-api}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
