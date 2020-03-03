@@ -28,6 +28,10 @@
     <name>MicroProfile JWT Auth API</name>
     <description>Eclipse MicroProfile JWT Feature - API</description>
 
+    <properties>
+        <bnd.version>5.0.0</bnd.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>jakarta.json</groupId>
@@ -75,7 +79,7 @@
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>${bnd.version}</version>
 
                 <executions>
                     <execution>
@@ -99,8 +103,10 @@
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-baseline-maven-plugin</artifactId>
-                <version>3.5.0</version>
-                
+                <version>${bnd.version}</version>
+                <configuration>
+                    <fullReport>true</fullReport>
+                </configuration>
                 <executions>
                     <execution>
                         <id>baseline</id>
