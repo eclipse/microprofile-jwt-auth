@@ -31,6 +31,7 @@
     <properties>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
         <version.testng>6.10</version.testng>
+        <version.jose4j>0.7.0</version.jose4j>
         <checkstyle.methodNameFormat>^_?[a-z][a-zA-Z0-9_]*$</checkstyle.methodNameFormat>
         <asciidoctor-maven.version>1.5.5</asciidoctor-maven.version>
         <asciidoctorj-pdf.version>1.5.0-alpha.15</asciidoctorj-pdf.version>
@@ -86,9 +87,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.nimbusds</groupId>
-            <artifactId>nimbus-jose-jwt</artifactId>
-            <version>4.23</version>
+            <groupId>org.bitbucket.b_c</groupId>
+            <artifactId>jose4j</artifactId>
+            <version>${version.jose4j}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap</groupId>
