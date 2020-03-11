@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -39,8 +40,13 @@ import java.util.Scanner;
 import java.util.Set;
 
 import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 import org.eclipse.microprofile.jwt.Claims;
+import org.jose4j.json.JsonUtil;
+import org.jose4j.jwe.JsonWebEncryption;
+import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
@@ -63,8 +69,21 @@ public class TokenUtils {
      * @return the JWT string
      * @throws Exception on parse failure
      */
+    @Deprecated
     public static String generateTokenString(final String jsonResName) throws Exception {
-        return generateTokenString(jsonResName, Collections.emptySet());
+        return signClaims(jsonResName);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
+     * test resource key.
+     *
+     * @param jsonResName - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signClaims(final String jsonResName) throws Exception {
+        return signClaims(jsonResName, Collections.emptySet());
     }
 
     /**
@@ -76,8 +95,22 @@ public class TokenUtils {
      * @return the JWT string
      * @throws Exception on parse failure
      */
+    @Deprecated
     public static String generateTokenString(final String jsonResName, final Set<InvalidClaims> invalidClaims) throws Exception {
-        return generateTokenString(jsonResName, invalidClaims, null);
+        return signClaims(jsonResName, invalidClaims);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
+     * test resource key, possibly with invalid fields.
+     *
+     * @param jsonResName   - name of test resources file
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signClaims(final String jsonResName, final Set<InvalidClaims> invalidClaims) throws Exception {
+        return signClaims(jsonResName, invalidClaims, null);
     }
 
     /**
@@ -90,14 +123,72 @@ public class TokenUtils {
      * @return the JWT string
      * @throws Exception on parse failure
      */
+    @Deprecated
     public static String generateTokenString(String jsonResName, Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
-        // Use the test private key associated with the test public key for a valid signature
-        PrivateKey pk = readPrivateKey("/privateKey.pem");
-        return generateTokenString(pk, "/privateKey.pem", jsonResName, invalidClaims, timeClaims);
+        return signClaims(jsonResName, invalidClaims, timeClaims);
     }
+
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
      * test resource key, possibly with invalid fields.
+     *
+     * @param jsonResName   - name of test resources file
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
+     * @param timeClaims - used to return the exp, iat, auth_time claims
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signClaims(String jsonResName, Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
+        // Use the test private key associated with the test public key for a valid signature
+        PrivateKey pk = readPrivateKey("/privateKey.pem");
+        return signClaims(pk, jsonResName, jsonResName, invalidClaims, timeClaims);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the private key
+     * test resource key, possibly with invalid fields.
+     *
+     * @param pk - the private key to sign the token with
+     * @param kid - the kid header to assign to the token
+     * @param jsonResName   - name of test resources file
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
+     * @param timeClaims - used to return the exp, iat, auth_time claims
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    @Deprecated
+    public static String generateTokenString(PrivateKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims,
+            Map<String, Long> timeClaims) throws Exception {
+        return signClaims(pk, kid, jsonResName, invalidClaims, timeClaims);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the private key
+     *
+     * @param pk - the private key to sign the token with
+     * @param jsonResName   - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signClaims(PrivateKey pk, String jsonResName) throws Exception {
+        return signClaims(pk, jsonResName, jsonResName);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the private key
+     *
+     * @param pk - the private key to sign the token with
+     * @param kid - the kid claim to assign to the token
+     * @param jsonResName   - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signClaims(PrivateKey pk, String kid, String jsonResName) throws Exception {
+        return signClaims(pk, kid, jsonResName, null, null);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the private key, possibly with invalid fields.
      *
      * @param pk - the private key to sign the token with
      * @param kid - the kid claim to assign to the token
@@ -107,14 +198,212 @@ public class TokenUtils {
      * @return the JWT string
      * @throws Exception on parse failure
      */
-    public static String generateTokenString(PrivateKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims,
+    public static String signClaims(PrivateKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims,
             Map<String, Long> timeClaims) throws Exception {
         if (invalidClaims == null) {
             invalidClaims = Collections.emptySet();
         }
+        JwtClaims claims = createJwtClaims(jsonResName, invalidClaims, timeClaims);
+        
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(claims.toJson());
+        jws.setKeyIdHeaderValue(kid);
+        jws.setHeader("typ", "JWT");
+        
+        if (invalidClaims.contains(InvalidClaims.ALG)) {
+            jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+            jws.setKey(KeyGenerator.getInstance("HMACSHA256").generateKey());
+        }
+        else {
+            jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+            if (invalidClaims.contains(InvalidClaims.SIGNER)) {
+                // Generate a new random private key to sign with to test invalid signatures
+                pk = generateKeyPair(2048).getPrivate();
+            }
+            jws.setKey(pk);   
+        }
+        return jws.getCompactSerialization();
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is encrypted by the publicKey.pem
+     * test resource key.
+     *
+     * @param jsonResName - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String encryptClaims(final String jsonResName) throws Exception {
+        return encryptClaims(jsonResName, Collections.emptySet());
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is encrypted by the publicKey.pem
+     * test resource key, possibly with invalid fields.
+     *
+     * @param jsonResName   - name of test resources file
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String encryptClaims(final String jsonResName, final Set<InvalidClaims> invalidClaims) throws Exception {
+        return encryptClaims(jsonResName, invalidClaims, null);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is encrypted by the publicKey.pem
+     * test resource key, possibly with invalid fields.
+     *
+     * @param jsonResName   - name of test resources file
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
+     * @param timeClaims - used to return the exp, iat, auth_time claims
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String encryptClaims(String jsonResName, Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
+        // Use the test public key associated with the test private key for a valid JWE encryption
+        PublicKey pk = readPublicKey("/publicKey.pem");
+        return encryptClaims(pk, jsonResName, jsonResName, invalidClaims, timeClaims);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is encrypted by the public key.
+     *
+     * @param pk - the public key to encrypt the token with
+     * @param jsonResName   - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String encryptClaims(PublicKey pk, String jsonResName) throws Exception {
+        return encryptClaims(pk, jsonResName, jsonResName);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is encrypted by the public key.
+     *
+     * @param pk - the public key to encrypt the token with
+     * @param kid - the kid header to assign to the token
+     * @param jsonResName   - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String encryptClaims(PublicKey pk, String kid, String jsonResName) throws Exception {
+        return encryptClaims(pk, kid, jsonResName, null, null);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is encrypted by the public key,
+     * possibly with invalid fields.
+     *
+     * @param pk - the public key to encrypt the token with
+     * @param kid - the kid header to assign to the token
+     * @param jsonResName   - name of test resources file
+     * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
+     * @param timeClaims - used to return the exp, iat, auth_time claims
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String encryptClaims(PublicKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims,
+            Map<String, Long> timeClaims) throws Exception {
+        if (invalidClaims == null) {
+            invalidClaims = Collections.emptySet();
+        }
+        JwtClaims claims = createJwtClaims(jsonResName, invalidClaims, timeClaims);
+
+        Key key = null;
+        if (invalidClaims.contains(InvalidClaims.ENCRYPTOR)) {
+            // Generate a new random private key to sign with to test invalid signatures
+            KeyPair keyPair = generateKeyPair(2048);
+            key = keyPair.getPublic();
+        }
+        else if (invalidClaims.contains(InvalidClaims.ALG)) {
+            key = KeyGenerator.getInstance("AES").generateKey();
+        }
+        else {
+            key = pk;
+        }
+        
+        return encryptString(key, kid, claims.toJson());
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file by signing it first
+     * with the privateKey.pem test resource and encrypting next with the publicKey.pem test resource.
+     *
+     * @param jsonResName   - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signEncryptClaims(String jsonResName) throws Exception {
+        PrivateKey signingKey = readPrivateKey("/privateKey.pem");
+        PublicKey encryptionKey = readPublicKey("/publicKey.pem");
+        return signEncryptClaims(signingKey, encryptionKey, jsonResName);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key and
+     * and encrypting next with the public key.
+     *
+     * @param signingKey - the private key to sign the token with
+     * @param encryptionKey - the public key to encrypt the token with
+     * @param jsonResName   - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signEncryptClaims(PrivateKey signingKey,
+                                             PublicKey encryptionKey,
+                                             String jsonResName) throws Exception {
+        return signEncryptClaims(signingKey, jsonResName + "-signed", encryptionKey, jsonResName + "-encrypted", jsonResName);
+    }
+    
+    /**
+     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key and
+     * and encrypting next with the public key.
+     *
+     * @param signingKey - the private key to sign the token with
+     * @param signingKid - the signing key identifier
+     * @param encryptionKey - the public key to encrypt the token with
+     * @param encryptionKid - the encryption key identifier
+     * @param jsonResName   - name of test resources file
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signEncryptClaims(PrivateKey signingKey,
+                                       String signingKid,
+                                       PublicKey encryptionKey,
+                                       String encryptionKid,
+                                       String jsonResName) throws Exception {
+
+        String nestedJwt = signClaims(signingKey, signingKid, jsonResName, null, null);
+        return encryptString(encryptionKey, encryptionKid, nestedJwt);
+    }
+
+    private static String encryptString(Key key, String kid, String plainText) throws Exception {
+
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setPlaintext(plainText);
+        jwe.setKeyIdHeaderValue(kid);
+        if (plainText.split("\\.").length == 3) {
+            // nested JWT
+            jwe.getHeaders().setObjectHeaderValue("cty", "JWT");
+        }
+        jwe.setEncryptionMethodHeaderParameter("A256GCM");
+
+        if (key instanceof SecretKey) {
+            jwe.setAlgorithmHeaderValue("A128KW");
+        }
+        else {
+            jwe.setAlgorithmHeaderValue("RSA-OAEP");
+        }
+        jwe.setKey(key);
+        return jwe.getCompactSerialization();
+    }
+
+    private static JwtClaims createJwtClaims(String jsonResName, Set<InvalidClaims> invalidClaims,
+            Map<String, Long> timeClaims) throws Exception {
         
         String content = readJsonContent(jsonResName);
-        JwtClaims claims = JwtClaims.parse(new String(content));
+        JwtClaims claims = JwtClaims.parse(content);
 
         // Change the issuer to INVALID_ISSUER for failure testing if requested
         if (invalidClaims.contains(InvalidClaims.ISSUER)) {
@@ -147,27 +436,7 @@ public class TokenUtils {
             timeClaims.put(Claims.auth_time.name(), authTime);
             timeClaims.put(Claims.exp.name(), exp);
         }
-
-        if (invalidClaims.contains(InvalidClaims.SIGNER)) {
-            // Generate a new random private key to sign with to test invalid signatures
-            KeyPair keyPair = generateKeyPair(2048);
-            pk = keyPair.getPrivate();
-        }
-
-        JsonWebSignature jws = new JsonWebSignature();
-        jws.setPayload(claims.toJson());
-        jws.setKeyIdHeaderValue(kid);
-        jws.setHeader("typ", "JWT");
-        if (invalidClaims.contains(InvalidClaims.ALG)) {
-            jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
-            KeyGenerator kgen = KeyGenerator.getInstance("HMACSHA256");
-            jws.setKey(kgen.generateKey());
-        }
-        else {
-            jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
-            jws.setKey(pk);
-        }
-        return jws.getCompactSerialization();
+        return claims;
     }
 
     private static String readJsonContent(String jsonResName) throws IOException {
@@ -214,6 +483,7 @@ public class TokenUtils {
         int length = contentIS.read(tmp);
         return decodePrivateKey(new String(tmp, 0, length));
     }
+
     /**
      * Read a PEM encoded public key from the classpath
      * @param pemResName - key file resource name
@@ -225,6 +495,28 @@ public class TokenUtils {
         byte[] tmp = new byte[4096];
         int length = contentIS.read(tmp);
         return decodePublicKey(new String(tmp, 0, length));
+    }
+
+    /**
+     * Read a public key in JWK format from the classpath
+     * @param jwkResName - key file resource name
+     * @return PublicKey
+     * @throws Exception on decode failure
+     */
+    public static PublicKey readJwkPublicKey(final String jwkResName) throws Exception {
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(JsonUtil.parseJson(readJsonContent(jwkResName)));
+        return PublicJsonWebKey.class.cast(jwk).getPublicKey();
+    }
+
+    /**
+     * Read a private key in JWK format from the classpath
+     * @param jwkResName - key file resource name
+     * @return PublicKey
+     * @throws Exception on decode failure
+     */
+    public static PrivateKey readJwkPrivateKey(final String jwkResName) throws Exception {
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(JsonUtil.parseJson(readJsonContent(jwkResName)));
+        return PublicJsonWebKey.class.cast(jwk).getPrivateKey();
     }
 
     /**
@@ -295,6 +587,7 @@ public class TokenUtils {
         ISSUER, // Set an invalid issuer
         EXP,    // Set an invalid expiration
         SIGNER, // Sign the token with the incorrect private key
-        ALG, // Sign the token with the correct private key, but HS
+        ENCRYPTOR, // Encrypt the token with the incorrect public key
+        ALG     // Sign the token with the correct private key or encrypt the token with the correct public key, but incorrect algorithm
     }
 }

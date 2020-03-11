@@ -1,0 +1,8 @@
+{
+   "kty":"RSA",
+   "use":"enc",
+   "alg":"RSA-OAEP",
+   "kid":"mp-jwt",
+   "n":"vNrRiMGbg3g4d6oApaDCQ09LeCL8Y2ig336NzPlAtzsPscp7yXrgya-sY0kvaYtFQa7AqPshm7U49ErVhYFQ3jBhJpfoIoYhmuIb4X3DLJfzwmC2K29dkWGWjeWW4kNiZKSC-TsvkuSPwhUtwzvOPpckMXLM1AuH_h9X0TJPNuwpBZ8M9WWHkzD4Y_VuFot0Eo7l-irtJk79_DgTBKL4gqzIrLty6NpSai7CSp00jhJ5ITG9hKLzQjwR3AmK0trXYgYX1frnRhYatDSXIT-xiaFul0asAmqHAtfVMPswjGXTQ9yPnQ8QvoLkfx3q5mg5OOPT31vaUDKPvBvZykvtrQ",
+   "e":"AQAB"
+}

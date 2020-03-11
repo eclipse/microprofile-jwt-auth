@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2016-2017 Eclipse Microprofile Contributors:
+// Copyright (c) 2016-2020 Eclipse Microprofile Contributors:
 // Red Hat
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,6 +54,8 @@ invalid tokens. A summary of the tck/resources directory contents is:
 ** A base MicroProfile config properties file for the org.eclipse.microprofile.jwt.tck.config.* package tests.
 * META-INF/microprofile-config-publickey-location.properties
 ** A base MicroProfile config properties file for the org.eclipse.microprofile.jwt.tck.jaxrs.* package tests.
+* META-INF/microprofile-config-decryptionkey-location.properties
+** A base MicroProfile config properties file for the org.eclipse.microprofile.jwt.tck.jaxrs.jwe.* package tests.
 * jwt-content1.json
 * testJWTCallerPrincipal.json
 * usePreferredName.json
@@ -79,6 +81,12 @@ ignored when validation is disabled.
 ** A JWK representation of the signer public key used by some of the org.eclipse.microprofile.jwt.tck.config.* package tests.
 * signer-keyset4k.jwk
 ** A JWKS representation of the signer public key used by some of the org.eclipse.microprofile.jwt.tck.config.* package tests.
+* encryptorPublicKey.jwk
+** A JWK representation of the encryptor public key used by some of the org.eclipse.microprofile.jwt.tck.config.jwe.* package tests.
+* decryptorPrivateKey.jwk
+** A JWK representation of the decryptor private key used by some of the org.eclipse.microprofile.jwt.tck.config.jwe.* package tests.
+* * decryptorPrivateKeySet.jwk
+** A JWKS representation of the decryptor private key used by some of the org.eclipse.microprofile.jwt.tck.config.jwe.* package tests.
 
 The test issuer value used in all valid test MP-JWT tokens as the `iss` claim value is "https://server.example.com".
 

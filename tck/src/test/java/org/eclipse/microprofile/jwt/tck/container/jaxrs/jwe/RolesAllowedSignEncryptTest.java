@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -17,15 +17,34 @@
  * limitations under the License.
  *
  */
-package org.eclipse.microprofile.jwt.tck.container.jaxrs;
+package org.eclipse.microprofile.jwt.tck.container.jaxrs.jwe;
+
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_EE_SECURITY;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Base64;
+
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
+import org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesEndpoint;
+import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -34,26 +53,10 @@ import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Base64;
-
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_EE_SECURITY;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
-
 /**
  * Tests of the MP-JWT auth method authorization behavior as expected by the MP-JWT RBAC 1.0 spec
  */
-public class RolesAllowedTest extends Arquillian {
+public class RolesAllowedSignEncryptTest extends Arquillian {
 
     /**
      * The test generated JWT token string
@@ -73,25 +76,32 @@ public class RolesAllowedTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL config = RolesAllowedTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL config = RolesAllowedSignEncryptTest.class.getResource("/META-INF/microprofile-config-verify-decrypt.properties");
+        URL verifyKey = RolesAllowedSignEncryptTest.class.getResource("/publicKey4k.pem");
+        URL decryptKey = RolesAllowedSignEncryptTest.class.getResource("/privateKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "RolesAllowedTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey.pem")
+            .create(WebArchive.class, "RolesAllowedSignEncryptTest.war")
+            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
+            .addAsResource(decryptKey, "/privateKey.pem")
+            .addAsResource(verifyKey, "/publicKey4k.pem")
             .addClass(RolesEndpoint.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
             .addAsManifestResource(config, "microprofile-config.properties");
-        System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
 
     @BeforeClass(alwaysRun=true)
     public static void generateToken() throws Exception {
-        token = TokenUtils.generateTokenString("/Token1.json", null);
+        token = signEncryptClaims("/Token1.json");
     }
 
+    private static String signEncryptClaims(String jsonResName) throws Exception {
+        PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
+        PublicKey encryptionKey = TokenUtils.readPublicKey("/publicKey.pem");
+        return TokenUtils.signEncryptClaims(signingKey, encryptionKey, jsonResName);
+    }
+    
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with no token fails with HTTP_UNAUTHORIZED")
     public void callEchoNoAuth() throws Exception {
@@ -99,8 +109,7 @@ public class RolesAllowedTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("input", "hello")
-            ;
+            .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
@@ -112,17 +121,13 @@ public class RolesAllowedTest extends Arquillian {
         Reporter.log("callEchoBASIC, expect HTTP_UNAUTHORIZED");
         byte[] tokenb = Base64.getEncoder().encode("jdoe@example.com:password".getBytes());
         String token = new String(tokenb);
-        System.out.printf("basic: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("input", "hello")
-            ;
+            .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "BASIC "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
-        String reply = response.readEntity(String.class);
-        System.out.println(reply);
     }
 
     @RunAsClient
@@ -134,8 +139,7 @@ public class RolesAllowedTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("input", "hello")
-            ;
+            .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
@@ -145,17 +149,18 @@ public class RolesAllowedTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS,
-        description = "Validate a request with MP-JWT which fails with HTTP_UNAUTHORIZED when token is signed and encrypted")
+        description = "Validate a request with MP-JWT which fails with HTTP_UNAUTHORIZED when token is signed")
     public void callEchoSignToken() throws Exception {
         Reporter.log("callEcho, expect HTTP_UNAUTHORIZED");
 
-        String signEncryptToken = TokenUtils.signEncryptClaims("/Token1.json");
+        PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
+        String signToken = TokenUtils.signClaims(signingKey, "/Token1.json", "/Token1.json", null, null);
         
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
             .queryParam("input", "hello");
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + signEncryptToken).get();
+        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + signToken).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -183,10 +188,8 @@ public class RolesAllowedTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "endp/echo2";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("input", "hello")
-            ;
+            .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        String reply = response.readEntity(String.class);
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_FORBIDDEN);
     }
 
@@ -197,40 +200,34 @@ public class RolesAllowedTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "endp/checkIsUserInRole";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
+            .target(uri);
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
-        String reply = response.readEntity(String.class);
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
     }
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT Token2 fails to access checkIsUserInRole with HTTP_FORBIDDEN")
     public void checkIsUserInRoleToken2() throws Exception {
         Reporter.log("checkIsUserInRoleToken2, expect HTTP_FORBIDDEN");
-        String token2 = TokenUtils.generateTokenString("/Token2.json");
+        String token2 = signEncryptClaims("/Token2.json");
 
         String uri = baseURL.toExternalForm() + "endp/checkIsUserInRole";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
+            .target(uri);
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token2).get();
-        String reply = response.readEntity(String.class);
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_FORBIDDEN);
     }
 
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT Token2 is able to access echoNeedsToken2Role with HTTP_OK")
     public void echoNeedsToken2Role() throws Exception {
-        Reporter.log("echoNeedsToken2Role, expect HTTP_FORBIDDEN");
-        String token2 = TokenUtils.generateTokenString("/Token2.json");
+        Reporter.log("echoNeedsToken2Role, expect HTTP_OK");
+        String token2 = signEncryptClaims("/Token2.json");
 
         String uri = baseURL.toExternalForm() + "endp/echoNeedsToken2Role";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("input", "hello")
-            ;
+            .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token2).get();
-        String reply = response.readEntity(String.class);
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
     }
 
@@ -238,15 +235,13 @@ public class RolesAllowedTest extends Arquillian {
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT Token2 calling echo fails with HTTP_FORBIDDEN")
     public void echoWithToken2() throws Exception {
         Reporter.log("echoWithToken2, expect HTTP_FORBIDDEN");
-        String token2 = TokenUtils.generateTokenString("/Token2.json");
+        String token2 = signEncryptClaims("/Token2.json");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("input", "hello")
-            ;
+            .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token2).get();
-        String reply = response.readEntity(String.class);
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_FORBIDDEN);
     }
 
@@ -257,8 +252,8 @@ public class RolesAllowedTest extends Arquillian {
         Reporter.log("getPrincipalClass, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "endp/getPrincipalClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
+            .target(uri);
+
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
@@ -276,12 +271,9 @@ public class RolesAllowedTest extends Arquillian {
         Reporter.log("testNeedsGroup1Mapping, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "endp/needsGroup1Mapping";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
+            .target(uri);
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        String reply = response.readEntity(String.class);
-        System.out.println(reply);
     }
 
     @RunAsClient
@@ -291,8 +283,7 @@ public class RolesAllowedTest extends Arquillian {
         Reporter.log("getInjectedPrincipal, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "endp/getInjectedPrincipal";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
+            .target(uri);
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
@@ -307,29 +298,10 @@ public class RolesAllowedTest extends Arquillian {
         String uri = baseURL.toExternalForm() + "endp/heartbeat";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
             .target(uri)
-            .queryParam("input", "hello")
-            ;
+            .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         Assert.assertTrue(reply.startsWith("Heartbeat:"), "Saw Heartbeat: ...");
-    }
-
-    @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-          description = "Validate a request with a valid JWT in a Cookie but no Token Header set fails with " +
-                        "HTTP_UNAUTHORIZED")
-    public void noTokenHeaderSetToCookie() throws Exception {
-        String token = TokenUtils.generateTokenString("/Token1.json");
-
-        String uri = baseURL.toExternalForm() + "endp/echo";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello");
-        Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
-            .cookie("Bearer", token)
-            .get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 }

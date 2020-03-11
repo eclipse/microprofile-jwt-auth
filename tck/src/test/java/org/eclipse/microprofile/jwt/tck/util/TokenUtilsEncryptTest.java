@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.util;
 
-import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,77 +37,48 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * Tests which verify TokenUtils generateTokenString methods
+ * Tests for TokenUtils encryptClaims methods
  */
-public class TokenUtilsTest {
+public class TokenUtilsEncryptTest {
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Illustrate validation of alg")
+            description = "Illustrate validation of iss")
     public void testFailAlgorithm() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ALG);
-        String token = TokenUtils.signClaims("/Token1.json", invalidFields);
-        validateToken(token);
-    }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of alg")
-    public void testFailAlgorithmDeprecated() throws Exception {
-        Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidClaims.ALG);
-        @SuppressWarnings("deprecation")
-        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
+        String token = TokenUtils.encryptClaims("/Token1.json", invalidFields);
         validateToken(token);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS,
+        description = "Illustrate validation of a JWT")
     public void testValidToken() throws Exception {
+        String token = TokenUtils.encryptClaims("/Token1.json");
+        validateToken(token);
+    }
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
+            description = "Illustrate validation failure if signed token is used")
+    public void testValidateSignedToken() throws Exception {
         String token = TokenUtils.signClaims("/Token1.json");
         validateToken(token);
     }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Deprecated: Illustrate validation of a JWT")
-    public void testValidTokenDeprecated() throws Exception {
-        @SuppressWarnings("deprecation")
-        String token = TokenUtils.generateTokenString("/Token1.json");
-        validateToken(token);
-    }
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Illustrate validation of issuer")
+            description = "Illustrate validation of alg")
     public void testFailIssuer() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
-        String token = TokenUtils.signClaims("/Token1.json", invalidFields);
-        validateToken(token);
-    }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of issuer")
-    public void testFailIssuerDeprecated() throws Exception {
-        Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
-        @SuppressWarnings("deprecation")
-        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
+        String token = TokenUtils.encryptClaims("/Token1.json", invalidFields);
         validateToken(token);
     }
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-        description = "Illustrate validation of signer")
-    public void testFailSignature() throws Exception {
+        description = "Illustrate validation of encryptor")
+    public void testFailEncryption() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
-        String token = TokenUtils.signClaims("/Token1.json", invalidFields);
-        validateToken(token);
-    }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of signer")
-    public void testFailSignatureDeprecated() throws Exception {
-        Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
-        @SuppressWarnings("deprecation")
-        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
+        invalidFields.add(TokenUtils.InvalidClaims.ENCRYPTOR);
+        String token = TokenUtils.encryptClaims("/Token1.json", invalidFields);
         validateToken(token);
     }
 
@@ -117,18 +88,7 @@ public class TokenUtilsTest {
         Map<String, Long> timeClaims = new HashMap<>();
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
-        String token = TokenUtils.signClaims("/Token1.json", invalidFields, timeClaims);
-        validateToken(token);
-    }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of exp")
-    public void testFailExpiredDeprecated() throws Exception {
-        Map<String, Long> timeClaims = new HashMap<>();
-        Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
-        invalidFields.add(TokenUtils.InvalidClaims.EXP);
-        @SuppressWarnings("deprecation")
-        String token = TokenUtils.generateTokenString("/Token1.json", invalidFields, timeClaims);
+        String token = TokenUtils.encryptClaims("/Token1.json", invalidFields, timeClaims);
         validateToken(token);
     }
 
@@ -139,19 +99,7 @@ public class TokenUtilsTest {
         // Set exp to 61 seconds in past
         long exp = TokenUtils.currentTimeInSecs() - 61;
         timeClaims.put(Claims.exp.name(), exp);
-        String token = TokenUtils.signClaims("/Token1.json", null, timeClaims);
-        validateToken(token);
-    }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of exp that has just expired")
-    public void testFailJustExpiredDeprecated() throws Exception {
-        Map<String, Long> timeClaims = new HashMap<>();
-        // Set exp to 61 seconds in past
-        long exp = TokenUtils.currentTimeInSecs() - 61;
-        timeClaims.put(Claims.exp.name(), exp);
-        @SuppressWarnings("deprecation")
-        String token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
+        String token = TokenUtils.encryptClaims("/Token1.json", null, timeClaims);
         validateToken(token);
     }
 
@@ -162,19 +110,7 @@ public class TokenUtilsTest {
         // Set exp to 45 seconds in past
         long exp = TokenUtils.currentTimeInSecs() - 45;
         timeClaims.put(Claims.exp.name(), exp);
-        String token = TokenUtils.signClaims("/Token1.json", null, timeClaims);
-        validateToken(token, exp);
-    }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS,
-            description = "Deprecated: Illustrate validation of exp that is in grace period")
-    public void testExpGraceDeprecated() throws Exception {
-        Map<String, Long> timeClaims = new HashMap<>();
-        // Set exp to 45 seconds in past
-        long exp = TokenUtils.currentTimeInSecs() - 45;
-        timeClaims.put(Claims.exp.name(), exp);
-        @SuppressWarnings("deprecation")
-        String token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
+        String token = TokenUtils.encryptClaims("/Token1.json", null, timeClaims);
         validateToken(token, exp);
     }
 
@@ -183,23 +119,24 @@ public class TokenUtilsTest {
     }
     private void validateToken(String token, Long expectedExpValue) throws Exception {
 
-        RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");
+        RSAPrivateKey privateKey = (RSAPrivateKey) TokenUtils.readPrivateKey("/privateKey.pem");
         int expGracePeriodSecs = 60;
 
         JwtConsumerBuilder builder = new JwtConsumerBuilder();
-
+        builder.setDisableRequireSignature();
+        builder.setEnableRequireEncryption();
         // 'exp' must be available
         builder.setRequireExpirationTime();
         builder.setSkipDefaultAudienceValidation();
         // 'iat' must be available
         builder.setRequireIssuedAt();
-        // 'RS256' is required
+        // 'RSA-OAEP' is required
         builder.setJwsAlgorithmConstraints(
-           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RS256"));
+           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RSA-OAEP"));
 
         // issuer must be equal to TCKConstants.TEST_ISSUER
         builder.setExpectedIssuer(true, TCKConstants.TEST_ISSUER);
-        builder.setVerificationKey(publicKey);
+        builder.setDecryptionKey(privateKey);
         builder.setAllowedClockSkewInSeconds(expGracePeriodSecs);
 
         JwtClaims claimsSet = builder.build().processToClaims(token);
