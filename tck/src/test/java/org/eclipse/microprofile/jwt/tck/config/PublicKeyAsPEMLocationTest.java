@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.config.Names;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
+import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -74,7 +75,7 @@ public class PublicKeyAsPEMLocationTest extends Arquillian {
      */
     @Deployment()
     public static WebArchive createLocationDeployment() throws IOException {
-        URL publicKey = PublicKeyAsPEMTest.class.getResource("/publicKey4k.pem");
+        URL publicKey = PublicKeyAsPEMLocationTest.class.getResource("/publicKey4k.pem");
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the PEM bundled in the deployment
@@ -86,6 +87,7 @@ public class PublicKeyAsPEMLocationTest extends Arquillian {
 
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "PublicKeyAsPEMLocationTest.war")
+            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addAsResource(publicKey, "/publicKey.pem")
             .addAsResource(publicKey, "/publicKey4k.pem")
             .addClass(PublicKeyEndpoint.class)

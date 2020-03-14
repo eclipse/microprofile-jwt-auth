@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.config.Names;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
+import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -56,8 +57,7 @@ import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 /**
  * Validate the handling of the JWT iss claim.
  *
- * Validate that if there is a {@linkplain Names#REQUIRE_ISS} property set to true, validation against
- * the {@linkplain Names#ISSUER} property is performed.
+ * Validate that validation against the {@linkplain Names#ISSUER} property is performed.
  */
 public class IssValidationTest extends Arquillian {
     /**
@@ -80,7 +80,7 @@ public class IssValidationTest extends Arquillian {
      */
     @Deployment()
     public static WebArchive createDeployment() throws Exception {
-        URL publicKey = PublicKeyAsPEMTest.class.getResource("/publicKey4k.pem");
+        URL publicKey = IssValidationTest.class.getResource("/publicKey4k.pem");
 
         PrivateKey privateKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         String kid = "publicKey4k";
@@ -99,6 +99,7 @@ public class IssValidationTest extends Arquillian {
 
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "IssValidationTest.war")
+            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addAsResource(publicKey, "/publicKey.pem")
             .addAsResource(publicKey, "/publicKey4k.pem")
             // Include the token for inspection by ApplicationArchiveProcessor
@@ -115,7 +116,7 @@ public class IssValidationTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that JWK without iss and mp.jwt.verify.requireiss=false returns HTTP_OK")
+        description = "Validate that JWK with iss that matches mp.jwt.verify.issuer returns HTTP_OK")
     public void testRequiredIss() throws Exception {
         Reporter.log("testRequiredIss, expect HTTP_OK");
 

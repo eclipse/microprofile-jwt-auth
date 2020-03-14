@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.config.Names;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
+import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -79,13 +80,14 @@ public class PublicKeyAsJWKSLocationTest extends Arquillian {
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the JWKS bundled in the deployment
-        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "classpath:/signer-keyset4k.jwk");
+        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/signer-keyset4k.jwk");
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "PublicKeyAsJWKSLocationTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "PublicKeyAsJWKSLocationTest.war")
+            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addAsResource(publicKey, "/publicKey4k.pem")
             .addAsResource(publicKey, "/publicKey.pem")
             .addAsResource(signerJwks, "/signer-keyset4k.jwk")

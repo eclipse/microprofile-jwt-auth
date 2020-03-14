@@ -48,7 +48,7 @@ public interface JsonWebToken extends Principal {
      * @return raw bear token string
      */
     default String getRawToken() {
-        return getClaim(Claims.raw_token.name());
+        return getClaim(Claims.raw_token);
     }
 
     /**
@@ -56,7 +56,7 @@ public interface JsonWebToken extends Principal {
      * @return the iss claim.
      */
     default String getIssuer() {
-        return getClaim(Claims.iss.name());
+        return getClaim(Claims.iss);
     }
 
     /**
@@ -65,7 +65,7 @@ public interface JsonWebToken extends Principal {
      * @return the aud claim or null if the claim is not present
      */
     default Set<String> getAudience() {
-        return getClaim(Claims.aud.name());
+        return getClaim(Claims.aud);
     }
 
     /**
@@ -76,7 +76,7 @@ public interface JsonWebToken extends Principal {
      * @return the sub claim.
      */
     default String getSubject() {
-        return getClaim(Claims.sub.name());
+        return getClaim(Claims.sub);
     }
 
     /**
@@ -90,7 +90,7 @@ public interface JsonWebToken extends Principal {
      * @return the jti claim.
      */
     default String getTokenID() {
-        return getClaim(Claims.jti.name());
+        return getClaim(Claims.jti);
     }
 
     /**
@@ -100,7 +100,7 @@ public interface JsonWebToken extends Principal {
      * @return the exp claim.
      */
     default long getExpirationTime() {
-        return getClaim(Claims.exp.name());
+        return getClaim(Claims.exp);
     }
 
     /**
@@ -109,7 +109,7 @@ public interface JsonWebToken extends Principal {
      * @return the iat claim
      */
     default long getIssuedAtTime() {
-        return getClaim(Claims.iat.name());
+        return getClaim(Claims.iat);
     }
 
     /**
@@ -120,7 +120,7 @@ public interface JsonWebToken extends Principal {
      * @return a possibly empty set of group names.
      */
     default Set<String> getGroups() {
-        return getClaim(Claims.groups.name());
+        return getClaim(Claims.groups);
     }
 
     /**
@@ -140,10 +140,23 @@ public interface JsonWebToken extends Principal {
 
     /**
      * Access the value of the indicated claim.
+     *
+     * @param <T> The claim type
      * @param claimName - the name of the claim
      * @return the value of the indicated claim if it exists, null otherwise.
      */
     <T> T getClaim(String claimName);
+
+    /**
+     * Access the value of the indicated claim.
+     *
+     * @param <T> The claim type
+     * @param claim - the claim
+     * @return the value of the indicated claim if it exists, null otherwise.
+     */
+    default <T> T getClaim(Claims claim) {
+        return getClaim(claim.name());
+    }
 
     /**
      * A utility method to access a claim value in an {@linkplain Optional}
@@ -154,5 +167,16 @@ public interface JsonWebToken extends Principal {
      */
     default <T> Optional<T> claim(String claimName) {
         return Optional.ofNullable(getClaim(claimName));
+    }
+
+    /**
+     * A utility method to access a claim value in an {@linkplain Optional}
+     * wrapper
+     * @param claim - the claim
+     * @param <T> - the type of the claim value to return
+     * @return an Optional wrapper of the claim value
+     */
+    default <T> Optional<T> claim(Claims claim) {
+        return claim(claim.name());
     }
 }

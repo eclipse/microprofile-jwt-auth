@@ -36,12 +36,14 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
+import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.Reporter;
@@ -77,14 +79,14 @@ public class JsonValueInjectionTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
-        URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
+        URL publicKey = JsonValueInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "JsonValueInjectionTest.war")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(JsonValuejectionEndpoint.class)
-            .addClass(TCKApplication.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            ;
+                .create(WebArchive.class, "JsonValueInjectionTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(JsonValuejectionEndpoint.class)
+                .addClass(TCKApplication.class)
+                .addAsWebInfResource("beans.xml", "beans.xml");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }

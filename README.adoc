@@ -58,3 +58,14 @@ any information within a security token
 
 Today, the most common solutions involving RESTful and microservices security are based on OAuth2, OpenID Connect and
 JSON Web Token (JWT) standards.
+
+## Project Links
+* https://wiki.eclipse.org/MicroProfile/JWT_Auth[Wiki Page]
+* https://docs.google.com/document/d/13nIVDJ6uxen7d57rxyARX8-vqsf3HTvC6hHnhitGZ0w/edit[Hangout Meeting Notes]
+
+### Continuous Integration
+* https://ci.eclipse.org/microprofile/job/JWT-Auth-maven-snapshots/[Snapshot Build Jobs]
+* https://ci.eclipse.org/microprofile/job/MicroProfile%20Releases/[Release Build Jobs]
+
+
+

@@ -41,6 +41,7 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.config.Names;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
+import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -96,18 +97,18 @@ public class PublicKeyAsFileLocationURLTest extends Arquillian {
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, tmp.toURI().toASCIIString());
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "PublicKeyAsJWKLocationURLTest microprofile-config.properties");
+        configProps.store(configSW, "PublicKeyAsFileLocationURLTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsJWKLocationURLTest.war")
-            .addAsResource(publicKey, "/publicKey4k.pem")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(PublicKeyEndpoint.class)
-            .addClass(PEMApplication.class)
-            .addClass(SimpleTokenUtils.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(configAsset, "microprofile-config.properties")
-            ;
+                .create(WebArchive.class, "PublicKeyAsFileLocationURLTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey4k.pem")
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(PublicKeyEndpoint.class)
+                .addClass(PEMApplication.class)
+                .addClass(SimpleTokenUtils.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(configAsset, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }

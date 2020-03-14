@@ -21,7 +21,7 @@ package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.Claims;
-
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.Json;
@@ -36,6 +36,7 @@ import java.util.Set;
 
 @Path("/endp")
 @RequestScoped
+@RolesAllowed("Tester")
 public class PrimitiveInjectionEndpoint {
     @Inject
     @Claim("raw_token")

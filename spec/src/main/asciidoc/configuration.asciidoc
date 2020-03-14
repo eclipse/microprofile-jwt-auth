@@ -249,7 +249,7 @@ MicroProfile JWT implementations are required to throw a `DeploymentException` i
 
 #### `mp.jwt.verify.publickey.location`
 
-The `mp.jwt.verify.publickey` config property allows for an external or internal location
+The `mp.jwt.verify.publickey.location` config property allows for an external or internal location
 of Public Key to be specified.  The value may be a relative path or a URL.
 
 MicroProfile JWT implementations are required to check the path at startup or deploy time.
@@ -356,3 +356,24 @@ return Public Key text in one of the supported formats.
 
 The `mp.jwt.verify.issuer` config property allows for the expected value of the `iss`
 claim to be specified.  A MicroProfile JWT implementation must verify the `iss` claim of incoming JWTs is present and matches the configured value of `mp.jwt.verify.issuer`.
+
+
+#### Mapping Properties to Environment Variables
+When using environment variables to specify the MP-JWT configuration properties defined in this section,
+note that some operating systems allow only alphabetic characters and underscores in environment variables.
+Since characters such as '.' may be disallowed, in order to set a value for a config property such as `mp.jwt.verify.publickey`
+using an environment variable, the following mapping rules from the MP configuration spec are relevant:
+
+When searching environment variables for configuration properties, the following transformation is applied to
+attempt to find a match:
+
+* Exact match (i.e. mp.jwt.verify.publickey)
+* Replace nonalphanumeric characters with '_' (i.e. mp_jwt_verify_publickey)
+* Replace nonalphanumeric characters with '_' and convert to uppercase (i.e. MP_JWT_VERIFY_PUBLICKEY)
+
+With these rules, the matching portable environment variables names for the current MP-JWT configuration
+properties are:
+
+`mp.jwt.verify.publickey` :: mp_jwt_verify_publickey or MP_JWT_VERIFY_PUBLICKEY
+`mp.jwt.verify.publickey.location` :: mp_jwt_verify_publickey_location or MP_JWT_VERIFY_PUBLICKEY_LOCATION
+`mp.jwt.verify.issuer` :: mp_jwt_verify_issuer or MP_JWT_VERIFY_ISSUER

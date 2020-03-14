@@ -43,3 +43,5 @@ include::configuration.asciidoc[]
 include::future-directions.asciidoc[]
 
 include::sample-impl.asciidoc[]
+
+include::release-notes.asciidoc[]

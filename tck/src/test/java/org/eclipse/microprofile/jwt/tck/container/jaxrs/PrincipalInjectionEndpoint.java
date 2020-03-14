@@ -29,15 +29,18 @@ import javax.json.JsonObject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
 
-import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 /**
  * Validate that the injection of a {@linkplain Principal} works when using the MP-JWT feature.
  * This validates that the MP-JWT implementation is not interfering with the CDI built in
  * Principal bean.
+ * This also validates that the {@linkplain SecurityContext#getUserPrincipal()} is also an
+ * instance of the {@linkplain JsonWebToken} interface.
  */
 @Path("/endp")
 @RequestScoped
@@ -45,6 +48,8 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 public class PrincipalInjectionEndpoint {
     @Inject
     private Principal principal;
+    @Context
+    private SecurityContext context;
 
     @GET
     @Path("/verifyInjectedPrincipal")
@@ -52,16 +57,33 @@ public class PrincipalInjectionEndpoint {
     public JsonObject verifyInjectedPrincipal() {
         boolean pass = false;
         String msg;
-        if (principal == null) {
-            msg = "principal value is null, FAIL";
+        // Validate that the context principal is a JsonWebToken
+        Principal jwtPrincipal = context.getUserPrincipal();
+        if (jwtPrincipal == null) {
+            msg = "SecurityContext#principal value is null, FAIL";
         }
-        else if (principal instanceof JsonWebToken) {
-            msg = Claims.iss.name() + " PASS";
+        else if (jwtPrincipal instanceof JsonWebToken) {
+            msg = "SecurityContext#getUserPrincipal is JsonWebToken, PASS";
             pass = true;
         }
         else {
-            msg = String.format("principal: JsonWebToken != %s", principal.getClass().getCanonicalName());
+            msg = String.format("principal: JsonWebToken != %s", jwtPrincipal.getClass().getCanonicalName());
         }
+        // Validate that the injection built-in principal name matches the JsonWebToken name
+        if(pass) {
+            pass = false;
+            if (principal == null) {
+                msg = "Injected principal value is null, FAIL";
+            }
+            else if (!principal.getName().equals(jwtPrincipal.getName())) {
+                msg = "Injected principal#name != jwtPrincipal#name, FAIL";
+            }
+            else {
+                msg += "\nInjected Principal#getName matches, PASS";
+                pass = true;
+            }
+        }
+
         JsonObject result = Json.createObjectBuilder()
             .add("pass", pass)
             .add("msg", msg)

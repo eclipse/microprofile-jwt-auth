@@ -1,0 +1,55 @@
+//
+// Copyright (c) 2016-2018 Eclipse Microprofile Contributors:
+// Red Hat
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+## Release Notes
+
+### Changes in 1.1.1-RC2
+
+This candidate patch release provides one additional TCK test fix, and information on how to use the MP-JWT
+configuration properties as environment variables on platforms that don't allow dots '.' in their names.
+
+There are no API changes.
+
+#### Closed Issues in 1.1.1-RC2
+https://github.com/eclipse/microprofile-jwt-auth/issues/104
+https://github.com/eclipse/microprofile-jwt-auth/issues/107
+
+### Changes in 1.1.1-RC1
+This is a candidate patch release that provides fixes to the TCK tests that were seen to have issues in different implementations.
+The TCK tests WARs now include a META-INF/MPJWTTESTVERSION resource that contains the major/minor version string enum for the MP-JWT version the test WAR is targeting. Currently the versions enums are:
+
+```java
+public enum MpJwtTestVersion {
+    MPJWT_V_1_0,
+    MPJWT_V_1_1
+    ;
+}
+```
+
+There are no API changes.
+
+#### Closed Issues in 1.1.1-RC1
+* https://github.com/eclipse/microprofile-jwt-auth/issues/104
+* https://github.com/eclipse/microprofile-jwt-auth/issues/103
+* https://github.com/eclipse/microprofile-jwt-auth/issues/98
+
+
+### Changes in 1.1
+The focus of this release was to add support for configuring the public key and issuer needed for verification of the MP-JWT using MicroProfile Config. The new MicroProfile Config properties are:
+
+mp.jwt.verify.publickey:: The embedded key material of the public key for the MP-JWT signer in PKCS8 PEM or JWK(S) format. If not found the mp.jwt.verify.publickey.location needs to be checked.
+mp.jwt.verify.publickey.location:: The relative path or full URL of the public key. All relative paths will be resolved within the archive using ClassLoader.getResource. If the value is a URL it will be resolved using new URL(“...”).openStream()
+mp.jwt.verify.issuer:: The expected iss claim value to validate against an MP-JWT.
