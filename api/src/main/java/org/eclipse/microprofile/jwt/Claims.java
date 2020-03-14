@@ -92,13 +92,13 @@ public enum Claims {
 
     private String description;
     private Class<?> type;
-    Claims(String description, Class<?> type) {
+    Claims(final String description, final Class<?> type) {
         this.description = description;
         this.type = type;
     }
 
     /**
-     * @return A desccription for the claim
+     * @return A description for the claim
      */
     public String getDescription() {
         return description;
