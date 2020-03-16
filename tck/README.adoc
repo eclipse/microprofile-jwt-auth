@@ -83,8 +83,8 @@ as an archive classpath resource at the location /WEB-INF/classes/publicKey.pem.
 The generated test JWT has its `exp`, `iat` and `auth_time` claims are set to the current time when the token is generated,
 as the number of seconds from 1970-01-01T00:00:00Z UTC.
 
-An example of how this information can be used to verify a JWT using the Nimbus library used by the TCK to
-generate the test JWTs can be found in the org.eclipse.microprofile.jwt.tck.parsing.DebugTest#testNimbus* methods.
+An example of how this information can be used to verify a JWT using the Jose4j library used by the TCK to
+generate the test JWTs can be found in the org.eclipse.microprofile.jwt.tck.utils.TokenUtilsTest#validateToken method.
 
 = Running the MicroProfile JWT Auth TCK
 
@@ -97,7 +97,7 @@ implementation specific artifacts, descriptors, libraries, etc. needed for
 the implementation to properly deploy the test web archive.
 
 There are base implementations of the `LoadableExtension` and `ApplicationArchiveProcessor`
-that can be used for strait-forward augmentation scenarios, but you can always
+that can be used for straight-forward augmentation scenarios, but you can always
 provide your own implementations. An example of the former is:
 https://github.com/MicroProfileJWT/wfswarm-jwt-auth-tck-viabase
 
@@ -163,13 +163,13 @@ An example skeleton pom.xml is shown here:
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-tck</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.2</version>
         </dependency>
         <!-- This is the actual MP-JWT TCK test classes --><2>
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-tck</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -373,13 +373,13 @@ following in your pom.xml:
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-tck</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
             <artifactId>microprofile-jwt-auth-tck</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -427,7 +427,6 @@ your build root:
     <test name="base-tests" verbose="10">
         <groups>
             <define name="base-groups">
-                <include name="arquillian" description="Arquillian internal"/>
                 <include name="utils" description="Utility tests"/>
                 <include name="jwt" description="Base JsonWebToken tests"/>
                 <include name="jaxrs" description="JAX-RS invocation tests"/>
@@ -437,7 +436,7 @@ your build root:
                 <include name="config" description="Validate configuration using MP-config"/>
             </define>
             <define name="excludes">
-                <include name="debug" description="Internal debugging tests" />
+                <include name="utils-extra" description="Additional utility tests" />
             </define>
             <run>
                 <include name="base-groups" />

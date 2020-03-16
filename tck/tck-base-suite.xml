@@ -21,7 +21,6 @@
     <test name="base-tests" verbose="10">
         <groups>
             <define name="base-groups">
-                <include name="arquillian" description="Arquillian internal"/>
                 <include name="utils" description="Utility tests"/>
                 <include name="jwt" description="Base JsonWebToken tests"/>
                 <include name="jaxrs" description="JAX-RS invocation tests"/>
@@ -31,7 +30,7 @@
                 <include name="config" description="Validate configuration using MP-config"/>
             </define>
             <define name="excludes">
-                <include name="debug" description="Internal debugging tests" />
+                <include name="utils-extra" description="Additional utility tests" />
             </define>
             <run>
                 <include name="base-groups" />
