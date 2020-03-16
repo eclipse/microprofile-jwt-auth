@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+// Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
 //
 // See the NOTICES file(s) distributed with this work for additional
 // information regarding copyright ownership.
@@ -19,45 +19,25 @@
 
 # JWT RBAC for MicroProfile
 
-## Status
-
-MicroProfile JWT RBAC proposal in progress
-http://[]
 ## Introduction
-This specification outlines a proposal for using http://openid.net/connect/[OpenID Connect(OIDC)] based
-https://tools.ietf.org/html/rfc7519[JSON Web Tokens(JWT)] for role based access control(RBAC) of microservice endpoints.
 
+Today, the most common solutions involving RESTful and microservices security are based on http://openid.net/connect/[OpenID Connect(OIDC)], https://tools.ietf.org/html/rfc6749[OAuth2] and https://tools.ietf.org/html/rfc7519[JSON Web Token (JWT)] standards.
+
+This specification outlines how the signed JWT tokens issued by OIDC and other trusted providers can be verified and their claims used for role based access control(RBAC) of microservice endpoints.
 
 ## Motivation
-MicroProfile 1.1 is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes. While Java EE is a very feature rich platform and is like a toolbox that can be used to to address a wide variety of application architectures, MicroProfile focuses on defining a small and a minimum set of Java EE standards that can be used to deliver applications based on a microservice architecture, they are:
 
-* JAX-RS
-* CDI
-* JSON-P
-
-The security requirements that involve microservice architectures are strongly related with RESTful Security. In a RESTful
-architecture style, services are usually stateless and any security state associated with a client is sent to the target
-service on every request in order to allow services to re-create a security context for the caller and perform both
-authentication and authorization checks.
-
-One of the main strategies to propagate the security state from clients to services or even from services to services involves
-the use of security tokens. In fact, the main security protocols in use today are based on security tokens such as OAuth2,
-OpenID Connect, SAML, WS-Trust, WS-Federation and others. While some of these standards are more related with identity
-federation, they share a common concept regarding security tokens and token based authentication.
-
-For RESTful based microservices, security tokens offer a very lightweight and interoperable way to propagate identities across
-different services, where:
+For RESTful based microservices, security tokens in a JWT format offer a lightweight and interoperable way to propagate identities across different services, where:
 
 * Services don’t need to store any state about clients or users
-* Services can verify the token validity if token follows a well known format. Otherwise, services may invoke a separated service.
-* Services can identify the caller by introspecting the token. If the token follows a well known format, services are capable to introspect the token by
-themselves, locally. Otherwise, services may invoke a separated service.
-* Services can enforce authorization policies based on
-any information within a security token
-* Support for both delegation and impersonation of identities
+* Services can verify and introspect the token locally if it follows a JWT format or remotely with the trusted provider.
+* Services can identify the caller and verify a given service is indeed an indended audience of the token.
+* Services can enforce authorization policies based on the information within the token.
+* Services can use the token for both delegation and impersonation of identities.
 
-Today, the most common solutions involving RESTful and microservices security are based on OAuth2, OpenID Connect and
-JSON Web Token (JWT) standards.
+## Documentation
+
+For links to the latest maven artifacts, Javadoc and specification document, see the link:https://github.com/eclipse/microprofile-jwt-auth/releases/latest[latest release].
 
 ## Project Links
 * https://wiki.eclipse.org/MicroProfile/JWT_Auth[Wiki Page]
@@ -66,6 +46,4 @@ JSON Web Token (JWT) standards.
 ### Continuous Integration
 * https://ci.eclipse.org/microprofile/job/JWT-Auth-maven-snapshots/[Snapshot Build Jobs]
 * https://ci.eclipse.org/microprofile/job/MicroProfile%20Releases/[Release Build Jobs]
-
-
 
