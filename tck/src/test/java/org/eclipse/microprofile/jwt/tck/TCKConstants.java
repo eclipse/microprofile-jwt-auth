@@ -22,6 +22,7 @@ package org.eclipse.microprofile.jwt.tck;
 public class TCKConstants {
     // TestNG groups
     public static final String TEST_GROUP_UTILS="utils";
+    public static final String TEST_GROUP_UTILS_EXTRA="utils-extra";
     public static final String TEST_GROUP_JWT="jwt";
     public static final String TEST_GROUP_JAXRS="jaxrs";
     public static final String TEST_GROUP_CDI="cdi";

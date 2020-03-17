@@ -136,7 +136,7 @@ public class TokenUtils {
             authTime = exp - 5;
         }
         claims.setIssuedAt(NumericDate.fromSeconds(iat));
-        claims.setClaim(Claims.auth_time.name(), NumericDate.fromSeconds(authTime));
+        claims.setClaim(Claims.auth_time.name(), authTime);
         // If the exp claim is not updated, it will be an old value that should be seen as expired
         if (!invalidClaims.contains(InvalidClaims.EXP)) {
             claims.setExpirationTime(NumericDate.fromSeconds(exp));

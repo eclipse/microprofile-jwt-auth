@@ -21,7 +21,6 @@
     <test name="base-tests" verbose="10">
         <groups>
             <define name="base-groups">
-                <include name="arquillian" description="Arquillian internal"/>
                 <include name="utils" description="Utility tests"/>
                 <include name="jwt" description="Base JsonWebToken tests"/>
                 <include name="jaxrs" description="JAX-RS invocation tests"/>
@@ -30,7 +29,7 @@
                 <include name="cdi-provider" description="CDI injection of javax.inject.Provider values"/>
             </define>
             <define name="excludes">
-                <include name="debug" description="Internal debugging tests" />
+                <include name="utils-extra" description="Additional utility tests" />
             </define>
             <run>
                 <include name="base-groups" />
@@ -51,14 +50,13 @@
     <test name="extended-tests" verbose="10">
         <groups>
             <define name="extended-groups">
-                <include name="arquillian" description="Arquillian internal"/>
                 <include name="ejb-optional" description="EJB container integration tests"/>
                 <include name="jacc-optional" description="JACC API integration tests"/>
                 <include name="servlet-optional" description="Servlet container integration tests"/>
                 <include name="ee-security-optional" description="Java EE security feature tests"/>
             </define>
             <define name="excludes">
-                <include name="debug" description="Internal debugging tests" />
+                <include name="utils-extra" description="Additional utility tests" />
             </define>
             <run>
                 <include name="extended-groups" />

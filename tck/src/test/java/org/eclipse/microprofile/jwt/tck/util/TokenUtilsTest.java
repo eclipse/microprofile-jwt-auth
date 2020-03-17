@@ -23,6 +23,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
@@ -35,14 +37,14 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * Internal debugging tests
+ * Tests which verify TokenUtils generateTokenString methods
  */
-public class TokenUtilsGenerateTokenTest {
+public class TokenUtilsTest {
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
             description = "Illustrate validation of iss")
     public void testFailAlgorithm() throws Exception {
-        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ALG);
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         validateToken(token);
@@ -58,7 +60,7 @@ public class TokenUtilsGenerateTokenTest {
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
             description = "Illustrate validation of alg")
     public void testFailIssuer() throws Exception {
-        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         validateToken(token);
@@ -67,7 +69,7 @@ public class TokenUtilsGenerateTokenTest {
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
         description = "Illustrate validation of signer")
     public void testFailSignature() throws Exception {
-        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
         validateToken(token);
@@ -76,8 +78,8 @@ public class TokenUtilsGenerateTokenTest {
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
         description = "Illustrate validation of exp")
     public void testFailExpired() throws Exception {
-        HashMap<String, Long> timeClaims = new HashMap<>();
-        HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
+        Map<String, Long> timeClaims = new HashMap<>();
+        Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields, timeClaims);
         validateToken(token);
@@ -86,7 +88,7 @@ public class TokenUtilsGenerateTokenTest {
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
         description = "Illustrate validation of exp that has just expired")
     public void testFailJustExpired() throws Exception {
-        HashMap<String, Long> timeClaims = new HashMap<>();
+        Map<String, Long> timeClaims = new HashMap<>();
         // Set exp to 61 seconds in past
         long exp = TokenUtils.currentTimeInSecs() - 61;
         timeClaims.put(Claims.exp.name(), exp);
@@ -97,15 +99,18 @@ public class TokenUtilsGenerateTokenTest {
     @Test(groups = TCKConstants.TEST_GROUP_UTILS,
         description = "Illustrate validation of exp that is in grace period")
     public void testExpGrace() throws Exception {
-        HashMap<String, Long> timeClaims = new HashMap<>();
+        Map<String, Long> timeClaims = new HashMap<>();
         // Set exp to 45 seconds in past
         long exp = TokenUtils.currentTimeInSecs() - 45;
         timeClaims.put(Claims.exp.name(), exp);
         String token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
-        validateToken(token);
+        validateToken(token, exp);
     }
 
     private void validateToken(String token) throws Exception {
+        validateToken(token, null);
+    }
+    private void validateToken(String token, Long expectedExpValue) throws Exception {
 
         RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");
         int expGracePeriodSecs = 60;
@@ -114,6 +119,7 @@ public class TokenUtilsGenerateTokenTest {
 
         // 'exp' must be available
         builder.setRequireExpirationTime();
+        builder.setSkipDefaultAudienceValidation();
         // 'iat' must be available
         builder.setRequireIssuedAt();
         // 'RS256' is required
@@ -130,23 +136,34 @@ public class TokenUtilsGenerateTokenTest {
 
         Assert.assertEquals(claimsSet.getClaimsMap().size(), 18);
         Assert.assertEquals(claimsSet.getIssuer(), "https://server.example.com");
-        Assert.assertEquals(claimsSet.getIssuer(), "a-123");
+        Assert.assertEquals(claimsSet.getJwtId(), "a-123");
         Assert.assertEquals(claimsSet.getSubject(), "24400320");
         Assert.assertEquals(claimsSet.getClaimValueAsString("upn"), "jdoe@example.com");
         Assert.assertEquals(claimsSet.getClaimValueAsString("preferred_username"), "jdoe");
         Assert.assertEquals(claimsSet.getAudience().size(), 1);
         Assert.assertEquals(claimsSet.getAudience().get(0), "s6BhdRkqt3");
-        Assert.assertEquals(claimsSet.getExpirationTime().getValue(), 1311281970L);
-        Assert.assertEquals(claimsSet.getIssuedAt().getValue(), 1311280970L);
-        Assert.assertEquals(claimsSet.getClaimValue("auth_time", NumericDate.class).getValue(), 1311280969L);
-        Assert.assertEquals(claimsSet.getClaimValueAsString("customStringValue"), "customString");
-        Assert.assertEquals(claimsSet.getClaimValue("customInteger", Integer.class), Integer.valueOf(123456789));
+        if (expectedExpValue != null) {
+            Assert.assertEquals(claimsSet.getExpirationTime().getValue(), (long)expectedExpValue);
+            Assert.assertEquals(claimsSet.getIssuedAt().getValue(), expectedExpValue - 5);
+            Assert.assertEquals(NumericDate.fromSeconds(claimsSet.getClaimValue("auth_time", Long.class)).getValue(),
+                    expectedExpValue - 5);
+        }
+        else {
+            Assert.assertNotNull(claimsSet.getExpirationTime());
+            long exp = claimsSet.getExpirationTime().getValue();
+            Assert.assertEquals(claimsSet.getIssuedAt().getValue(), exp - 300);
+            Assert.assertEquals(NumericDate.fromSeconds(claimsSet.getClaimValue("auth_time", Long.class)).getValue(),
+                    exp - 300);
+        }
+
+        Assert.assertEquals(claimsSet.getClaimValueAsString("customString"), "customStringValue");
+        Assert.assertEquals(claimsSet.getClaimValue("customInteger", Long.class), Long.valueOf(123456789));
         Assert.assertEquals(claimsSet.getClaimValue("customDouble", Double.class), 3.141592653589793);
         Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("roles")).size(), 1);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("groupsd")).size(), 4);
+        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("groups")).size(), 4);
         Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customStringArray")).size(), 3);
         Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customIntegerArray")).size(), 4);
         Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customDoubleArray")).size(), 5);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customObject")).size(), 3);
+        Assert.assertEquals(((Map<?, ?>)claimsSet.getClaimsMap().get("customObject")).size(), 3);
     }
 }

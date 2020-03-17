@@ -15,23 +15,19 @@
 -->
 <suite name="microprofile-jwt-auth-BaseTCK" verbose="1" preserve-order="true" configfailurepolicy="continue" >
 
-    <!-- A default test-suite.xml that includes no test classes to avoid running
-    tests during TCK artifact creation.
+    <!-- A test-suite.xml that only includes TokenUtils tests and is run during the TCK build.
     -->
     <test name="base-tests">
         <groups>
             <run>
-                <include name="arquillian" />
-                <include name="jwt" />
                 <include name="utils" />
-                <include name="jaxrs" />
-                <include name="cdi" />
-                <exclude name="debug" />
-                <exclude name="ejb-optional" />
-                <exclude name="servlet-optional" />
-                <exclude name="jacc-optional" />
+                <include name="utils-extra" />
             </run>
         </groups>
+        <classes>
+            <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsExtraTest" />
+        </classes>
     </test>
 
 </suite>

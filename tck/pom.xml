@@ -36,9 +36,8 @@
         <asciidoctor-maven.version>1.5.5</asciidoctor-maven.version>
         <asciidoctorj-pdf.version>1.5.0-alpha.15</asciidoctorj-pdf.version>
         <!-- TCK properties that must be overriden in the vendor profile -->
-        <tck.ITokenParserArtifact>INVALID</tck.ITokenParserArtifact>
         <tck.includes>INVALID</tck.includes>
-        <tck.testSuite>tck-null-suite.xml</tck.testSuite>
+        <tck.testSuite>tck-build-suite.xml</tck.testSuite>
         <tck.redirectTestOutputToFile>false</tck.redirectTestOutputToFile>
     </properties>
 
