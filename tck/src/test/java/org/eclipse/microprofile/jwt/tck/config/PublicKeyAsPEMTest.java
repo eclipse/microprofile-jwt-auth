@@ -74,7 +74,7 @@ public class PublicKeyAsPEMTest extends Arquillian {
     public static WebArchive createDeployment() throws IOException {
         URL publicKey = PublicKeyAsPEMTest.class.getResource("/publicKey4k.pem");
         // This mp.jwt.verify.publickey value is an embedded PEM key
-        URL config = PublicKeyAsPEMTest.class.getResource("/META-INF/microprofile-config.properties");
+        URL config = PublicKeyAsPEMTest.class.getResource("/META-INF/microprofile-config-publickey.properties");
 
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "PublicKeyAsPEMTest.war")

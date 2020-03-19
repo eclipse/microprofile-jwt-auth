@@ -47,7 +47,7 @@ The TCK includes resources for the the MP-JWT token payload content as well as t
 are used by the unit tests along with the `org.eclipse.microprofile.jwt.tck.util.TokenUtils` class to generate both valid and
 invalid tokens. A summary of the tck/resources directory contents is:
 
-* META-INF/microprofile-config.properties
+* META-INF/microprofile-config-publickey.properties
 ** A base MicroProfile config properties file for the org.eclipse.microprofile.jwt.tck.config.* package tests.
 * jwt-content1.json
 * testJWTCallerPrincipal.json
