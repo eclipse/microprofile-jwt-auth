@@ -86,7 +86,7 @@ as the number of seconds from 1970-01-01T00:00:00Z UTC.
 An example of how this information can be used to verify a JWT using the Jose4j library used by the TCK to
 generate the test JWTs can be found in the org.eclipse.microprofile.jwt.tck.utils.TokenUtilsTest#validateToken method.
 
-= Running the MicroProfile JWT Auth TCK
+=Running the MicroProfile JWT Auth TCK
 
 The TCK is designed around a set of Arquillian based unit tests that require
 the MP-JWT implementation under test to provide a TCK harness
