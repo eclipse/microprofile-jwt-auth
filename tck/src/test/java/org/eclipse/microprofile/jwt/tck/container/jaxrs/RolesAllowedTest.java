@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -19,7 +19,6 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
@@ -44,7 +43,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
-import java.util.HashMap;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
@@ -60,10 +58,6 @@ public class RolesAllowedTest extends Arquillian {
      * The test generated JWT token string
      */
     private static String token;
-    // Time claims in the token
-    private static Long iatClaim;
-    private static Long authTimeClaim;
-    private static Long expClaim;
 
     /**
      * The base URL for the container under test
@@ -78,6 +72,7 @@ public class RolesAllowedTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
+        URL config = RolesAllowedTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = RolesAllowedTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "RolesAllowedTest.war")
@@ -86,18 +81,14 @@ public class RolesAllowedTest extends Arquillian {
             .addClass(RolesEndpoint.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
-            ;
+            .addAsManifestResource(config, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
 
     @BeforeClass(alwaysRun=true)
     public static void generateToken() throws Exception {
-        HashMap<String, Long> timeClaims = new HashMap<>();
-        token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
-        iatClaim = timeClaims.get(Claims.iat.name());
-        authTimeClaim = timeClaims.get(Claims.auth_time.name());
-        expClaim = timeClaims.get(Claims.exp.name());
+        token = TokenUtils.generateTokenString("/Token1.json", null);
     }
 
     @RunAsClient

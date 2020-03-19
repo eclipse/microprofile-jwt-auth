@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -60,6 +60,7 @@ public class InvalidTokenTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
+        URL config = InvalidTokenTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = InvalidTokenTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "InvalidTokenTest.war")
@@ -68,7 +69,7 @@ public class InvalidTokenTest extends Arquillian {
             .addClass(RolesEndpoint.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
-            ;
+            .addAsManifestResource(config, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
