@@ -195,7 +195,7 @@
                     <configuration>
                         <redirectTestOutputToFile>${tck.redirectTestOutputToFile}</redirectTestOutputToFile>
                         <suiteXmlFiles>
-                            <suiteXmlFile>${tck.testSuite}</suiteXmlFile>
+                            <suiteXmlFile>${project.build.directory}/test-classes/suites/${tck.testSuite}</suiteXmlFile>
                         </suiteXmlFiles>
                         <environmentVariables>
                         </environmentVariables>
