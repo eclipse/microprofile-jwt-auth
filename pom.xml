@@ -325,6 +325,7 @@
                         <exclude>.factorypath</exclude>
                         <exclude>.editorconfig</exclude>
                         <exclude>sandbox/**</exclude>
+                        <exclude>.github/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
