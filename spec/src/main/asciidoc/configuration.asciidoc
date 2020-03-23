@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2016-2018 Eclipse Microprofile Contributors:
+// Copyright (c) 2016-2020 Eclipse Microprofile Contributors:
 // Red Hat, IBM, Tomitribe
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
