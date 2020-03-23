@@ -40,4 +40,10 @@ public interface Names {
      * The expected iss claim value to validate against an MP-JWT.
      */
     String ISSUER = "mp.jwt.verify.issuer";
+    
+    /**
+     * The expected "aud" claim value(s), separated by commas. 
+     * If specified, MP-JWT claim must be present and match one of the values.
+     */
+    String AUDIENCES = "mp.jwt.verify.audiences";
 }

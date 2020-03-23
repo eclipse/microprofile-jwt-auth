@@ -140,7 +140,7 @@ public class TokenUtilsTest {
         Assert.assertEquals(claimsSet.getSubject(), "24400320");
         Assert.assertEquals(claimsSet.getClaimValueAsString("upn"), "jdoe@example.com");
         Assert.assertEquals(claimsSet.getClaimValueAsString("preferred_username"), "jdoe");
-        Assert.assertEquals(claimsSet.getAudience().size(), 1);
+        Assert.assertEquals(claimsSet.getAudience().size(), 5);
         Assert.assertEquals(claimsSet.getAudience().get(0), "s6BhdRkqt3");
         if (expectedExpValue != null) {
             Assert.assertEquals(claimsSet.getExpirationTime().getValue(), (long)expectedExpValue);

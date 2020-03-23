@@ -357,6 +357,11 @@ return Public Key text in one of the supported formats.
 The `mp.jwt.verify.issuer` config property allows for the expected value of the `iss`
 claim to be specified.  A MicroProfile JWT implementation must verify the `iss` claim of incoming JWTs is present and matches the configured value of `mp.jwt.verify.issuer`.
 
+#### `mp.jwt.verify.audiences`
+
+The `mp.jwt.verify.audiences` config property is a comma delimited list of allowable values for the `aud` claim.  If specified, a MicroProfile JWT implementation must verify the `aud` claim of incoming JWTs is present and at least one value in the claim matches one of the configured values of `mp.jwt.verify.audiences`.
+If the JWT contains an `aud` claim and the `mp.jwt.verify.audiences` config property is not set, behavior is undefined for backward compatibility purposes.
+
 
 #### Mapping Properties to Environment Variables
 When using environment variables to specify the MP-JWT configuration properties defined in this section,

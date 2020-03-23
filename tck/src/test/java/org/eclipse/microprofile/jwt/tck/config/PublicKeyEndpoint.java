@@ -30,8 +30,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.security.PermitAll;
@@ -75,6 +78,12 @@ public class PublicKeyEndpoint {
     @Inject
     @Claim(standard = Claims.iss)
     private ClaimValue<Optional<String>> iss;
+    @Inject
+    @ConfigProperty(name = Names.AUDIENCES)
+    private Optional<String> audiences;
+    @Inject
+    @Claim(standard = Claims.aud)
+    private ClaimValue<Optional<Set<String>>> aud;
 
     @PostConstruct
     private void init() {
@@ -559,6 +568,55 @@ public class PublicKeyEndpoint {
             .build();
         return result;
     }
+    
+    /**
+     * Check a token with an aud claim matches one of the mp.jwt.verify.audiences values
+     * @return result of validation test
+     */
+    @GET
+    @Path("/verifyAudIsOk")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Tester")
+    public JsonObject verifyAudIsOk() {
+        boolean pass = false;
+        String msg;
+
+        if(!aud.getValue().isPresent()) {
+            // The iss claim should be provided for this endpoint
+            msg = String.format("MP-JWT missing aud claim, or injection of claim failed");
+        }
+        else if(audiences.isPresent()) {
+            
+            Set<String> claimAud = aud.getValue().get();
+            String[] configAud = audiences.get().split(",");
+            boolean match = false;
+            Iterator<String> it = claimAud.iterator();
+            while(it.hasNext()) {
+                String oneAud = it.next();
+                for(int j=0; j <configAud.length; j++) {
+                    if (oneAud.equals(configAud[j])){
+                        match = true;
+                    }
+                }
+            }
+            if(match) {
+                msg = String.format("endpoint accessed with audiences(%s) = config.audiences(%s) as expected PASS",
+                                    claimAud, Arrays.toString(configAud));
+                pass = true;
+            }
+            else {
+                msg = String.format("mp.jwt.verify.audiences(%s) != jwt.aud(%s)", Arrays.toString(configAud), claimAud);
+            }
+        }
+        else {
+            msg = "No mp.jwt.verify.audiences provided";
+        }
+        JsonObject result = Json.createObjectBuilder()
+            .add("pass", pass)
+            .add("msg", msg)
+            .build();
+        return result;
+    }  
 
     /**
      * An endpoint that returns the contents of the bundled /publicKey4k.pem key
