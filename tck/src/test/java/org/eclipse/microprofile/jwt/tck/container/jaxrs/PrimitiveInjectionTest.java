@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -51,7 +51,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI_PROVIDER;
-
 /**
  * Tests that claims can be injected as primitive types into @RequestScoped beans
  */
@@ -79,6 +78,7 @@ public class PrimitiveInjectionTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
+        URL config = PrimitiveInjectionTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = PrimitiveInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "PrimitiveInjectionTest.war")
@@ -87,7 +87,7 @@ public class PrimitiveInjectionTest extends Arquillian {
             .addClass(PrimitiveInjectionEndpoint.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
-            ;
+            .addAsManifestResource(config, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }

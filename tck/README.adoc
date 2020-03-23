@@ -49,6 +49,8 @@ invalid tokens. A summary of the tck/resources directory contents is:
 
 * META-INF/microprofile-config-publickey.properties
 ** A base MicroProfile config properties file for the org.eclipse.microprofile.jwt.tck.config.* package tests.
+* META-INF/microprofile-config-publickey-location.properties
+** A base MicroProfile config properties file for the org.eclipse.microprofile.jwt.tck.jaxrs.* package tests.
 * jwt-content1.json
 * testJWTCallerPrincipal.json
 * usePreferredName.json

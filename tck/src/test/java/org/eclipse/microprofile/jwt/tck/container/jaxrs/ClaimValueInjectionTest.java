@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -63,7 +63,6 @@ public class ClaimValueInjectionTest extends Arquillian {
     // Time claims in the token
     private static Long iatClaim;
     private static Long authTimeClaim;
-    private static Long expClaim;
 
     /**
      * The base URL for the container under test
@@ -78,6 +77,7 @@ public class ClaimValueInjectionTest extends Arquillian {
      */
     @Deployment(testable=true)
     public static WebArchive createDeployment() throws IOException {
+        URL config = ClaimValueInjectionTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = ClaimValueInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
             .create(WebArchive.class, "ClaimValueInjectionTest.war")
@@ -86,7 +86,7 @@ public class ClaimValueInjectionTest extends Arquillian {
             .addClass(ClaimValueInjectionEndpoint.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
-            ;
+            .addAsManifestResource(config, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
@@ -97,7 +97,6 @@ public class ClaimValueInjectionTest extends Arquillian {
         token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
         iatClaim = timeClaims.get(Claims.iat.name());
         authTimeClaim = timeClaims.get(Claims.auth_time.name());
-        expClaim = timeClaims.get(Claims.exp.name());
     }
 
     @RunAsClient
