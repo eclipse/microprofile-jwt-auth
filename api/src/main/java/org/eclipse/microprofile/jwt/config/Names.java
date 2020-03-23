@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -54,4 +54,10 @@ public interface Names {
      * This configuration will be ignored unless `mp.jwt.token.header` is set to `Cookie`.
      */
     String TOKEN_COOKIE = "mp.jwt.token.cookie";
+    
+    /**
+     * The expected "aud" claim value(s), separated by commas. 
+     * If specified, MP-JWT claim must be present and match one of the values.
+     */
+    String AUDIENCES = "mp.jwt.verify.audiences";
 }
