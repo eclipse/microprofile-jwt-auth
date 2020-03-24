@@ -32,14 +32,17 @@ for the JsonWebToken claim values. Tests in this category are marked with the Te
 and "cdi-provider".
 4. Tests that validate the use of the MicroProfile configuration feature to externalize the information necessariy to verify the MP-JWT signer and optional iss claim.
 
-The TestNG testsuite for these categories of tests can be found in the tck directory root as tck-base-suite.xml.
+The TestNG testsuite for these categories of tests can be found in the tck directory 
+`src/test/resources/suites`, file `tck-base-suite.xml`.
 
 == Optional Java EE Container Integration Tests
 In addition to the categories of tests defined above, there are optional tests that illustrate the expected container API
 integration for Java EE container runtimes beyond JAX-RS. These tests are marked with the TestNG groups "ejb-optional",
 "jacc-optional", "servlet-optional" and "ee-security-optional". An MP-JWT implementation is not required to pass these tests
-in order to be considered a valid implementation. The TestNG testsuite for these categories + the base categories of tests can
-be found in the tck directory root as tck-full-suite.xml.
+in order to be considered a valid implementation. 
+
+The TestNG testsuite for these categories + the base categories of tests can be found in the tck directory
+`src/test/resources/suites`, file `tck-full-suite.xml`.
 
 == TCK Resource Files and Information
 
@@ -369,7 +372,7 @@ You can run the TCK tests from within your TCK harness build by including the
 following in your pom.xml:
 
 ```maven
-    </dependencies>
+    <dependencies>
     ...
         <!-- Include the MP-JWT TCK dependencies, utility and base classes + actual test classes -->
         <dependency>
@@ -406,76 +409,47 @@ following in your pom.xml:
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <suiteXmlFiles>
-                        <suiteXmlFile>tck-base-suite.xml</suiteXmlFile>
+                        <suiteXmlFile>${project.build.directory}/tck-suite/suites/tck-base-suite.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <forkCount>1</forkCount>
                 </configuration>
+            </plugin>
+            
+            <!-- Extract the TCK Suite Files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.eclipse.microprofile.jwt</groupId>
+                                    <artifactId>microprofile-jwt-auth-tck</artifactId>
+                                    <version>1.2</version>
+                                    <type>test-jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/tck-suite</outputDirectory>
+                                    <!-- Includes the tck-base-suite.xml file -->
+                                    <includes>**/tck-build-suite.xml</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
 ```
 
-and then either copy the tck-base-suite.xml file from the TCK source tree into your
-build root, or copy the following and paste if into a tck-base-suite.xml file in
-your build root:
-
-```maven
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="microprofile-jwt-auth-BaseTCK" verbose="1" preserve-order="true" configfailurepolicy="continue" >
-
-    <!-- The required base JAX-RS and CDI based tests that all MP-JWT implementations
-    must pass.
-    -->
-    <test name="base-tests" verbose="10">
-        <groups>
-            <define name="base-groups">
-                <include name="utils" description="Utility tests"/>
-                <include name="jwt" description="Base JsonWebToken tests"/>
-                <include name="jaxrs" description="JAX-RS invocation tests"/>
-                <include name="cdi" description="Base CDI injection of ClaimValues"/>
-                <include name="cdi-json" description="CDI injection of JSON-P values"/>
-                <include name="cdi-provider" description="CDI injection of javax.inject.Provider values"/>
-                <include name="config" description="Validate configuration using MP-config"/>
-            </define>
-            <define name="excludes">
-                <include name="utils-extra" description="Additional utility tests" />
-            </define>
-            <run>
-                <include name="base-groups" />
-                <exclude name="excludes" />
-            </run>
-        </groups>
-        <classes>
-            <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.UnsecuredPingTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RequiredClaimsTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ClaimValueInjectionTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.JsonValueInjectionTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PrimitiveInjectionTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PrincipalInjectionTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMLocationTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMLocationURLTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKLocationTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKLocationURLTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKSTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsJWKSLocationTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsBase64JWKTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsFileLocationURLTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.IssNoValidationNoIssTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.IssNoValidationBadIssTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationFailTest" />
-
-        </classes>
-    </test>
-
-</suite>
-```
+Alternatively, you can copy any of the TCK suite files present in `src/test/resources/suites` to your project and 
+customize to fit your needs. If this is the case, you can remove the `maven-dependency-plugin` section from the 
+previous XML fragment.  
 
 You then simply run `mvn test` to run the TCK tests. An example of using this approach
 can be found in the https://github.com/MicroProfileJWT/wfswarm-jwt-auth-tck repo.
