@@ -357,8 +357,26 @@ return Public Key text in one of the supported formats.
 The `mp.jwt.verify.issuer` config property allows for the expected value of the `iss`
 claim to be specified.  A MicroProfile JWT implementation must verify the `iss` claim of incoming JWTs is present and matches the configured value of `mp.jwt.verify.issuer`.
 
+## JWT and HTTP headers
 
-#### Mapping Properties to Environment Variables
+### Configuration Properties
+
+#### `mp.jwt.token.header`
+
+The `mp.jwt.token.header` configuration property allows to set up the header which is expected to contain a JWT token.
+
+MP JWT implementations are required to support `Authorization` (default) or `Cookie` configuration values.
+
+Support for other headers or alternative authentication schemes is optional.
+
+#### `mp.jwt.token.cookie`
+
+The `mp.jwt.token.cookie` configuration property allows to set up the Cookie name (default is `Bearer`) which is
+expected to contain a JWT token.
+
+This configuration will be ignored unless `mp.jwt.token.header` is set to `Cookie`.
+
+## Mapping Properties to Environment Variables
 When using environment variables to specify the MP-JWT configuration properties defined in this section,
 note that some operating systems allow only alphabetic characters and underscores in environment variables.
 Since characters such as '.' may be disallowed, in order to set a value for a config property such as `mp.jwt.verify.publickey`
@@ -377,3 +395,5 @@ properties are:
 `mp.jwt.verify.publickey` :: mp_jwt_verify_publickey or MP_JWT_VERIFY_PUBLICKEY
 `mp.jwt.verify.publickey.location` :: mp_jwt_verify_publickey_location or MP_JWT_VERIFY_PUBLICKEY_LOCATION
 `mp.jwt.verify.issuer` :: mp_jwt_verify_issuer or MP_JWT_VERIFY_ISSUER
+`mp.jwt.token.header` :: mp_jwt_token_header or MP_JWT_TOKEN_HEADER
+`mp.jwt.token.cookie` :: mp_jwet_token_cookie or MP_JWT_TOKEN_COOKIE
