@@ -46,6 +46,7 @@ import java.util.Base64;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_EE_SECURITY;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
 
@@ -280,5 +281,23 @@ public class RolesAllowedTest extends Arquillian {
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         Assert.assertTrue(reply.startsWith("Heartbeat:"), "Saw Heartbeat: ...");
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_CONFIG,
+          description = "Validate a request with a valid JWT in a Cookie but no Token Header set fails with " +
+                        "HTTP_UNAUTHORIZED")
+    public void noTokenHeaderSetToCookie() throws Exception {
+        String token = TokenUtils.generateTokenString("/Token1.json");
+
+        String uri = baseURL.toExternalForm() + "endp/echo";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+                                                    .target(uri)
+                                                    .queryParam("input", "hello");
+        Response response = echoEndpointTarget
+            .request(TEXT_PLAIN)
+            .cookie("Bearer", token)
+            .get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 }
