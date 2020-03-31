@@ -419,6 +419,16 @@ public class RolesEndpoint {
 
 ```
 
+If there is no JWT in the request, an empty `JsonWebToken` is injected, which means all method calls to this token
+return `null`. Note that MP JWT will still perform Authentication and Authorization if the endpoint requires these
+verifications. Effectively, the injected empty token  is only visible on unauthenticated and unauthorized endpoints.
+
+If a JWT is sent to an endpoint that does not require Authentication and/or Authorization then it still must be
+verified before it can be accessed via `JsonWebToken` interface.
+
+Endpoints which need to control the authentication process themselves can check if a token is available by calling
+a `JsonWebToken.getRawToken()` method.
+
 #### Injection of `JsonWebToken` claims via Raw Type, `ClaimValue`, `javax.enterprise.inject.Instance` and JSON-P Types
 
 This specification requires support for injection of claims from the current
