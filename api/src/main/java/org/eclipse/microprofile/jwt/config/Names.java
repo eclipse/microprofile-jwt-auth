@@ -40,4 +40,18 @@ public interface Names {
      * The expected iss claim value to validate against an MP-JWT.
      */
     String ISSUER = "mp.jwt.verify.issuer";
+
+    /**
+     * The HTTP header name expected to contain the JWT token.<p>
+     *
+     * Supported values are <em>Authorization</em> (default) and <em>Cookie</em>.
+     */
+    String TOKEN_HEADER = "mp.jwt.token.header";
+
+    /**
+     * The Cookie name expected to containe the JWT token (default is <em>Bearer</em>).<p>
+     *
+     * This configuration will be ignored unless `mp.jwt.token.header` is set to `Cookie`.
+     */
+    String TOKEN_COOKIE = "mp.jwt.token.cookie";
 }
