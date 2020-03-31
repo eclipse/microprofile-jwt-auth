@@ -376,6 +376,9 @@ expected to contain a JWT token.
 
 This configuration will be ignored unless `mp.jwt.token.header` is set to `Cookie`.
 
+Providing the recommendations on how to secure a JWT token as a Cookie is out of scope for the MP JWT specification.
+Generally one should avoid putting sensitive user information into a signed JWT token.
+
 ## Mapping Properties to Environment Variables
 When using environment variables to specify the MP-JWT configuration properties defined in this section,
 note that some operating systems allow only alphabetic characters and underscores in environment variables.
