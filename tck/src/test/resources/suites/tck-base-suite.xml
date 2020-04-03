@@ -49,6 +49,10 @@
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PrimitiveInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PrincipalInjectionTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.AudValidationTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.AudArrayValidationTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.AudValidationBadAudTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.AudValidationMissingAudTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMLocationTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMLocationURLTest" />
