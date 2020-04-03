@@ -404,8 +404,6 @@ Note that since this property verifies the `iss` claim value, it will be effecti
 
 The `mp.jwt.verify.audiences` config property is a comma delimited list of allowable values for the `aud` claim.  If specified, a MicroProfile JWT implementation must verify the `aud` claim of incoming JWTs is present and at least one value in the claim matches one of the configured values of `mp.jwt.verify.audiences`.
 
-Note that the `aud` claim should only be injected into a Set of String, not as a comma delimited string.
-
 ## Requirements for accepting signed and encrypted tokens
 
 MP JWT specification currently requires that an MP JWT application accepts only signed or only encrypted or only signed and encrypted tokens as it expected that many endpoints will have the requirements to accept a single token type only. 

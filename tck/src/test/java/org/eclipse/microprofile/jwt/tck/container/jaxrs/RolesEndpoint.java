@@ -19,9 +19,8 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.Claim;
-import org.eclipse.microprofile.jwt.ClaimValue;
-import org.eclipse.microprofile.jwt.JsonWebToken;
+import java.security.Principal;
+import java.util.Date;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -35,8 +34,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.security.Principal;
-import java.util.Date;
+
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.ClaimValue;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 @Path("/endp")
 @DenyAll
@@ -55,6 +56,14 @@ public class RolesEndpoint {
     public String echoInput(@Context SecurityContext sec, @QueryParam("input") String input) {
         Principal user = sec.getUserPrincipal();
         return input + ", user="+user.getName();
+    }
+
+    @GET
+    @Path("/echo-permit-all")
+    @PermitAll
+    public String echoInputPermitAll(@Context SecurityContext sec, @QueryParam("input") String input) {
+        Principal user = sec.getUserPrincipal();
+        return input + ",permitAll, user="+user.getName();
     }
 
     @GET

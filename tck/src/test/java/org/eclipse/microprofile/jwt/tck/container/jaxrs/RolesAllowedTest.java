@@ -89,7 +89,7 @@ public class RolesAllowedTest extends Arquillian {
 
     @BeforeClass(alwaysRun=true)
     public static void generateToken() throws Exception {
-        token = TokenUtils.generateTokenString("/Token1.json", null);
+        token = TokenUtils.generateTokenString("/Token1.json");
     }
 
     @RunAsClient
@@ -173,6 +173,26 @@ public class RolesAllowedTest extends Arquillian {
             .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + encryptToken).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JAXRS, 
+        description = "Validate a request with MP-JWT without a groups claim succeeds with HTTP_OK}")
+    public void callEchoNoGroups() throws Exception {
+        Reporter.log("callEcho, expect HTTP_OK");
+
+        String tokenNoGroups = TokenUtils.generateTokenString("/TokenNoGroups.json");
+
+        String uri = baseURL.toExternalForm() + "endp/echo-permit-all";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam("input", "hello")
+            ;
+        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenNoGroups).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
+        String reply = response.readEntity(String.class);
+        // Must return hello, permitAll, user={token upn claim}
+        Assert.assertEquals(reply, "hello, permitAll, user=jdoe@example.com");
     }
 
     @RunAsClient
