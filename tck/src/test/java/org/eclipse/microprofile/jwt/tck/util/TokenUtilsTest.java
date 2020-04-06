@@ -134,7 +134,7 @@ public class TokenUtilsTest {
         JwtClaims claimsSet = builder.build().processToClaims(token);
         // Confirm all the claims available in /Token1.json have made it into the verified claimSet
 
-        Assert.assertEquals(claimsSet.getClaimsMap().size(), 18);
+        Assert.assertEquals(claimsSet.getClaimsMap().size(), 19);
         Assert.assertEquals(claimsSet.getIssuer(), "https://server.example.com");
         Assert.assertEquals(claimsSet.getJwtId(), "a-123");
         Assert.assertEquals(claimsSet.getSubject(), "24400320");
@@ -159,6 +159,7 @@ public class TokenUtilsTest {
         Assert.assertEquals(claimsSet.getClaimValueAsString("customString"), "customStringValue");
         Assert.assertEquals(claimsSet.getClaimValue("customInteger", Long.class), Long.valueOf(123456789));
         Assert.assertEquals(claimsSet.getClaimValue("customDouble", Double.class), 3.141592653589793);
+        Assert.assertTrue(claimsSet.getClaimValue("customBoolean", Boolean.class));
         Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("roles")).size(), 1);
         Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("groups")).size(), 4);
         Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customStringArray")).size(), 3);

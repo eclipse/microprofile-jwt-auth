@@ -334,18 +334,20 @@ public enum Claims {
 }
 ```
 
-Custom claims not handled by the Claims enum are required to be valid JSON-P `javax.json.JsonValue` subtypes. The
-current complete set of valid claim types is therefore, (excluding the invalid Claims.UNKNOWN Void type):
+The current complete set of valid claim types is therefore, (excluding the invalid Claims.UNKNOWN Void type):
 
 * java.lang.String
-* java.lang.Long
-* java.lang.Boolean
+* java.lang.Long and long
+* java.lang.Boolean and boolean
 * java.util.Set<java.lang.String>
 * javax.json.JsonValue.TRUE/FALSE
 * javax.json.JsonString
 * javax.json.JsonNumber
 * javax.json.JsonArray
 * javax.json.JsonObject
+
+Custom claims not handled by the Claims enum must be any of the types defined in the previous acceptable claim
+types list.
 
 ### Service Specific Authorization Claims
 An extended form of authorization on a per service basis using a "resource_access"
@@ -469,18 +471,23 @@ public class MyEndpoint {
 }
 ----
 
-The set of types one my use for a claim value injection is:
+The current complete set of valid claim types is:
 
 * java.lang.String
+* java.lang.Long and long
+* java.lang.Boolean and boolean
 * java.util.Set<java.lang.String>
-* java.lang.Long
-* java.lang.Boolean
-* javax.json.JsonValue subtypes
+* javax.json.JsonValue.TRUE/FALSE
+* javax.json.JsonString
+* javax.json.JsonNumber
+* javax.json.JsonArray
+* javax.json.JsonObject
 * java.util.Optional wrapper of the above types.
 * org.eclipse.microprofile.jwt.ClaimValue wrapper of the above types.
 
-MP-JWT implementations are required to support injection of the claim values
-using any of these types.
+MP-JWT implementations are required to support injection of the claim values using any of these types. The claims are
+automatically converted to the type used in the injection point where the type must be any of the types defined in
+the previous acceptable claim types list.
 
 The `org.eclipse.microprofile.jwt.ClaimValue` interface is:
 [source,java]
