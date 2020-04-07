@@ -347,7 +347,7 @@ return Public Key text in one of the supported formats.
 Some claims may contain a sensitive information. For example, a user https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim [Address claim] can be easily viewed if signed JWT token containing such a claim
 is intercepted or leaked in the logs.
 
-In such cases, when the confidentiality of the claims is critical, the claims can be encrypted instead of being signed,
+In such cases, when the confidentiality of the claims is critical, the claims can be encrypted or the signed JWT can be encrypted,
 producing a JWT token by following the steps in the https://tools.ietf.org/html/rfc7516[JSON Web Encryption(JWE)] specification.
 
 Decrypting the encrypted claims requires a single property, `mp.jwt.decrypt.key.location`, pointing to a private key which can be used to decrypt the token. All the location options supported by the `mp.jwt.verify.publickey.location` property are also supported by `mp.jwt.decrypt.key.location`.
@@ -375,7 +375,7 @@ The rules about matching a token `kid` header and JWK `kid` property for selecti
 
 If the claims have been immediately encrypted, without being signed first, then the application endpoints will have no guarantee that a token came from a trusted issuer. To have this proof the claims will need to be signed first and the resulting nested JWT token - encrypted next.
 
-If the encrypted content is an inner nested JWT then its signature has to be verified by configuring the verification key as described in the <<signed-jwt-tokens, Signed JWT tokens>> section.
+If the encrypted content is an inner nested JWT then the implementations must check that the `cty` (content type) JWE header is set to `JWT` and verify the signature of the nested JWT by configuring the verification key as described in the <<signed-jwt-tokens, Signed JWT tokens>> section.
 
 See the <<claims-verification, Verification of JWT token claims>> section how to verify the token claims once the token has been decrypted and the signature of its nested token (if present) verified.
 
@@ -408,7 +408,7 @@ Note that the `aud` claim should only be injected into a Set of String, not as a
 
 ## Requirements for accepting signed and encrypted tokens
 
-This specification does not support the application endpoints accepting signed or encrypted or signed and encrypted tokens at the same time. Requiring the implementations to determine a token type at runtime (signed token will have 3 parts, encrypted token - 5 parts) will have a small performance cost and it is expected that a given MP JWT application will accept only signed or only encrypted or only signed and encrypted tokens which will be enforced depending on how `mp.jwt.decrypt.key.location` and either `mp.jwt.verify.publickey.location` or `mp.jwt.verify.publickey` properties are set.
+MP JWT specification currently requires that an MP JWT application accepts only signed or only encrypted or only signed and encrypted tokens as it expected that many endpoints will have the requirements to accept a single token type only. 
 
 If only `mp.jwt.verify.publickey.location` or `mp.jwt.verify.publickey` properties are set then only the tokens containing the signed claims can be accepted. Support for such tokens is `required`.
 

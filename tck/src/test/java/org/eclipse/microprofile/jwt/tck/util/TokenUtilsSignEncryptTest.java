@@ -44,24 +44,24 @@ public class TokenUtilsSignEncryptTest {
         description = "Illustrate an encryption of the nested JWT")
     public void testEncryptSignedClaims() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json");
-        validateToken(token);
+        validateToken(token, true);
     }
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {JoseException.class},
             description = "Illustrate validation failure if signed token is used")
     public void testValidateSignedToken() throws Exception {
         String token = TokenUtils.signClaims("/Token1.json");
-        validateToken(token);
+        validateToken(token, false);
     }
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
             description = "Illustrate validation failure if encrypted token without nested token is used")
     public void testValidateEncryptedOnlyToken() throws Exception {
         String token = TokenUtils.encryptClaims("/Token1.json");
-        validateToken(token);
+        validateToken(token, false);
     }
 
-    private void validateToken(String jweCompact) throws Exception {
+    private void validateToken(String jweCompact, boolean jwtExpected) throws Exception {
 
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setAlgorithmConstraints(
@@ -70,6 +70,13 @@ public class TokenUtilsSignEncryptTest {
         RSAPrivateKey privateKey = (RSAPrivateKey) TokenUtils.readPrivateKey("/privateKey.pem");
         jwe.setKey(privateKey);
         String token = jwe.getPlaintextString();
+
+        if (jwtExpected) {
+            Assert.assertEquals(jwe.getHeader("cty"), "JWT");
+        }
+        else {
+            Assert.assertNull(jwe.getHeader("cty"));
+        }
 
         // verify the nested token
         RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");

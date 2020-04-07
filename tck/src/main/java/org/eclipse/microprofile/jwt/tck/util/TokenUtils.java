@@ -166,18 +166,6 @@ public class TokenUtils {
      * Utility method to generate a JWT string from a JSON resource file that is signed by the private key
      *
      * @param pk - the private key to sign the token with
-     * @param jsonResName   - name of test resources file
-     * @return the JWT string
-     * @throws Exception on parse failure
-     */
-    public static String signClaims(PrivateKey pk, String jsonResName) throws Exception {
-        return signClaims(pk, jsonResName, jsonResName);
-    }
-
-    /**
-     * Utility method to generate a JWT string from a JSON resource file that is signed by the private key
-     *
-     * @param pk - the private key to sign the token with
      * @param kid - the kid claim to assign to the token
      * @param jsonResName   - name of test resources file
      * @return the JWT string
@@ -385,7 +373,7 @@ public class TokenUtils {
         jwe.setKeyIdHeaderValue(kid);
         if (plainText.split("\\.").length == 3) {
             // nested JWT
-            jwe.getHeaders().setObjectHeaderValue("cty", "JWT");
+            jwe.setHeader("cty", "JWT");
         }
         jwe.setEncryptionMethodHeaderParameter("A256GCM");
 

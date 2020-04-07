@@ -104,7 +104,7 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
     
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with no token fails with HTTP_UNAUTHORIZED")
-    public void callEchoNoAuth() throws Exception {
+    public void callEchoNoAuth() {
         Reporter.log("callEchoNoAuth, expect HTTP_UNAUTHORIZED");
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
@@ -117,7 +117,7 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
     @RunAsClient
     @Test(groups = TCKConstants.TEST_GROUP_JAXRS,
         description = "Attempting access with BASIC auth header should fail with HTTP_UNAUTHORIZED")
-    public void callEchoBASIC() throws Exception {
+    public void callEchoBASIC() {
         Reporter.log("callEchoBASIC, expect HTTP_UNAUTHORIZED");
         byte[] tokenb = Base64.getEncoder().encode("jdoe@example.com:password".getBytes());
         String token = new String(tokenb);
@@ -133,7 +133,7 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS,
         description = "Validate a request with MP-JWT succeeds with HTTP_OK, and replies with hello, user={token upn claim}")
-    public void callEcho() throws Exception {
+    public void callEcho() {
         Reporter.log("callEcho, expect HTTP_OK");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
@@ -182,7 +182,7 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT but no associated role fails with HTTP_FORBIDDEN")
-    public void callEcho2() throws Exception {
+    public void callEcho2() {
         Reporter.log("callEcho2, expect HTTP_FORBIDDEN");
 
         String uri = baseURL.toExternalForm() + "endp/echo2";
@@ -195,7 +195,7 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
 
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT is able to access checkIsUserInRole with HTTP_OK")
-    public void checkIsUserInRole() throws Exception {
+    public void checkIsUserInRole() {
         Reporter.log("checkIsUserInRole, expect HTTP_OK");
 
         String uri = baseURL.toExternalForm() + "endp/checkIsUserInRole";
@@ -248,7 +248,7 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS,
         description = "Validate a request with MP-JWT SecurityContext.getUserPrincipal() is a JsonWebToken")
-    public void getPrincipalClass() throws Exception {
+    public void getPrincipalClass() {
         Reporter.log("getPrincipalClass, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "endp/getPrincipalClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
@@ -279,7 +279,7 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
     @RunAsClient
     @Test(groups = TEST_GROUP_CDI,
         description = "Validate that accessing secured method has HTTP_OK and injected JsonWebToken principal")
-    public void getInjectedPrincipal() throws Exception {
+    public void getInjectedPrincipal() {
         Reporter.log("getInjectedPrincipal, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "endp/getInjectedPrincipal";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
@@ -293,7 +293,7 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS,
         description = "Validate a request without an MP-JWT to unsecured endpoint has HTTP_OK with expected response")
-    public void callHeartbeat() throws Exception {
+    public void callHeartbeat() {
         Reporter.log("callHeartbeat, expect HTTP_OK");
         String uri = baseURL.toExternalForm() + "endp/heartbeat";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
