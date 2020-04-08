@@ -195,7 +195,9 @@ public class TokenUtils {
         
         JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
-        jws.setKeyIdHeaderValue(kid);
+        if (kid != null) {
+            jws.setKeyIdHeaderValue(kid);
+        }
         jws.setHeader("typ", "JWT");
         
         if (invalidClaims.contains(InvalidClaims.ALG)) {
@@ -311,7 +313,7 @@ public class TokenUtils {
             key = pk;
         }
         
-        return encryptString(key, kid, claims.toJson());
+        return encryptString(key, kid, claims.toJson(), false);
     }
 
     /**
@@ -361,17 +363,41 @@ public class TokenUtils {
                                        PublicKey encryptionKey,
                                        String encryptionKid,
                                        String jsonResName) throws Exception {
-
-        String nestedJwt = signClaims(signingKey, signingKid, jsonResName, null, null);
-        return encryptString(encryptionKey, encryptionKid, nestedJwt);
+        return signEncryptClaims(signingKey, signingKid, encryptionKey, encryptionKid, jsonResName, true);
     }
 
-    private static String encryptString(Key key, String kid, String plainText) throws Exception {
+    /**
+     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key and
+     * and encrypting next with the public key with an option to skip setting a content-type 'cty' parameter.
+     *
+     * @param signingKey - the private key to sign the token with
+     * @param signingKid - the signing key identifier
+     * @param encryptionKey - the public key to encrypt the token with
+     * @param encryptionKid - the encryption key identifier
+     * @param jsonResName   - name of test resources file
+     * @param setContentType  - set a content-type 'cty' parameter if true 
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signEncryptClaims(PrivateKey signingKey,
+                                       String signingKid,
+                                       PublicKey encryptionKey,
+                                       String encryptionKid,
+                                       String jsonResName,
+                                       boolean setContentType) throws Exception {
+
+        String nestedJwt = signClaims(signingKey, signingKid, jsonResName, null, null);
+        return encryptString(encryptionKey, encryptionKid, nestedJwt, setContentType);
+    }
+
+    private static String encryptString(Key key, String kid, String plainText, boolean setContentType) throws Exception {
 
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setPlaintext(plainText);
-        jwe.setKeyIdHeaderValue(kid);
-        if (plainText.split("\\.").length == 3) {
+        if (kid != null) {
+            jwe.setKeyIdHeaderValue(kid);
+        }
+        if (setContentType && plainText.split("\\.").length == 3) {
             // nested JWT
             jwe.setHeader("cty", "JWT");
         }

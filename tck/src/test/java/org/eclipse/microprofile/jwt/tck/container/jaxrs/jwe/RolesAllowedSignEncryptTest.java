@@ -97,11 +97,15 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
     }
 
     private static String signEncryptClaims(String jsonResName) throws Exception {
+        return signEncryptClaimsWithOptionalCty(jsonResName, true);
+    }
+
+    private static String signEncryptClaimsWithOptionalCty(String jsonResName, boolean cty) throws Exception {
         PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         PublicKey encryptionKey = TokenUtils.readPublicKey("/publicKey.pem");
-        return TokenUtils.signEncryptClaims(signingKey, encryptionKey, jsonResName);
+        return TokenUtils.signEncryptClaims(signingKey, null, encryptionKey, null, jsonResName, cty);
     }
-    
+
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with no token fails with HTTP_UNAUTHORIZED")
     public void callEchoNoAuth() {
@@ -145,6 +149,20 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
         String reply = response.readEntity(String.class);
         // Must return hello, user={token upn claim}
         Assert.assertEquals(reply, "hello, user=jdoe@example.com");
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JAXRS,
+        description = "Validate a request with MP-JWT fail with HTTP_UNAUTHORIZED if no 'cty' header is set")
+    public void callEchoWithoutCty() throws Exception {
+        Reporter.log("callEcho, expect HTTP_OK");
+        String token2 = signEncryptClaimsWithOptionalCty("/Token1.json", false);
+        String uri = baseURL.toExternalForm() + "endp/echo";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+            .target(uri)
+            .queryParam("input", "hello");
+        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token2).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @RunAsClient

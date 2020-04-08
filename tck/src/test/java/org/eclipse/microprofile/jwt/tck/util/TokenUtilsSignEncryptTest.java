@@ -19,8 +19,11 @@
  */
 package org.eclipse.microprofile.jwt.tck.util;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +47,16 @@ public class TokenUtilsSignEncryptTest {
         description = "Illustrate an encryption of the nested JWT")
     public void testEncryptSignedClaims() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json");
+        validateToken(token, true);
+    }
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
+            description = "Illustrate validation failure if signed token is encrypted and no 'cty' header is set")
+    public void testEncryptSignedClaimsWithoutCty() throws Exception {
+        PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey.pem");
+        PublicKey encryptionKey = TokenUtils.readPublicKey("/publicKey.pem");
+        String token =
+            TokenUtils.signEncryptClaims(signingKey, "1", encryptionKey, "2", "/Token1.json", false);
         validateToken(token, true);
     }
 
@@ -72,7 +85,9 @@ public class TokenUtilsSignEncryptTest {
         String token = jwe.getPlaintextString();
 
         if (jwtExpected) {
-            Assert.assertEquals(jwe.getHeader("cty"), "JWT");
+            if (!"JWT".equals(jwe.getHeader("cty"))) {
+                throw new InvalidJwtException("'cty' header is missing", Collections.emptyList(), null);
+            }
         }
         else {
             Assert.assertNull(jwe.getHeader("cty"));
