@@ -406,7 +406,7 @@ tokens and their associated claim values.
 
 #### Injection of `JsonWebToken`
 An MP-JWT implementation must support the injection of the currently authenticated
-caller as a `JsonWebToken` with `@RequestScoped` scoping:
+caller as a `JsonWebToken` with `@RequestScoped` scoping which must work even if the outer bean is `@ApplicationScoped`:
 
 ```java
 @Path("/endp")
@@ -615,14 +615,10 @@ string or a `Claims` enum value. The string form would allow for specifying non-
 claims while the `Claims` enum approach guards against typos.
 
 #### Handling of Non-RequestScoped Injection of Claim Values
-MP-JWT implementations are required to validate the use of claim value injection into contexts that do not match
-@RequestScoped. When the target context has @ApplicationScoped or @SessionScoped scope, implementations are
-required to generate a `javax.enterprise.inject.spi.DeploymentException`. For any other context, implementations
-should issue a warning, that may be suppressed by an implementation specific configuration setting.
-
-[NOTE]
 If one needs to inject a claim value into a scope with a lifetime greater than @RequestScoped, such as
-@ApplicationScoped or @SessionScoped, one can use the javax.enterprise.inject.Instance interface to do so.
+@ApplicationScoped or @SessionScoped, one can also use the javax.enterprise.inject.Instance interface to do so.
+
+MP-JWT implementations may issue a warning when a claim value is injected into an `@ApplicationScoped` scope if the injection point is a primitive or wrapper type.
 
 ### JAX-RS Container API Integration
 The behavior of the following JAX-RS security related methods is required for
