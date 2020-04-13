@@ -25,16 +25,22 @@ package org.eclipse.microprofile.jwt.config;
  */
 public interface Names {
     /**
-     * The embedded key material of the public key for the MP-JWT signer in PKCS8 PEM or JWK(S) format.  If not found
+     * The embedded key material of the verification public key for the MP-JWT signer in PKCS8 PEM or JWK(S) format.  If not found
      * the {@linkplain #VERIFIER_PUBLIC_KEY_LOCATION} needs to be checked.
      */
     String VERIFIER_PUBLIC_KEY = "mp.jwt.verify.publickey";
 
     /**
-     * The relative path or full URL of the public key.  All relative paths will be resolved within the archive using
+     * The relative path or full URL of the verification public key.  All relative paths will be resolved within the archive using
      * ClassLoader.getResource.  If the value is a URL it will be resolved using `new URL(“”).openStream()`
      */
     String VERIFIER_PUBLIC_KEY_LOCATION = "mp.jwt.verify.publickey.location";
+    
+    /**
+     * The relative path or full URL of the decryption key.  All relative paths will be resolved within the archive using
+     * ClassLoader.getResource.  If the value is a URL it will be resolved using `new URL(“”).openStream()`
+     */
+    String DECRYPTOR_KEY_LOCATION = "mp.jwt.decrypt.key.location";
 
     /**
      * The expected iss claim value to validate against an MP-JWT.

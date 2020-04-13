@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -27,7 +27,10 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyFactory;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -42,6 +45,20 @@ import javax.json.JsonObject;
  */
 public class SimpleTokenUtils {
     private SimpleTokenUtils(){}
+
+    /**
+     * Decode a PEM encoded private key string to an RSA PrivateKey
+     * @param pemEncoded - PEM string for private key
+     * @return PrivateKey
+     * @throws Exception on decode failure
+     */
+    public static PrivateKey decodePrivateKey(final String pemEncoded) throws Exception {
+        byte[] encodedBytes = toEncodedBytes(pemEncoded);
+
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(keySpec);
+    }
 
     /**
      * Decode a PEM encoded public key string to an RSA PublicKey
@@ -81,8 +98,34 @@ public class SimpleTokenUtils {
         BigInteger modulus = new BigInteger(1, nbytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
         RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, publicExponent);
-        PublicKey publicKey = kf.generatePublic(rsaPublicKeySpec);
-        return publicKey;
+        return kf.generatePublic(rsaPublicKeySpec);
+    }
+
+    /**
+     * Decode a JWK(S) encoded private key string to an RSA PrivateKey
+     * @param jwksValue - JWKS string value
+     * @return PrivateKey from RSAPrivateKeySpec
+     */
+    public static PrivateKey decodeJWKSPrivateKey(String jwksValue) throws Exception {
+        JsonObject jwks = Json.createReader(new StringReader(jwksValue)).readObject();
+        JsonArray keys = jwks.getJsonArray("keys");
+        JsonObject jwk;
+        if(keys != null) {
+            jwk = keys.getJsonObject(0);
+        }
+        else {
+            jwk = jwks;
+        }
+        String d = jwk.getString("d");
+        String n = jwk.getString("n");
+
+        byte[] dbytes = Base64.getUrlDecoder().decode(d);
+        BigInteger privateExponent = new BigInteger(1, dbytes);
+        byte[] nbytes = Base64.getUrlDecoder().decode(n);
+        BigInteger modulus = new BigInteger(1, nbytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(modulus, privateExponent);
+        return kf.generatePrivate(rsaPrivateKeySpec);
     }
 
     private static byte[] toEncodedBytes(final String pemEncoded) {

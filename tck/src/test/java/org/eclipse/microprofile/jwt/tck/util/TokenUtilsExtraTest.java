@@ -62,4 +62,16 @@ public class TokenUtilsExtraTest {
         RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");
         Assert.assertEquals(publicKey.getModulus().bitLength(), 2048);
     }
+
+    @Test(groups = TEST_GROUP_UTILS_EXTRA, description = "Test initial key validation")
+    public void testReadJwkPublicKey() throws Exception {
+        RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readJwkPublicKey("/encryptorPublicKey.jwk");
+        Assert.assertEquals(publicKey.getModulus().bitLength(), 2048);
+    }
+
+    @Test(groups = TEST_GROUP_UTILS_EXTRA, description = "Test initial key validation")
+    public void testReadJwkPrivateKey() throws Exception {
+        RSAPrivateKey privateKey = (RSAPrivateKey) TokenUtils.readJwkPrivateKey("/decryptorPrivateKey.jwk");
+        Assert.assertEquals(privateKey.getModulus().bitLength(), 2048);
+    }
 }

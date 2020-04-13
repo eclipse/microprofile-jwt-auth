@@ -26,6 +26,8 @@
         </groups>
         <classes>
             <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsEncryptTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsSignEncryptTest" />
             <class name="org.eclipse.microprofile.jwt.tck.util.TokenUtilsExtraTest" />
         </classes>
     </test>
