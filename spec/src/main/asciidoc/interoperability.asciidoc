@@ -402,11 +402,6 @@ by the container configuration must be rejected with an HTTP_UNAUTHENTICATED(401
 4. The JWT signer must have a public key that maps to an MP-JWT implementation container runtime
 configured value when service endpoint is configured to verify the signed tokens and the JWT encryptor must have a private key that maps to an MP-JWT implementation container runtime configured value when service endpoint is configured to decrypt the encrypted tokens. Any public or private key other than those that have been whitelisted by the container configuration must be rejected with an HTTP_UNAUTHENTICATED(401) error.
 
-[NOTE]
-A future MP-JWT specification may define how an MP-JWT implementation makes use of the MicroProfile Config
-specification to allow for configuration of the issuer, issuer public key and expiration clock
-skew. Additional requirements for validation of the required MP-JWT claims may also be defined.
-
 ## Mapping MP-JWT Tokens to Java EE Container APIs
 
 The requirements of how a JWT should be exposed via the various Java EE container
@@ -634,10 +629,16 @@ string or a `Claims` enum value. The string form would allow for specifying non-
 claims while the `Claims` enum approach guards against typos.
 
 #### Handling of Non-RequestScoped Injection of Claim Values
+
+MP-JWT implementations are required to support a claim value injection into @ApplicationScoped scoped beans. A warning may be issued when the injection point is not an `org.eclipse.microprofile.jwt.ClaimValue` or `javax.inject.Provider` interface.
+
+MP-JWT implementations are required to generate a `javax.enterprise.inject.spi.DeploymentException` for a claim value injection into Passivation capable beans, for example, @SessionScoped.
+
+MP JWT implementations may issue a warning for any other context with a lifetime greater than @RequestScoped.
+
+[NOTE]
 If one needs to inject a claim value into a scope with a lifetime greater than @RequestScoped, such as
 @ApplicationScoped or @SessionScoped, one can also use the javax.enterprise.inject.Instance interface to do so.
-
-MP-JWT implementations may issue a warning when a claim value is injected into an `@ApplicationScoped` scope if the injection point is a primitive or wrapper type.
 
 ### JAX-RS Container API Integration
 The behavior of the following JAX-RS security related methods is required for
