@@ -142,7 +142,7 @@ public class TokenUtilsEncryptTest {
         JwtClaims claimsSet = builder.build().processToClaims(token);
         // Confirm all the claims available in /Token1.json have made it into the verified claimSet
 
-        Assert.assertEquals(claimsSet.getClaimsMap().size(), 18);
+        Assert.assertEquals(claimsSet.getClaimsMap().size(), 19);
         Assert.assertEquals(claimsSet.getIssuer(), "https://server.example.com");
         Assert.assertEquals(claimsSet.getJwtId(), "a-123");
         Assert.assertEquals(claimsSet.getSubject(), "24400320");
