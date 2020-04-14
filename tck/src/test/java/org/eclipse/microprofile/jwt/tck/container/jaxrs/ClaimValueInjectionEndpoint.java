@@ -75,6 +75,9 @@ public class ClaimValueInjectionEndpoint {
     @Inject
     @Claim("customDouble")
     private ClaimValue<JsonNumber> customDouble;
+    @Inject
+    @Claim("customBoolean")
+    private ClaimValue<Boolean> customBoolean;
 
     @Inject
     @Claim(standard = Claims.raw_token)
@@ -474,7 +477,6 @@ public class ClaimValueInjectionEndpoint {
     public JsonObject verifyInjectedCustomString(@QueryParam("value") String value) {
         boolean pass = false;
         String msg;
-        // iat
         String customValue = customString.getValue();
         if(customValue == null || customValue.length() == 0) {
             msg = "customString value is null or empty, FAIL";
@@ -499,7 +501,6 @@ public class ClaimValueInjectionEndpoint {
     public JsonObject verifyInjectedCustomInteger(@QueryParam("value") Long value) {
         boolean pass = false;
         String msg;
-        // iat
         Object test = customInteger.getValue();
         System.out.printf("+++ verifyInjectedCustomInteger, JsonNumber.class.CL: %s\n",
             JsonNumber.class.getClassLoader());
@@ -533,7 +534,6 @@ public class ClaimValueInjectionEndpoint {
     public JsonObject verifyInjectedCustomDouble(@QueryParam("value") Double value) {
         boolean pass = false;
         String msg;
-        // iat
         JsonNumber customValue = customDouble.getValue();
         if(customValue == null) {
             msg = "customDouble value is null, FAIL";
@@ -550,5 +550,28 @@ public class ClaimValueInjectionEndpoint {
             .add("msg", msg)
             .build();
         return result;
+    }
+
+    @GET
+    @Path("/verifyInjectedCustomBoolean")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject verifyInjectedCustomBoolean(@QueryParam("value") String value) {
+        boolean pass = false;
+        String msg;
+        final Boolean customValue = customBoolean.getValue();
+        if(customValue == null) {
+            msg = "customBoolean value is null, FAIL";
+        }
+        else if(customValue == Boolean.valueOf(value)) {
+            msg = "customBoolean PASS";
+            pass = true;
+        }
+        else {
+            msg = String.format("customBoolean: %s != %s", customValue, value);
+        }
+        return Json.createObjectBuilder()
+                   .add("pass", pass)
+                   .add("msg", msg)
+                   .build();
     }
 }

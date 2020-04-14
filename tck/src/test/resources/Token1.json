@@ -20,6 +20,7 @@
     "customString": "customStringValue",
     "customInteger": 123456789,
     "customDouble": 3.141592653589793,
+    "customBoolean": true,
     "customStringArray": [
         "value0",
         "value1",
