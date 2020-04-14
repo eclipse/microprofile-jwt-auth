@@ -21,7 +21,6 @@ package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
 import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.Claims;
-
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -61,9 +60,6 @@ public class PrimitiveInjectionEndpoint {
     @Claim("iat")
     private long issuedAt;
     @Inject
-    @Claim("iat")
-    private Long issuedAtWrapper;
-    @Inject
     @Claim("exp")
     private long expiration;
     @Inject
@@ -72,12 +68,6 @@ public class PrimitiveInjectionEndpoint {
     @Inject
     @Claim("customString")
     private String customString;
-    @Inject
-    @Claim("customBoolean")
-    private Boolean customBooleanWrapper;
-    @Inject
-    @Claim("customBoolean")
-    private boolean customBoolean;
 
     @GET
     @Path("/verifyInjectedIssuer")
@@ -260,8 +250,8 @@ public class PrimitiveInjectionEndpoint {
         boolean pass = false;
         String msg;
         // iat
-        Long iatValue = this.issuedAtWrapper;
-        if (iatValue == null || iatValue.intValue() == 0 || iatValue != issuedAt) {
+        Long iatValue = this.issuedAt;
+        if (iatValue == null || iatValue.intValue() == 0) {
             msg = Claims.iat.name() + "value is null or empty, FAIL";
         }
         else if (iatValue.equals(iat)) {
@@ -326,29 +316,5 @@ public class PrimitiveInjectionEndpoint {
                 .add("msg", msg)
                 .build();
         return result;
-    }
-
-    @GET
-    @Path("/verifyInjectedCustomBoolean")
-    @Produces(MediaType.APPLICATION_JSON)
-    public JsonObject verifyInjectedCustomBoolean(@QueryParam("value") String value) {
-        boolean pass = false;
-        String msg;
-
-        if (customBooleanWrapper == null || customBoolean != customBooleanWrapper) {
-            msg = "injected boolean values are different";
-        }
-        else if (Boolean.valueOf(value) == customBoolean) {
-            msg = "customBoolean PASS";
-            pass = true;
-        }
-        else {
-            msg = String.format("customBoolean: %s != %s", customBoolean, value);
-        }
-
-        return Json.createObjectBuilder()
-                   .add("pass", pass)
-                   .add("msg", msg)
-                   .build();
     }
 }

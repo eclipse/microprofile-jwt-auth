@@ -282,21 +282,4 @@ public class PrimitiveInjectionTest extends Arquillian {
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
     }
-
-    @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_PROVIDER,
-        description = "Verify that the injected customBoolean claim is as expected")
-    public void verifyInjectedCustomBoolean() {
-        String uri = baseURL.toExternalForm() + "endp/verifyInjectedCustomBoolean";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("value", "true");
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
-        String replyString = response.readEntity(String.class);
-        JsonReader jsonReader = Json.createReader(new StringReader(replyString));
-        JsonObject reply = jsonReader.readObject();
-        Reporter.log(reply.toString());
-        Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
-    }
 }
