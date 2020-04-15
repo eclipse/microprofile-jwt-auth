@@ -33,10 +33,10 @@ To meet those requirements, we introduce 2 new claims to the MP-JWT:
 
 * "upn": A human readable claim that uniquely identifies the subject or user principal of the token, across
 the MicroProfile services the token will be accessed with.
-* "groups": The token subject's group memberships that will be mapped to Java EE style application
-level roles in the MicroProfile service container.
+* "groups": A list of group names to be assigned to the principal of the MP-JWT. This typically will require a mapping at the application container level to application roles. A one-to-one mapping between group names and application role names is done by default when no custom mapping is defined in an implementation specific way.
 
-### Minimum MP-JWT Required Headers and Claims
+### Minimum MP-JWT Header and Claim Requirements
+
 The required minimum set of MP-JWT headers and claims is:
 
 typ:: This JOSE header parameter identifies the token as an RFC7519 and must be "JWT" https://tools.ietf.org/html/rfc7519#section-5.1[RFC7519, Section 5.1]
@@ -61,11 +61,10 @@ upn:: This MP-JWT custom claim is the user principal name in the java.security.P
     principal name in javax.security.enterprise.identitystore.IdentityStore. If this claim is missing, fallback to
     the http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims["preferred_username", OIDC Section 5.1] should be
     attempted, and if that claim is missing, fallback to the "sub" claim should be used.
-groups:: This MP-JWT custom claim is the list of group names that have been assigned to the principal of the MP-JWT.
-    This typically will require a mapping at the application container level to application deployment roles, but a
-    one-to-one between group names and application role names is required to be performed in addition to any
-    other mapping.
 
+[NOTE] It is recommended that JWT tokens have a `groups` claim if the endpoint requires Authorization but MP JWT implementations can map the groups from the other claims if the tokens have been issued by OpenId Connect and other providers which currently do not support MP JWT.
+
+If no groups information can be extracted directly from the `groups` claim or via the custom mappers from other custom claims in a given token then this token can be accepted if the endpoint requires Authentication only.
 
 [NOTE]
 NumericDate used by `exp`, `iat`, and other date related claims is a JSON numeric value
@@ -219,6 +218,17 @@ public interface JsonWebToken extends Principal {
     default <T> Optional<T> claim(String claimName) {
         return Optional.ofNullable(getClaim(claimName));
     }
+
+    /**
+     * A utility method to access a claim value in an {@linkplain Optional}
+     * wrapper
+     * @param claim - the claim
+     * @param <T> - the type of the claim value to return
+     * @return an Optional wrapper of the claim value
+     */
+    default <T> Optional<T> claim(Claims claim) {
+        return claim(claim.name());
+    }
 }
 ```
 
@@ -334,6 +344,8 @@ public enum Claims {
 }
 ```
 
+Note that the `groups` and `aud` claims should only be injected into a Set of String, not as a comma delimited string.
+
 The current complete set of valid claim types is therefore, (excluding the invalid Claims.UNKNOWN Void type):
 
 * java.lang.String
@@ -384,10 +396,10 @@ invalid MP-JWT token if any of the following conditions are not met:
 
 1. The JWT must have a JOSE header that indicates the token was signed using the RS256 algorithm when the service endpoint expects signed tokens.
 2. The JWT must have a JOSE header that indicates the token was encrypted using the RSA-OAEP and A256GCM algorithms when the service endpoint expects encrypted tokens. If the encrypted content is a nested signed JWT token then it must meet the condition 1.
-2. The JWT must have an iss claim representing the token issuer that maps to an MP-JWT implementation
+3. The JWT must have an iss claim representing the token issuer that maps to an MP-JWT implementation
 container runtime configured value. Any issuer other than those issuers that have been whitelisted
 by the container configuration must be rejected with an HTTP_UNAUTHENTICATED(401) error.
-3. The JWT signer must have a public key that maps to an MP-JWT implementation container runtime
+4. The JWT signer must have a public key that maps to an MP-JWT implementation container runtime
 configured value when service endpoint is configured to verify the signed tokens and the JWT encryptor must have a private key that maps to an MP-JWT implementation container runtime configured value when service endpoint is configured to decrypt the encrypted tokens. Any public or private key other than those that have been whitelisted by the container configuration must be rejected with an HTTP_UNAUTHENTICATED(401) error.
 
 [NOTE]
