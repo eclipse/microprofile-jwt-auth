@@ -35,7 +35,12 @@ public interface Names {
      * ClassLoader.getResource.  If the value is a URL it will be resolved using `new URL(“”).openStream()`
      */
     String VERIFIER_PUBLIC_KEY_LOCATION = "mp.jwt.verify.publickey.location";
-    
+
+    /**
+     * Public Key Signature Algorithm property which can be set to either 'RS256' or 'ES256'.
+     */
+    String VERIFIER_PUBLIC_KEY_ALGORITHM = "mp.jwt.verify.publickey.algorithm";
+
     /**
      * The relative path or full URL of the decryption key.  All relative paths will be resolved within the archive using
      * ClassLoader.getResource.  If the value is a URL it will be resolved using `new URL(“”).openStream()`

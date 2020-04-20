@@ -28,7 +28,8 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
@@ -62,24 +63,38 @@ public class SimpleTokenUtils {
 
     /**
      * Decode a PEM encoded public key string to an RSA PublicKey
-     * @param pemEncoded - PEM string for private key
-     * @return PublicKey
+     * @param pemEncoded - PEM string for public key
+     * @return RSAPublicKey
      * @throws Exception on decode failure
      */
-    public static PublicKey decodePublicKey(String pemEncoded) throws Exception {
+    public static RSAPublicKey decodePublicKey(String pemEncoded) throws Exception {
         byte[] encodedBytes = toEncodedBytes(pemEncoded);
 
         X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
+        return (RSAPublicKey)kf.generatePublic(spec);
+    }
+
+    /**
+     * Decode a PEM encoded public key string to an EC PublicKey
+     * @param pemEncoded - PEM string for public key
+     * @return ECPublicKey
+     * @throws Exception on decode failure
+     */
+    public static ECPublicKey decodeECPublicKey(String pemEncoded) throws Exception {
+        byte[] encodedBytes = toEncodedBytes(pemEncoded);
+
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedBytes);
+        KeyFactory kf = KeyFactory.getInstance("EC");
+        return (ECPublicKey)kf.generatePublic(spec);
     }
 
     /**
      * Decode a JWK(S) encoded public key string to an RSA PublicKey
      * @param jwksValue - JWKS string value
-     * @return PublicKey from RSAPublicKeySpec
+     * @return RSAPublicKey from RSAPublicKeySpec
      */
-    public static PublicKey decodeJWKSPublicKey(String jwksValue) throws Exception {
+    public static RSAPublicKey decodeJWKSPublicKey(String jwksValue) throws Exception {
         JsonObject jwks = Json.createReader(new StringReader(jwksValue)).readObject();
         JsonArray keys = jwks.getJsonArray("keys");
         JsonObject jwk;
@@ -98,7 +113,7 @@ public class SimpleTokenUtils {
         BigInteger modulus = new BigInteger(1, nbytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
         RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, publicExponent);
-        return kf.generatePublic(rsaPublicKeySpec);
+        return (RSAPublicKey)kf.generatePublic(rsaPublicKeySpec);
     }
 
     /**

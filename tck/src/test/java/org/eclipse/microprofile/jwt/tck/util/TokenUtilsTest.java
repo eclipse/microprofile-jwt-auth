@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.util;
 
-import java.security.interfaces.RSAPublicKey;
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +46,7 @@ public class TokenUtilsTest {
     public void testFailAlgorithm() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ALG);
-        String token = TokenUtils.signClaims("/Token1.json", invalidFields);
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, invalidFields);
         validateToken(token);
     }
     
@@ -66,6 +66,26 @@ public class TokenUtilsTest {
         validateToken(token);
     }
     
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT")
+    public void testValidTokenEC256() throws Exception {
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.ES256);
+        validateToken(token, SignatureAlgorithm.ES256, null);
+    }
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT",
+        expectedExceptions = {InvalidJwtException.class})
+    public void testSignedByRSKeyVerifiedByECKey() throws Exception {
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256);
+        validateToken(token, SignatureAlgorithm.ES256, null);
+    }
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT",
+            expectedExceptions = {InvalidJwtException.class})
+    public void testSignedByECKeyVerifiedByRSKey() throws Exception {
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.ES256);
+        validateToken(token, SignatureAlgorithm.RS256, null);
+    }
+
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Deprecated: Illustrate validation of a JWT")
     public void testValidTokenDeprecated() throws Exception {
         @SuppressWarnings("deprecation")
@@ -78,7 +98,7 @@ public class TokenUtilsTest {
     public void testFailIssuer() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
-        String token = TokenUtils.signClaims("/Token1.json", invalidFields);
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, invalidFields);
         validateToken(token);
     }
     
@@ -97,7 +117,7 @@ public class TokenUtilsTest {
     public void testFailSignature() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
-        String token = TokenUtils.signClaims("/Token1.json", invalidFields);
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, invalidFields);
         validateToken(token);
     }
     
@@ -117,7 +137,7 @@ public class TokenUtilsTest {
         Map<String, Long> timeClaims = new HashMap<>();
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
-        String token = TokenUtils.signClaims("/Token1.json", invalidFields, timeClaims);
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, invalidFields, timeClaims);
         validateToken(token);
     }
     
@@ -139,7 +159,7 @@ public class TokenUtilsTest {
         // Set exp to 61 seconds in past
         long exp = TokenUtils.currentTimeInSecs() - 61;
         timeClaims.put(Claims.exp.name(), exp);
-        String token = TokenUtils.signClaims("/Token1.json", null, timeClaims);
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, null, timeClaims);
         validateToken(token);
     }
     
@@ -162,7 +182,7 @@ public class TokenUtilsTest {
         // Set exp to 45 seconds in past
         long exp = TokenUtils.currentTimeInSecs() - 45;
         timeClaims.put(Claims.exp.name(), exp);
-        String token = TokenUtils.signClaims("/Token1.json", null, timeClaims);
+        String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, null, timeClaims);
         validateToken(token, exp);
     }
     
@@ -175,15 +195,21 @@ public class TokenUtilsTest {
         timeClaims.put(Claims.exp.name(), exp);
         @SuppressWarnings("deprecation")
         String token = TokenUtils.generateTokenString("/Token1.json", null, timeClaims);
-        validateToken(token, exp);
+        validateToken(token, SignatureAlgorithm.RS256, exp);
     }
 
     private void validateToken(String token) throws Exception {
-        validateToken(token, null);
+        validateToken(token, SignatureAlgorithm.RS256, null);
     }
-    private void validateToken(String token, Long expectedExpValue) throws Exception {
 
-        RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");
+    private void validateToken(String token, Long expectedExpValue) throws Exception {
+        validateToken(token, SignatureAlgorithm.RS256, expectedExpValue);
+    }
+
+    private void validateToken(String token, SignatureAlgorithm algorithm, Long expectedExpValue) throws Exception {
+
+        PublicKey publicKey = algorithm == SignatureAlgorithm.RS256 ? TokenUtils.readPublicKey("/publicKey.pem")
+            : TokenUtils.readECPublicKey("/ecPublicKey.pem");
         int expGracePeriodSecs = 60;
 
         JwtConsumerBuilder builder = new JwtConsumerBuilder();
@@ -195,7 +221,7 @@ public class TokenUtilsTest {
         builder.setRequireIssuedAt();
         // 'RS256' is required
         builder.setJwsAlgorithmConstraints(
-           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RS256"));
+           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, algorithm.getAlgorithm()));
 
         // issuer must be equal to TCKConstants.TEST_ISSUER
         builder.setExpectedIssuer(true, TCKConstants.TEST_ISSUER);

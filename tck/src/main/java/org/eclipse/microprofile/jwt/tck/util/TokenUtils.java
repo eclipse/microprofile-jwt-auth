@@ -31,6 +31,10 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -63,7 +67,7 @@ public class TokenUtils {
 
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
-     * test resource key.
+     * test resource key using RS256 algorithm.
      *
      * @param jsonResName - name of test resources file
      * @return the JWT string
@@ -76,19 +80,32 @@ public class TokenUtils {
 
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
-     * test resource key.
+     * test resource key using RS256 algorithm.
      *
      * @param jsonResName - name of test resources file
      * @return the JWT string
      * @throws Exception on parse failure
      */
     public static String signClaims(final String jsonResName) throws Exception {
-        return signClaims(jsonResName, Collections.emptySet());
+        return signClaims(jsonResName, SignatureAlgorithm.RS256);
     }
 
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
-     * test resource key, possibly with invalid fields.
+     * test resource key using either RS256 or ES256 algorithm.
+     *
+     * @param jsonResName - name of test resources file
+     * @param algorithm - signature algorithm
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signClaims(final String jsonResName, SignatureAlgorithm algorithm) throws Exception {
+        return signClaims(jsonResName, algorithm, Collections.emptySet());
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
+     * test resource key using RS256 algorithm, possibly with invalid fields.
      *
      * @param jsonResName   - name of test resources file
      * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
@@ -97,25 +114,26 @@ public class TokenUtils {
      */
     @Deprecated
     public static String generateTokenString(final String jsonResName, final Set<InvalidClaims> invalidClaims) throws Exception {
-        return signClaims(jsonResName, invalidClaims);
+        return signClaims(jsonResName, SignatureAlgorithm.RS256, invalidClaims);
     }
 
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
-     * test resource key, possibly with invalid fields.
+     * test resource key using either RS256 or ES256 algorithm, possibly with invalid fields.
      *
      * @param jsonResName   - name of test resources file
+     * @param algorithm - signature algorithm
      * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
      * @return the JWT string
      * @throws Exception on parse failure
      */
-    public static String signClaims(final String jsonResName, final Set<InvalidClaims> invalidClaims) throws Exception {
-        return signClaims(jsonResName, invalidClaims, null);
+    public static String signClaims(final String jsonResName, SignatureAlgorithm algorithm, final Set<InvalidClaims> invalidClaims) throws Exception {
+        return signClaims(jsonResName, algorithm, invalidClaims, null);
     }
 
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
-     * test resource key, possibly with invalid fields.
+     * test resource key using RS256 algorithm, possibly with invalid fields and custom time fields.
      *
      * @param jsonResName   - name of test resources file
      * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
@@ -125,28 +143,37 @@ public class TokenUtils {
      */
     @Deprecated
     public static String generateTokenString(String jsonResName, Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
-        return signClaims(jsonResName, invalidClaims, timeClaims);
+        return signClaims(jsonResName, SignatureAlgorithm.RS256, invalidClaims, timeClaims);
     }
 
     /**
-     * Utility method to generate a JWT string from a JSON resource file that is signed by the privateKey.pem
-     * test resource key, possibly with invalid fields.
+     * Utility method to generate a JWT string from a JSON resource file that is signed by either the privateKey.pem
+     * test resource using RS256 algorithm or the ecPrivateKey.pem test resource using ES256 algorithm,
+     * possibly with invalid fields and custom time claims.
      *
      * @param jsonResName   - name of test resources file
+     * @param algorithm - signature algorithm
      * @param invalidClaims - the set of claims that should be added with invalid values to test failure modes
      * @param timeClaims - used to return the exp, iat, auth_time claims
      * @return the JWT string
      * @throws Exception on parse failure
      */
-    public static String signClaims(String jsonResName, Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
+    public static String signClaims(String jsonResName, SignatureAlgorithm algorithm,
+        Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
         // Use the test private key associated with the test public key for a valid signature
-        PrivateKey pk = readPrivateKey("/privateKey.pem");
+        PrivateKey pk = null;
+        if (algorithm == SignatureAlgorithm.RS256) {
+            pk = readPrivateKey("/privateKey.pem");
+        }
+        else {
+            pk = readECPrivateKey("/ecPrivateKey.pem");
+        }
         return signClaims(pk, jsonResName, jsonResName, invalidClaims, timeClaims);
     }
 
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the private key
-     * test resource key, possibly with invalid fields.
+     * test resource key using either RS256 or ES256 algorithm, possibly with invalid fields.
      *
      * @param pk - the private key to sign the token with
      * @param kid - the kid header to assign to the token
@@ -164,6 +191,7 @@ public class TokenUtils {
 
     /**
      * Utility method to generate a JWT string from a JSON resource file that is signed by the private key
+     * using either RS256 or ES256 algorithm.
      *
      * @param pk - the private key to sign the token with
      * @param kid - the kid claim to assign to the token
@@ -176,7 +204,8 @@ public class TokenUtils {
     }
 
     /**
-     * Utility method to generate a JWT string from a JSON resource file that is signed by the private key, possibly with invalid fields.
+     * Utility method to generate a JWT string from a JSON resource file that is signed by the private key
+     * using either RS256 or ES256 algorithm, possibly with invalid fields.
      *
      * @param pk - the private key to sign the token with
      * @param kid - the kid claim to assign to the token
@@ -186,8 +215,9 @@ public class TokenUtils {
      * @return the JWT string
      * @throws Exception on parse failure
      */
-    public static String signClaims(PrivateKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims,
-            Map<String, Long> timeClaims) throws Exception {
+    public static String signClaims(PrivateKey pk, String kid, String jsonResName,
+        Set<InvalidClaims> invalidClaims, Map<String, Long> timeClaims) throws Exception {
+
         if (invalidClaims == null) {
             invalidClaims = Collections.emptySet();
         }
@@ -205,7 +235,8 @@ public class TokenUtils {
             jws.setKey(KeyGenerator.getInstance("HMACSHA256").generateKey());
         }
         else {
-            jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+            jws.setAlgorithmHeaderValue(pk instanceof RSAPrivateKey ? AlgorithmIdentifiers.RSA_USING_SHA256
+                : AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
             if (invalidClaims.contains(InvalidClaims.SIGNER)) {
                 // Generate a new random private key to sign with to test invalid signatures
                 pk = generateKeyPair(2048).getPrivate();
@@ -318,21 +349,41 @@ public class TokenUtils {
 
     /**
      * Utility method to generate a JWT string from a JSON resource file by signing it first
-     * with the privateKey.pem test resource and encrypting next with the publicKey.pem test resource.
+     * with the privateKey.pem test resource  using RS256 algorithm and encrypting next with the publicKey.pem test resource.
      *
      * @param jsonResName   - name of test resources file
      * @return the JWT string
      * @throws Exception on parse failure
      */
     public static String signEncryptClaims(String jsonResName) throws Exception {
-        PrivateKey signingKey = readPrivateKey("/privateKey.pem");
+        return signEncryptClaims(jsonResName, SignatureAlgorithm.RS256);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file by signing it first by either
+     * the privateKey.pem test resource using RS256 algorithm or the ecPrivateKey.pem test resource using ES256 algorithm
+     * and encrypting it next with the publicKey.pem test resource.
+     *
+     * @param jsonResName  - name of test resources file
+     * @param signatureAlgorithm  - signature algorithm
+     * @return the JWT string
+     * @throws Exception on parse failure
+     */
+    public static String signEncryptClaims(String jsonResName, SignatureAlgorithm signatureAlgorithm) throws Exception {
+        PrivateKey signingKey = null;
+        if (signatureAlgorithm == SignatureAlgorithm.RS256) {
+            signingKey = readPrivateKey("/privateKey.pem");
+        }
+        else {
+            signingKey = readECPrivateKey("/ecPrivateKey.pem");
+        }
         PublicKey encryptionKey = readPublicKey("/publicKey.pem");
         return signEncryptClaims(signingKey, encryptionKey, jsonResName);
     }
 
     /**
-     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key and
-     * and encrypting next with the public key.
+     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key
+     * using RS256 algorithm and encrypting next with the public key.
      *
      * @param signingKey - the private key to sign the token with
      * @param encryptionKey - the public key to encrypt the token with
@@ -347,8 +398,8 @@ public class TokenUtils {
     }
     
     /**
-     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key and
-     * and encrypting next with the public key.
+     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key
+     * using RS256 algorithm and and encrypting next with the public key.
      *
      * @param signingKey - the private key to sign the token with
      * @param signingKid - the signing key identifier
@@ -367,8 +418,8 @@ public class TokenUtils {
     }
 
     /**
-     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key and
-     * and encrypting next with the public key with an option to skip setting a content-type 'cty' parameter.
+     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key
+     * using RS256 algorithm and encrypting next with the public key with an option to skip setting a content-type 'cty' parameter.
      *
      * @param signingKey - the private key to sign the token with
      * @param signingKid - the signing key identifier
@@ -486,12 +537,12 @@ public class TokenUtils {
     }
 
     /**
-     * Read a PEM encoded private key from the classpath
+     * Read a PEM encoded RSA private key from the classpath
      * @param pemResName - key file resource name
-     * @return PrivateKey
+     * @return RSAPrivateKey
      * @throws Exception on decode failure
      */
-    public static PrivateKey readPrivateKey(final String pemResName) throws Exception {
+    public static RSAPrivateKey readPrivateKey(final String pemResName) throws Exception {
         InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
         byte[] tmp = new byte[4096];
         int length = contentIS.read(tmp);
@@ -499,16 +550,42 @@ public class TokenUtils {
     }
 
     /**
-     * Read a PEM encoded public key from the classpath
+     * Read a PEM encoded EC private key from the classpath
      * @param pemResName - key file resource name
-     * @return PublicKey
+     * @return ECPrivateKey
      * @throws Exception on decode failure
      */
-    public static PublicKey readPublicKey(final String pemResName) throws Exception {
+    public static ECPrivateKey readECPrivateKey(final String pemResName) throws Exception {
+        InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
+        byte[] tmp = new byte[4096];
+        int length = contentIS.read(tmp);
+        return decodeECPrivateKey(new String(tmp, 0, length));
+    }
+
+    /**
+     * Read a PEM encoded RSA public key from the classpath
+     * @param pemResName - key file resource name
+     * @return RSAPublicKey
+     * @throws Exception on decode failure
+     */
+    public static RSAPublicKey readPublicKey(final String pemResName) throws Exception {
         InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
         byte[] tmp = new byte[4096];
         int length = contentIS.read(tmp);
         return decodePublicKey(new String(tmp, 0, length));
+    }
+
+    /**
+     * Read a PEM encoded EC public key from the classpath
+     * @param pemResName - key file resource name
+     * @return ECPublicKey
+     * @throws Exception on decode failure
+     */
+    public static ECPublicKey readECPublicKey(final String pemResName) throws Exception {
+        InputStream contentIS = TokenUtils.class.getResourceAsStream(pemResName);
+        byte[] tmp = new byte[4096];
+        int length = contentIS.read(tmp);
+        return decodeECPublicKey(new String(tmp, 0, length));
     }
 
     /**
@@ -548,29 +625,57 @@ public class TokenUtils {
     /**
      * Decode a PEM encoded private key string to an RSA PrivateKey
      * @param pemEncoded - PEM string for private key
-     * @return PrivateKey
+     * @return RSAPrivateKey
      * @throws Exception on decode failure
      */
-    public static PrivateKey decodePrivateKey(final String pemEncoded) throws Exception {
+    public static RSAPrivateKey decodePrivateKey(final String pemEncoded) throws Exception {
         byte[] encodedBytes = toEncodedBytes(pemEncoded);
 
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePrivate(keySpec);
+        return (RSAPrivateKey)kf.generatePrivate(keySpec);
+    }
+
+    /**
+     * Decode a PEM encoded private key string to an EC PrivateKey
+     * @param pemEncoded - PEM string for private key
+     * @return ECPrivateKey
+     * @throws Exception on decode failure
+     */
+    public static ECPrivateKey decodeECPrivateKey(final String pemEncoded) throws Exception {
+        byte[] encodedBytes = toEncodedBytes(pemEncoded);
+
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedBytes);
+        KeyFactory kf = KeyFactory.getInstance("EC");
+        return (ECPrivateKey)kf.generatePrivate(keySpec);
     }
 
     /**
      * Decode a PEM encoded public key string to an RSA PublicKey
      * @param pemEncoded - PEM string for private key
-     * @return PublicKey
+     * @return RSAPublicKey
      * @throws Exception on decode failure
      */
-    public static PublicKey decodePublicKey(String pemEncoded) throws Exception {
+    public static RSAPublicKey decodePublicKey(String pemEncoded) throws Exception {
         byte[] encodedBytes = toEncodedBytes(pemEncoded);
 
         X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
+        return (RSAPublicKey)kf.generatePublic(spec);
+    }
+
+    /**
+     * Decode a PEM encoded public key string to an EC PublicKey
+     * @param pemEncoded - PEM string for private key
+     * @return ECPublicKey
+     * @throws Exception on decode failure
+     */
+    public static ECPublicKey decodeECPublicKey(String pemEncoded) throws Exception {
+        byte[] encodedBytes = toEncodedBytes(pemEncoded);
+
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedBytes);
+        KeyFactory kf = KeyFactory.getInstance("EC");
+        return (ECPublicKey)kf.generatePublic(spec);
     }
 
     private static byte[] toEncodedBytes(final String pemEncoded) {
