@@ -63,7 +63,7 @@ public class RolesEndpoint {
     @PermitAll
     public String echoInputPermitAll(@Context SecurityContext sec, @QueryParam("input") String input) {
         Principal user = sec.getUserPrincipal();
-        return input + ",permitAll, user="+user.getName();
+        return input + ", permitAll, user="+user.getName();
     }
 
     @GET
