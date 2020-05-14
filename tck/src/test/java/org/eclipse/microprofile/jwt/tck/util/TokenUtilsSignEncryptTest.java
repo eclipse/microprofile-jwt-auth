@@ -22,7 +22,6 @@ package org.eclipse.microprofile.jwt.tck.util;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +49,27 @@ public class TokenUtilsSignEncryptTest {
         validateToken(token, true);
     }
 
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS,
+            description = "Illustrate an encryption of the nested JWT")
+    public void testEncryptECSignedClaims() throws Exception {
+        String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.ES256);
+        validateToken(token, SignatureAlgorithm.ES256, true);
+    }
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT",
+            expectedExceptions = {InvalidJwtException.class})
+    public void testNestedSignedByRSKeyVerifiedByECKey() throws Exception {
+        String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.RS256);
+        validateToken(token, SignatureAlgorithm.ES256, true);
+    }
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT",
+            expectedExceptions = {InvalidJwtException.class})
+    public void testNestedSignedByECKeyVerifiedByRSKey() throws Exception {
+        String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.ES256);
+        validateToken(token, SignatureAlgorithm.RS256, true);
+    }
+
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
             description = "Illustrate validation failure if signed token is encrypted and no 'cty' header is set")
     public void testEncryptSignedClaimsWithoutCty() throws Exception {
@@ -75,7 +95,10 @@ public class TokenUtilsSignEncryptTest {
     }
 
     private void validateToken(String jweCompact, boolean jwtExpected) throws Exception {
+        validateToken(jweCompact, SignatureAlgorithm.RS256, jwtExpected);
+    }
 
+    private void validateToken(String jweCompact, SignatureAlgorithm signatureAlgorithm, boolean jwtExpected) throws Exception {
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setAlgorithmConstraints(
            new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RSA-OAEP"));
@@ -94,7 +117,9 @@ public class TokenUtilsSignEncryptTest {
         }
 
         // verify the nested token
-        RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readPublicKey("/publicKey.pem");
+        PublicKey publicKey = signatureAlgorithm == SignatureAlgorithm.RS256 ? TokenUtils.readPublicKey("/publicKey.pem")
+                : TokenUtils.readECPublicKey("/ecPublicKey.pem");
+
         int expGracePeriodSecs = 60;
 
         JwtConsumerBuilder builder = new JwtConsumerBuilder();
@@ -106,7 +131,7 @@ public class TokenUtilsSignEncryptTest {
         builder.setRequireIssuedAt();
         // 'RS256' is required
         builder.setJwsAlgorithmConstraints(
-           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RS256"));
+           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, signatureAlgorithm.getAlgorithm()));
 
         // issuer must be equal to TCKConstants.TEST_ISSUER
         builder.setExpectedIssuer(true, TCKConstants.TEST_ISSUER);

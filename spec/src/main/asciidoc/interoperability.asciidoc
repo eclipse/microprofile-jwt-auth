@@ -40,8 +40,10 @@ the MicroProfile services the token will be accessed with.
 The required minimum set of MP-JWT headers and claims is:
 
 typ:: This JOSE header parameter identifies the token as an RFC7519 and must be "JWT" https://tools.ietf.org/html/rfc7519#section-5.1[RFC7519, Section 5.1]
-alg:: This JOSE header parameter identifies the cryptographic algorithm used to secure the JWT. RSASSA-PKCS1-v1_5 SHA-256 algorithm is required for signing the claims and must be specified as "RS256", https://tools.ietf.org/html/rfc7515#section-4.1.1[RFC7515, Section 4.1.1]. RSAES using Optimal Asymmetric Encryption Padding and AES in Galois/Counter Mode (GCM) algorithms are required for
-encrypting the claims and must be specified as "RSA-OAEP", https://tools.ietf.org/html/rfc7518#section-4.3[RFC7518, Section 4.3] and "A256GCM", https://tools.ietf.org/html/rfc7518#section-5.3[RFC7518, Section 5.3]
+alg:: This JOSE header parameter identifies the cryptographic algorithm used to secure the JWT.
+    - RSASSA-PKCS1-v1_5 SHA-256 or ECDSA using P-256 and SHA-256 algorithm are required when the claims have to be signed and must be specified as either "RS256", https://tools.ietf.org/html/rfc7518#section-3.3[RFC7518, Section 3.3] or "ES256", https://tools.ietf.org/html/rfc7518#section-3.4[RFC7515, Section 3.4].
+    - RSAES using Optimal Asymmetric Encryption Padding algorithm is required when the claims or nested JWT tokens have to be encrypted. It is used for encrypting the content encryption key and must be specified as "RSA-OAEP", https://tools.ietf.org/html/rfc7518#section-4.3[RFC7518, Section 4.3].
+enc:: This JOSE header parameter is only required when the claims or nested JWT tokens have to be encrypted. It identifies the cryptographic algorithm used to encrypt the claims or nested JWT tokens. AES in Galois/Counter Mode (GCM) algorithm is required and must be specified as "A256GCM", https://tools.ietf.org/html/rfc7518#section-5.3[RFC7518, Section 5.3]
 kid:: This JOSE header parameter is a hint indicating which key was used to secure the JWT. https://tools.ietf.org/html/rfc7515#section-4.1.4[RFC7515, Section-4.1.4]
 iss:: The MP-JWT issuer. https://tools.ietf.org/html/rfc7519#section-4.1.1[RFC7519, Section 4.1.1]
 sub:: Identifies the principal that is the subject of the JWT. See the "upn" claim for how this relates to the container
