@@ -46,7 +46,7 @@ import java.util.Properties;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.eclipse.microprofile.jwt.config.Names.ISSUER;
-import static org.eclipse.microprofile.jwt.config.Names.TOKEN_COOKIE;
+import static org.eclipse.microprofile.jwt.config.Names.TOKEN_HEADER;
 import static org.eclipse.microprofile.jwt.config.Names.VERIFIER_PUBLIC_KEY_LOCATION;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
 
@@ -59,7 +59,7 @@ public class TokenAsCookieTest extends Arquillian {
         Properties configProps = new Properties();
         configProps.setProperty(VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey.pem");
         configProps.setProperty(ISSUER, TCKConstants.TEST_ISSUER);
-        configProps.setProperty(TOKEN_COOKIE, "Cookie");
+        configProps.setProperty(TOKEN_HEADER, "Cookie");
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "PublicKeyAsJWKTest JWK microprofile-config.properties");
         StringAsset config = new StringAsset(configSW.toString());
