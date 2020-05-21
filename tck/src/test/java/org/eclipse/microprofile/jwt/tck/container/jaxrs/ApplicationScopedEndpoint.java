@@ -50,7 +50,7 @@ public class ApplicationScopedEndpoint {
     private ClaimValue<String> rawToken;
 
     @Inject
-    @Claim("raw_roken")
+    @Claim("raw_token")
     private Provider<String> providedRawToken;
 
     @GET
