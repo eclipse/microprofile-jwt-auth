@@ -80,7 +80,7 @@ public class ApplicationScopedInjectionTest extends Arquillian {
             .create(WebArchive.class, "ClaimValueInjectionTest.war")
             .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(ClaimValueInjectionEndpoint.class)
+            .addClass(ApplicationScopedEndpoint.class)
             .addClass(TCKApplication.class)
             .addAsWebInfResource("beans.xml", "beans.xml")
             .addAsManifestResource(config, "microprofile-config.properties");
