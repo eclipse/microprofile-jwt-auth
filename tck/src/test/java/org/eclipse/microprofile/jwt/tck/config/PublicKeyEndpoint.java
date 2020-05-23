@@ -375,8 +375,10 @@ public class PublicKeyEndpoint {
                 StringBuilder msgBuilder = new StringBuilder();
                 JsonObject jwk = Json.createReader(new StringReader(jwkValue)).readObject();
                 if(verifyJWK(jwk, kid, msgBuilder)) {
-                    PublicKey publicKey = SimpleTokenUtils.decodeJWKSPublicKey(jwkValue);
-                    log.info(String.format("verifyKeyLocationAsJWKResource, publicKey=%s", publicKey));
+                    if ("RS256".equals(algorithm)) {
+                        PublicKey publicKey = SimpleTokenUtils.decodeJWKSPublicKey(jwkValue);
+                        log.info(String.format("verifyKeyLocationAsJWKResource, publicKey=%s", publicKey));
+                    }
                     msg = "key location as resource to JWK PASS";
                     pass = true;
                 }
@@ -723,8 +725,8 @@ public class PublicKeyEndpoint {
             }
         }
         else if ("ES256".equals(algorithm)) {
-            if(!key.getJsonString("crv").getString().equals("P256")) {
-                msg.append("crv != P256");
+            if(!key.getJsonString("crv").getString().equals("P-256")) {
+                msg.append("crv != P-256");
                 pass = false;
             }
             if(!key.getJsonString("x").getString().startsWith("w4HohvwOj21FBQE1Pr")) {
