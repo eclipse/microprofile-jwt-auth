@@ -19,9 +19,31 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JWT;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_ISSUER;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.PrivateKey;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
+import org.eclipse.microprofile.jwt.tck.util.TokenUtils.InvalidClaims;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -33,23 +55,6 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JWT;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_ISSUER;
 
 /**
  * Test to ensure that a MP-JWT containing only the minimum set of
@@ -97,7 +102,7 @@ public class RequiredClaimsTest extends Arquillian {
 
     @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
-        HashMap<String, Long> timeClaims = new HashMap<>();
+        Map<String, Long> timeClaims = new HashMap<>();
         token = TokenUtils.generateTokenString("/RequiredClaims.json", null, timeClaims);
         iatClaim = timeClaims.get(Claims.iat.name());
         authTimeClaim = timeClaims.get(Claims.auth_time.name());
@@ -254,5 +259,51 @@ public class RequiredClaimsTest extends Arquillian {
         JsonObject reply = jsonReader.readObject();
         Reporter.log(reply.toString());
         Assert.assertTrue(reply.getBoolean("pass"), reply.getString("msg"));
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JWT,
+            description = "Verify that HTTP 401 status is returned if the token contains no exp claim")
+    public void verifyTokenWithoutExpiration() throws Exception {
+        PrivateKey pk = TokenUtils.readPrivateKey("/privateKey.pem");
+        String tokenWithoutExp =
+            TokenUtils.signClaims(pk, "1", "/TokenWithoutExp.json", Collections.singleton(InvalidClaims.EXP), null);
+        Reporter.log("Begin verifyTokenWithoutExpiration\n");
+        String uri = baseURL.toExternalForm() + "endp/verifyTokenWithoutExpiration";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+                .target(uri);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,
+            "Bearer " + tokenWithoutExp).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JWT,
+            description = "Verify that HTTP 401 status is returned if the token contains no 'upn', 'preferred_username' and 'sub' claims")
+    public void verifyTokenWithoutName() throws Exception {
+        String tokenWithoutName = TokenUtils.signClaims("/TokenWithoutName.json");
+        Reporter.log("Begin verifyTokenWithoutName\n");
+        String uri = baseURL.toExternalForm() + "endp/verifyTokenWithoutName";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+                .target(uri);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,
+            "Bearer " + tokenWithoutName).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JWT,
+            description = "Verify that HTTP 401 status is returned if the token 'iat' claim is older than 'exp' claim")
+    public void verifyTokenWithIatOlderThanExp() throws Exception {
+        PrivateKey pk = TokenUtils.readPrivateKey("/privateKey.pem");
+        String tokenWithIatOlderThanExp =
+            TokenUtils.signClaims(pk, "1", "/TokenWithIatOlderThanExp.json", Collections.singleton(InvalidClaims.IAT), null);
+        Reporter.log("Begin verifyTokenWithIatOlderThanExp\n");
+        String uri = baseURL.toExternalForm() + "endp/verifyTokenWithIatOlderThanExp";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+                .target(uri);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,
+            "Bearer " + tokenWithIatOlderThanExp).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 }

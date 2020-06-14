@@ -35,34 +35,45 @@ To meet those requirements, we introduce 2 new claims to the MP-JWT:
 the MicroProfile services the token will be accessed with.
 * "groups": A list of group names to be assigned to the principal of the MP-JWT. This typically will require a mapping at the application container level to application roles. A one-to-one mapping between group names and application role names is done by default when no custom mapping is defined in an implementation specific way.
 
-### Minimum MP-JWT Header and Claim Requirements
+### Required and Recommended MP-JWT Headers and Claims
 
-The required minimum set of MP-JWT headers and claims is:
+#### Required MP-JWT Headers
 
-typ:: This JOSE header parameter identifies the token as an RFC7519 and must be "JWT" https://tools.ietf.org/html/rfc7519#section-5.1[RFC7519, Section 5.1]
 alg:: This JOSE header parameter identifies the cryptographic algorithm used to secure the JWT.
     - RSASSA-PKCS1-v1_5 SHA-256 or ECDSA using P-256 and SHA-256 algorithm are required when the claims have to be signed and must be specified as either "RS256", https://tools.ietf.org/html/rfc7518#section-3.3[RFC7518, Section 3.3] or "ES256", https://tools.ietf.org/html/rfc7518#section-3.4[RFC7515, Section 3.4].
     - RSAES using Optimal Asymmetric Encryption Padding algorithm is required when the claims or nested JWT tokens have to be encrypted. It is used for encrypting the content encryption key and must be specified as "RSA-OAEP", https://tools.ietf.org/html/rfc7518#section-4.3[RFC7518, Section 4.3].
 enc:: This JOSE header parameter is only required when the claims or nested JWT tokens have to be encrypted. It identifies the cryptographic algorithm used to encrypt the claims or nested JWT tokens. AES in Galois/Counter Mode (GCM) algorithm is required and must be specified as "A256GCM", https://tools.ietf.org/html/rfc7518#section-5.3[RFC7518, Section 5.3]
-kid:: This JOSE header parameter is a hint indicating which key was used to secure the JWT. https://tools.ietf.org/html/rfc7515#section-4.1.4[RFC7515, Section-4.1.4]
-iss:: The MP-JWT issuer. https://tools.ietf.org/html/rfc7519#section-4.1.1[RFC7519, Section 4.1.1]
-sub:: Identifies the principal that is the subject of the JWT. See the "upn" claim for how this relates to the container
- java.security.Principal. https://tools.ietf.org/html/rfc7519#section-4.1.2[RFC7519, Section 4.1.2]
+
+#### Recommended MP-JWT headers
+
+typ:: This JOSE header parameter identifies the token as an RFC7519 and should be "JWT". https://tools.ietf.org/html/rfc7519#section-5.1[RFC7519, Section 5.1]
+kid:: This JOSE header parameter is a hint indicating which key was used to secure the JWT. https://tools.ietf.org/html/rfc7515#section-4.1.4[RFC7515, Section-4.1.4]. It may need to be set if the verification key is in the JWK format.
+
+#### Required MP-JWT claims
+iss:: Identifies the token issuer
+iat:: Identifies the time at which the JWT was issued. This claim can be used to determine the age of the JWT.  Its
+    value MUST be a number containing a NumericDate value. https://tools.ietf.org/html/rfc7519#section-4.1.6[RFC7519, Section 4.1.6]
 exp:: Identifies the expiration time on or after which the JWT MUST NOT be accepted for processing.  The processing of the
     "exp" claim requires that the current date/time MUST be before the expiration date/time listed in the "exp" claim.
     Implementers MAY provide for some small leeway, usually no more than a few minutes, to account for clock skew.
     Its value MUST be a number containing a NumericDate value. https://tools.ietf.org/html/rfc7519#section-4.1.4[RFC7519, Section 4.1.4]
-iat:: Identifies the time at which the JWT was issued.  This claim can be used to determine the age of the JWT.  Its
-    value MUST be a number containing a NumericDate value. https://tools.ietf.org/html/rfc7519#section-4.1.6[RFC7519, Section 4.1.6]
+upn (or preferred_username or sub):: MP-JWT "upn" claim is the user principal name in the java.security.Principal interface, and is the caller
+    principal name in javax.security.enterprise.identitystore.IdentityStore. If this claim is missing, fallback to
+    the http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims["preferred_username", OIDC Section 5.1] should be
+    attempted, and if that claim is missing, fallback to the "sub" claim should be used.
+
+#### Recommended MP-JWT claims
+
+sub:: Uniquely identifies the principal that is the subject of the JWT. See the "upn" claim for how this relates to the container
+ java.security.Principal. https://tools.ietf.org/html/rfc7519#section-4.1.2[RFC7519, Section 4.1.2].
 jti:: Provides a unique identifier for the JWT. The identifier value MUST be assigned in a manner that ensures that
     there is a negligible probability that the same value will be accidentally assigned to a different data object;
     if the application uses multiple issuers, collisions MUST be prevented among values produced by different issuers
     as well.  The "jti" claim can be used to prevent the JWT from being replayed.  The "jti" value is a case-sensitive
     string. https://tools.ietf.org/html/rfc7519#section-4.1.7[RFC7519, Section 4.1.7]
-upn:: This MP-JWT custom claim is the user principal name in the java.security.Principal interface, and is the caller
-    principal name in javax.security.enterprise.identitystore.IdentityStore. If this claim is missing, fallback to
-    the http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims["preferred_username", OIDC Section 5.1] should be
-    attempted, and if that claim is missing, fallback to the "sub" claim should be used.
+aud:: Identifies the MP JWT endpoint(s) which can be accessed by JWT. https://tools.ietf.org/html/rfc7519#section-4.1.3[RFC7519, Section 4.1.3]
+
+[NOTE] MP JWT implementations may enforce that JWT tokens contain all the recommended headers and claims. The recommended headers and claims may become required in the future versions of the MP JWT specification.
 
 [NOTE] It is recommended that JWT tokens have a `groups` claim if the endpoint requires Authorization but MP JWT implementations can map the groups from the other claims if the tokens have been issued by OpenId Connect and other providers which currently do not support MP JWT.
 
@@ -393,16 +404,18 @@ underlying implementation container.
 
 ## Requirements for Rejecting MP-JWT Tokens
 
-The MP-JWT specification requires that an MP-JWT implementation reject a bearer token as an
+The MP-JWT specification requires that an MP-JWT implementation reject a JWT token as an
 invalid MP-JWT token if any of the following conditions are not met:
 
-1. The JWT must have a JOSE header that indicates the token was signed using the RS256 algorithm when the service endpoint expects signed tokens.
-2. The JWT must have a JOSE header that indicates the token was encrypted using the RSA-OAEP and A256GCM algorithms when the service endpoint expects encrypted tokens. If the encrypted content is a nested signed JWT token then it must meet the condition 1.
-3. The JWT must have an iss claim representing the token issuer that maps to an MP-JWT implementation
-container runtime configured value. Any issuer other than those issuers that have been whitelisted
-by the container configuration must be rejected with an HTTP_UNAUTHENTICATED(401) error.
-4. The JWT signer must have a public key that maps to an MP-JWT implementation container runtime
-configured value when service endpoint is configured to verify the signed tokens and the JWT encryptor must have a private key that maps to an MP-JWT implementation container runtime configured value when service endpoint is configured to decrypt the encrypted tokens. Any public or private key other than those that have been whitelisted by the container configuration must be rejected with an HTTP_UNAUTHENTICATED(401) error.
+1. The JWT must have a JOSE "alg" header that indicates the token was signed using the RS256 or ES256 algorithm when the service endpoint expects signed tokens.
+2. The JWT must have the JOSE "alg" and "enc" headers that indicate that the token was encrypted using the RSA-OAEP and A256GCM algorithms when the service endpoint expects encrypted tokens.
+   If the encrypted content is a nested signed JWT token then it must meet the condition 1.
+3. The JWT must have an "iss" claim representing the token issuer that maps to an MP-JWT implementation container runtime configured value.
+   Any issuer other than those issuers that have been whitelisted by the container configuration must be rejected with an HTTP_UNAUTHENTICATED(401) error.
+4. The JWT must have an "iat" claim representing the token issuance time. It is impossible to calculate how long the token may have been used for without the "iat" claim so such tokens must be rejected with an HTTP_UNAUTHENTICATED(401) error.
+5. The JWT must have an "exp" claim representing the token expiration time. Tokens without the "exp" claim have an unlimited lifetime and must be rejected with an HTTP_UNAUTHENTICATED(401) error.
+6. The token must have at least one of "upn" or "preferred_username" or "sub" claim for Java Principal to have a name. Tokens from which no Principal name can be deduced must be rejected with an HTTP_UNAUTHENTICATED(401) error.
+7. The signed JWT token verification and encrypted JWT token decryption failures must lead to an HTTP_UNAUTHENTICATED(401) error.
 
 ## Mapping MP-JWT Tokens to Java EE Container APIs
 

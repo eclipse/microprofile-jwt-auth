@@ -1,0 +1,7 @@
+{
+    "iss": "https://server.example.com",
+    "jti": "a-f2b2180c",
+    "exp": 1311281970,
+    "iat": 1311280970,
+    "groups": ["Tester"]
+}

@@ -19,8 +19,8 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.Claims;
-import org.eclipse.microprofile.jwt.JsonWebToken;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
@@ -32,8 +32,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Optional;
-import java.util.Set;
+import javax.ws.rs.core.Response;
+
+import org.eclipse.microprofile.jwt.Claims;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 @Path("/endp")
 @RequestScoped
@@ -262,5 +264,22 @@ public class RequiredClaimsEndpoint {
         return result;
     }
 
+    @GET
+    @Path("/verifyTokenWithoutExpiration")
+    public Response verifyTokenWithoutExpiration() {
+        throw new RuntimeException("This method must not be invoked");
+    }
+
+    @GET
+    @Path("/verifyTokenWithoutClaim")
+    public Response verifyTokenWithoutClaim() {
+        throw new RuntimeException("This method must not be invoked");
+    }
+
+    @GET
+    @Path("/verifyTokenWithIatOlderThanExp")
+    public Response verifyTokenWithIatOlderThanExp() {
+        throw new RuntimeException("This method must not be invoked");
+    }
 }
 
