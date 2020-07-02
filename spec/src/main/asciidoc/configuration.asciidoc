@@ -47,9 +47,11 @@ HTTPS request.
 
 ### Supported Signature Algorithms
 
-Support for RSA RS256 and Elliptical Curve Digital Signature Algorithm (ECDSA) ES256 is required.
+Support for RSA RS256 and Elliptic Curve Digital Signature Algorithm (ECDSA) ES256 is required.
 RSA keys used for creating and verifying RS256 signatures must be of 1024 or 2048 bits in length.
 Other RSA key sizes are allowed, but should be considered vendor-specific.
+
+[NOTE] Support for RSA keys of 1024 bits in length is deprecated and will become optional in the next major version of the MP JWT specification.
 
 Other asymmetric signature algorithms are allowed, but should be considered vendor-specific.
 This includes Digital Signature Algorithm (DSA), Diffie-Hellman (DS), Edwards-curve Digital Signature

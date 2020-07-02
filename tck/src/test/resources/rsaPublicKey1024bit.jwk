@@ -1,0 +1,7 @@
+{
+  "kty":"RSA",
+  "kid": "1024bit",
+  "alg": "RS256",
+  "n":"gSP-Hczm79MiY4sIkGcNlT5oWWh29cxmu8yk9Jqx4GiSP_R4BhY4TqKeHMeiwn64VLQH24ux3kgtQgkvtAUt2X_toDy9LBpO3EvDfZXVabe34BqJY3ppaFtrfsYqwwhhZ0y5xpKmQy_Vtl_Hi2ps4L3hnxHbPvzCfFp4k0E1UZM",
+  "e":"AQAB"
+}

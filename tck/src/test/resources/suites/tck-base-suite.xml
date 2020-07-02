@@ -83,6 +83,7 @@
             <class name="org.eclipse.microprofile.jwt.tck.config.jwe.PrivateKeyAsPEMClasspathTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.jwe.PrivateKeyAsJWKClasspathTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.jwe.PrivateKeyAsJWKSClasspathTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.config.jwe.RsaKeySignatureTest" />
         </classes>
     </test>
 

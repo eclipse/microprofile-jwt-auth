@@ -19,6 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.util;
 
+import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,6 +67,13 @@ public class TokenUtilsTest {
         validateToken(token);
     }
     
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT")
+    public void testValidToken1024BitKeyLength() throws Exception {
+        KeyPair pair = TokenUtils.generateKeyPair(1024);
+        String token = TokenUtils.signClaims(pair.getPrivate(), "kid", "/Token1.json", null, null);
+        validateToken(token, pair.getPublic(), SignatureAlgorithm.RS256, null);
+    }
+
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT")
     public void testValidTokenEC256() throws Exception {
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.ES256);
@@ -207,9 +215,13 @@ public class TokenUtilsTest {
     }
 
     private void validateToken(String token, SignatureAlgorithm algorithm, Long expectedExpValue) throws Exception {
-
         PublicKey publicKey = algorithm == SignatureAlgorithm.RS256 ? TokenUtils.readPublicKey("/publicKey.pem")
-            : TokenUtils.readECPublicKey("/ecPublicKey.pem");
+                : TokenUtils.readECPublicKey("/ecPublicKey.pem");
+        validateToken(token, publicKey, algorithm, expectedExpValue);    
+    }
+
+    private void validateToken(String token, PublicKey publicKey, SignatureAlgorithm algorithm, Long expectedExpValue) throws Exception {
+
         int expGracePeriodSecs = 60;
 
         JwtConsumerBuilder builder = new JwtConsumerBuilder();
@@ -227,7 +239,7 @@ public class TokenUtilsTest {
         builder.setExpectedIssuer(true, TCKConstants.TEST_ISSUER);
         builder.setVerificationKey(publicKey);
         builder.setAllowedClockSkewInSeconds(expGracePeriodSecs);
-
+        builder.setRelaxVerificationKeyValidation();
         JwtClaims claimsSet = builder.build().processToClaims(token);
         // Confirm all the claims available in /Token1.json have made it into the verified claimSet
 
