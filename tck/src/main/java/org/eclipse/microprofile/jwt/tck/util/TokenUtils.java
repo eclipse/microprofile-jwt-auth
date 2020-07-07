@@ -243,6 +243,7 @@ public class TokenUtils {
             }
             jws.setKey(pk);   
         }
+        jws.setDoKeyValidation(false);
         return jws.getCompactSerialization();
     }
 
