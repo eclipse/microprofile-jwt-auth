@@ -57,6 +57,7 @@
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.AudValidationBadAudTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.AudValidationMissingAudTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ApplicationScopedInjectionTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RsaKeySignatureTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMLocationTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.PublicKeyAsPEMLocationURLTest" />
@@ -70,8 +71,6 @@
             <class name="org.eclipse.microprofile.jwt.tck.config.ECPublicKeyAsPEMTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.ECPublicKeyAsPEMLocationTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.ECPublicKeyAsJWKLocationTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.IssNoValidationNoIssTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.IssNoValidationBadIssTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.IssValidationFailTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.CookieTokenTest" />
@@ -83,7 +82,6 @@
             <class name="org.eclipse.microprofile.jwt.tck.config.jwe.PrivateKeyAsPEMClasspathTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.jwe.PrivateKeyAsJWKClasspathTest" />
             <class name="org.eclipse.microprofile.jwt.tck.config.jwe.PrivateKeyAsJWKSClasspathTest" />
-            <class name="org.eclipse.microprofile.jwt.tck.config.jwe.RsaKeySignatureTest" />
         </classes>
     </test>
 

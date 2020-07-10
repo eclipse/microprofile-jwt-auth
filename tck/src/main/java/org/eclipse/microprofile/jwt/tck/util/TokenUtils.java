@@ -478,17 +478,21 @@ public class TokenUtils {
         long currentTimeInSecs = currentTimeInSecs();
         long exp = currentTimeInSecs + 300;
         long iat = currentTimeInSecs;
-        long authTime = currentTimeInSecs;
+        long authTime = iat;
         boolean expWasInput = false;
         // Check for an input exp to override the default of now + 300 seconds
         if (timeClaims != null && timeClaims.containsKey(Claims.exp.name())) {
             exp = timeClaims.get(Claims.exp.name());
             expWasInput = true;
         }
-        // iat and auth_time should be before any input exp value
+        // iat and auth_time should be before any input exp value unless 'iat' is expected to be invalid
         if (expWasInput) {
             iat = exp - 5;
-            authTime = exp - 5;
+            authTime = iat;
+        }
+        else if (invalidClaims.contains(InvalidClaims.IAT)) {
+            iat = exp + 5;
+            authTime = iat;
         }
         claims.setIssuedAt(NumericDate.fromSeconds(iat));
         claims.setClaim(Claims.auth_time.name(), authTime);
@@ -705,6 +709,7 @@ public class TokenUtils {
      */
     public enum InvalidClaims {
         ISSUER, // Set an invalid issuer
+        IAT,    // Set an invalid issuance time
         EXP,    // Set an invalid expiration
         SIGNER, // Sign the token with the incorrect private key
         ENCRYPTOR, // Encrypt the token with the incorrect public key
