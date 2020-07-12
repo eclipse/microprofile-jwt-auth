@@ -86,7 +86,7 @@ vendor-specific key formats.
 MicroProfile JWT implementations are required to throw a `DeploymentException` when given
 a Private Key in any format.
 
-#### PCKS#8
+#### PKCS#8
 
 Public Key Cryptography Standards #8 (PKCS#8) PEM format is a plain text format and is the
 default format for OpenSSL, many public/private key tools and is natively supported in
@@ -112,7 +112,7 @@ OQIDAQAB
 ----
 
 MicroProfile JWT implementations must inspect the supplied Public Key body for the
-`-----BEGIN PUBLIC KEY-----` header and parse the key as PCKS#8 if found.
+`-----BEGIN PUBLIC KEY-----` header and parse the key as PKCS#8 if found.
 
 Support for the legacy PKCS#1 format is not required and should be considered vendor-specific.
 PKCS#1 formatted keys can be identified by the use of the `-----BEGIN RSA PUBLIC KEY-----`.
