@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2016-2018 Eclipse Microprofile Contributors:
+// Copyright (c) 2016-2020 Eclipse Microprofile Contributors:
 // Red Hat
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,20 +14,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-## Release Notes
+[[release_notes_12]]
+== Release Notes for MicroProfile JWT 1.2
 
-### Changes in 1.1.1-RC2
+A full list of changes delivered in the 1.2 release can be found at link:https://github.com/eclipse/microprofile-jwt-auth/milestone/7[MicroProfile JWT 1.2 Milestone].
+
+=== API Changes
+
+- A convenience method has been added to allow retrieving claims from `JsonWebToken` by using the `Claims` enum (link:https://github.com/eclipse/microprofile-jwt-auth/issues/154[#154])
+
+=== Spec Changes
+
+- Support for verifying JWT tokens which have been signed using Elliptic Curve `ES256` signature algorithm (link:https://github.com/eclipse/microprofile-jwt-auth/issues/161[#161])
+- Support for decrypting JWT tokens which have been encrypted using `RSA-OAEP` and `A256GCM` algorithms and contain the claims or inner-signed JWT tokens (link:https://github.com/eclipse/microprofile-jwt-auth/issues/58[#58])
+- Support for JWT audience `aud` claim (link:https://github.com/eclipse/microprofile-jwt-auth/issues/121[#121])
+- Support for JWT token cookies (link:https://github.com/eclipse/microprofile-jwt-auth/issues/93[#93])
+- JWT token `groups` claim is now optional (link:https://github.com/eclipse/microprofile-jwt-auth/issues/129[#129])
+- Better specification of the injection point (link:https://github.com/eclipse/microprofile-jwt-auth/issues/116[#116], link:https://github.com/eclipse/microprofile-jwt-auth/issues/127[#127]), scope (link:https://github.com/eclipse/microprofile-jwt-auth/issues/45[#45], link:https://github.com/eclipse/microprofile-jwt-auth/issues/183[#183]) and required claims (link:https://github.com/eclipse/microprofile-jwt-auth/issues/128[#128]) requirements
+- Support for RSA keys of 1024 bit length has been deprecated (link:https://github.com/eclipse/microprofile-jwt-auth/issues/197[#197])
+
+=== Other Changes
+
+- New TCK tests
+- TCK tests now use `Jose4J` to sign and encrypt the tokens.
+
+[[release_notes_111]]
+== Release Notes for MicroProfile JWT 1.1.1
+
+=== Changes in 1.1.1-RC2
 
 This candidate patch release provides one additional TCK test fix, and information on how to use the MP-JWT
 configuration properties as environment variables on platforms that don't allow dots '.' in their names.
 
 There are no API changes.
 
-#### Closed Issues in 1.1.1-RC2
+=== Closed Issues in 1.1.1-RC2
 https://github.com/eclipse/microprofile-jwt-auth/issues/104
 https://github.com/eclipse/microprofile-jwt-auth/issues/107
 
-### Changes in 1.1.1-RC1
+=== Changes in 1.1.1-RC1
 This is a candidate patch release that provides fixes to the TCK tests that were seen to have issues in different implementations.
 The TCK tests WARs now include a META-INF/MPJWTTESTVERSION resource that contains the major/minor version string enum for the MP-JWT version the test WAR is targeting. Currently the versions enums are:
 
@@ -41,13 +66,14 @@ public enum MpJwtTestVersion {
 
 There are no API changes.
 
-#### Closed Issues in 1.1.1-RC1
+=== Closed Issues in 1.1.1-RC1
 * https://github.com/eclipse/microprofile-jwt-auth/issues/104
 * https://github.com/eclipse/microprofile-jwt-auth/issues/103
 * https://github.com/eclipse/microprofile-jwt-auth/issues/98
 
+[[release_notes_11]]
+== Release Notes for MicroProfile JWT 1.1
 
-### Changes in 1.1
 The focus of this release was to add support for configuring the public key and issuer needed for verification of the MP-JWT using MicroProfile Config. The new MicroProfile Config properties are:
 
 mp.jwt.verify.publickey:: The embedded key material of the public key for the MP-JWT signer in PKCS8 PEM or JWK(S) format. If not found the mp.jwt.verify.publickey.location needs to be checked.
