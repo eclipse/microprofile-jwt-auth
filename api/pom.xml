@@ -112,6 +112,10 @@
                 <version>${bnd.version}</version>
                 <configuration>
                     <fullReport>true</fullReport>
+                    <base>
+                        <version>1.1</version>
+                    </base>
+                    <includeDistributionManagement>false</includeDistributionManagement>
                 </configuration>
                 <executions>
                     <execution>
