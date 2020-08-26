@@ -10,7 +10,6 @@
 target/
 tck/bin/
 .project
-build/
 .classpath
 .factorypath
 test-output
