@@ -61,7 +61,7 @@ public class TokenAsCookieTest extends Arquillian {
         configProps.setProperty(ISSUER, TCKConstants.TEST_ISSUER);
         configProps.setProperty(TOKEN_HEADER, "Cookie");
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "PublicKeyAsJWKTest JWK microprofile-config.properties");
+        configProps.store(configSW, "TokenAsCookieTest microprofile-config.properties");
         StringAsset config = new StringAsset(configSW.toString());
 
         URL publicKey = InvalidTokenTest.class.getResource("/publicKey.pem");
