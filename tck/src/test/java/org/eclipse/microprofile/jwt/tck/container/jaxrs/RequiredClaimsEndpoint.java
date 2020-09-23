@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -271,6 +271,12 @@ public class RequiredClaimsEndpoint {
     }
 
     @GET
+    @Path("/verifyTokenWithoutName")
+    public Response verifyTokenWithoutName() {
+        throw new RuntimeException("This method must not be invoked");
+    }
+
+    @GET
     @Path("/verifyTokenWithoutClaim")
     public Response verifyTokenWithoutClaim() {
         throw new RuntimeException("This method must not be invoked");
@@ -282,4 +288,3 @@ public class RequiredClaimsEndpoint {
         throw new RuntimeException("This method must not be invoked");
     }
 }
-
