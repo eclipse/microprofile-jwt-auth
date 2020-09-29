@@ -61,15 +61,14 @@ public class TokenAsCookieIgnoredTest extends Arquillian {
         Properties configProps = new Properties();
         configProps.setProperty(VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey.pem");
         configProps.setProperty(ISSUER, TCKConstants.TEST_ISSUER);
-        configProps.setProperty(TOKEN_COOKIE, "Authorization");
         configProps.setProperty(TOKEN_COOKIE, "jwt");
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "PublicKeyAsJWKTest JWK microprofile-config.properties");
+        configProps.store(configSW, "TokenAsCookieIgnoredTest microprofile-config.properties");
         StringAsset config = new StringAsset(configSW.toString());
 
         URL publicKey = InvalidTokenTest.class.getResource("/publicKey.pem");
         return ShrinkWrap
-            .create(WebArchive.class, "TokenAsCookie.war")
+            .create(WebArchive.class, "TokenAsCookieIgnored.war")
             .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(TCKApplication.class)
