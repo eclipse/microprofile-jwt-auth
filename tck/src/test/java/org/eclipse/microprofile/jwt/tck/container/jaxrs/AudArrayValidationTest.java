@@ -98,7 +98,7 @@ public class AudArrayValidationTest extends Arquillian {
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         configProps.setProperty(Names.AUDIENCES, "aud3,badAud,aud1");  // matches json, should pass
         StringWriter configSW = new StringWriter();
-        configProps.store(configSW, "AudValidationTest microprofile-config.properties");
+        configProps.store(configSW, "AudArrayValidationTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap

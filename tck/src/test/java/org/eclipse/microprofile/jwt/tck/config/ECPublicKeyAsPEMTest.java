@@ -75,7 +75,7 @@ public class ECPublicKeyAsPEMTest extends Arquillian {
         URL config = ECPublicKeyAsPEMTest.class.getResource("/META-INF/microprofile-config-ecpublickey.properties");
 
         WebArchive webArchive = ShrinkWrap
-                .create(WebArchive.class, "PublicKeyAsPEMTest.war")
+                .create(WebArchive.class, "ECPublicKeyAsPEMTest.war")
             .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
                 .addClass(PublicKeyEndpoint.class)
                 .addClass(TCKApplication.class)
