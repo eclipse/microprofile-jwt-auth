@@ -42,7 +42,7 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
 
 public class EmptyTokenTest extends Arquillian {
@@ -69,7 +69,7 @@ public class EmptyTokenTest extends Arquillian {
     public void emptyToken() {
         String uri = baseURL.toExternalForm() + "endp/verifyEmptyToken";
         WebTarget echoEndpointTarget = ClientBuilder.newClient().target(uri);
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
+        Response response = echoEndpointTarget.request(APPLICATION_JSON).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -86,7 +86,7 @@ public class EmptyTokenTest extends Arquillian {
                                                     .target(uri)
                                                     .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
+            .request(APPLICATION_JSON)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + "something")
             .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
@@ -103,7 +103,7 @@ public class EmptyTokenTest extends Arquillian {
                                                     .target(uri)
                                                     .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
+            .request(APPLICATION_JSON)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
             .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
