@@ -77,7 +77,7 @@ public class ApplicationScopedInjectionTest extends Arquillian {
         URL config = ApplicationScopedInjectionTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = ApplicationScopedInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "ClaimValueInjectionTest.war")
+            .create(WebArchive.class, "ApplicationScopedInjectionTest.war")
             .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addAsResource(publicKey, "/publicKey.pem")
             .addClass(ApplicationScopedEndpoint.class)
