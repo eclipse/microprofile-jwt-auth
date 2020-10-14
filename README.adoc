@@ -47,3 +47,6 @@ For links to the latest maven artifacts, Javadoc and specification document, see
 * https://ci.eclipse.org/microprofile/job/JWT-Auth-maven-snapshots/[Snapshot Build Jobs]
 * https://ci.eclipse.org/microprofile/job/MicroProfile%20Releases/[Release Build Jobs]
 
+
+
+image:https://badges.gitter.im/eclipse/microprofile-jwt-auth.svg[link="https://gitter.im/eclipse/microprofile-jwt-auth?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
