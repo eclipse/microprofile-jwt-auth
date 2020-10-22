@@ -27,6 +27,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Properties;
 
@@ -76,10 +77,12 @@ public class PrivateKeyAsJWKSClasspathTest extends Arquillian {
      */
     @Deployment()
     public static WebArchive createLocationDeployment() throws IOException {
+        URL publicKey = PrivateKeyAsPEMClasspathTest.class.getResource("/publicKey4k.pem");
         URL decryptorJwk = PrivateKeyAsJWKSClasspathTest.class.getResource("/decryptorPrivateKeySet.jwk");
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the JWKS bundled in the deployment
+        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey4k.pem");
         configProps.setProperty(Names.DECRYPTOR_KEY_LOCATION, "/decryptorPrivateKeySet.jwk");
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
@@ -88,6 +91,7 @@ public class PrivateKeyAsJWKSClasspathTest extends Arquillian {
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "PrivateKeyAsJWKSClasspathTest.war")
                 .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey4k.pem")
                 .addAsResource(decryptorJwk, "/decryptorPrivateKeySet.jwk")
                 .addClass(PrivateKeyEndpoint.class)
                 .addClass(JwksApplication.class)
@@ -103,9 +107,10 @@ public class PrivateKeyAsJWKSClasspathTest extends Arquillian {
     public void testKeyAsLocation() throws Exception {
         Reporter.log("testKeyAsLocation, expect HTTP_OK");
 
+        PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         PublicKey publicKey = TokenUtils.readJwkPublicKey("/encryptorPublicKey.jwk");
         String kid = "mp-jwt-set";
-        String token = TokenUtils.encryptClaims(publicKey, kid, "/Token1.json");
+        String token = TokenUtils.signEncryptClaims(signingKey, null, publicKey, kid, "/Token1.json", true);
 
         String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyLocationAsJWKSResource";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()

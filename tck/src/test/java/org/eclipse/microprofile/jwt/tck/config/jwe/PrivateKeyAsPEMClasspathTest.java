@@ -27,6 +27,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Properties;
 
@@ -76,10 +77,12 @@ public class PrivateKeyAsPEMClasspathTest extends Arquillian {
      */
     @Deployment()
     public static WebArchive createLocationDeployment() throws IOException {
+        URL publicKey = PrivateKeyAsPEMClasspathTest.class.getResource("/publicKey4k.pem");
         URL privateKey = PrivateKeyAsPEMClasspathTest.class.getResource("/privateKey4k.pem");
         // Setup the microprofile-config.properties content
         Properties configProps = new Properties();
         // Location points to the PEM bundled in the deployment
+        configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey4k.pem");
         configProps.setProperty(Names.DECRYPTOR_KEY_LOCATION, "/privateKey4k.pem");
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
@@ -90,6 +93,7 @@ public class PrivateKeyAsPEMClasspathTest extends Arquillian {
             .create(WebArchive.class, "PrivateKeyAsPEMClasspathTest.war")
             .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
             .addAsResource(privateKey, "/privateKey4k.pem")
+            .addAsResource(publicKey, "/publicKey4k.pem")
             .addClass(PrivateKeyEndpoint.class)
             .addClass(PEMApplication.class)
             .addClass(SimpleTokenUtils.class)
@@ -104,8 +108,9 @@ public class PrivateKeyAsPEMClasspathTest extends Arquillian {
     public void testKeyAsLocationResource() throws Exception {
         Reporter.log("testKeyAsLocationResource, expect HTTP_OK");
 
+        PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         PublicKey publicKey = TokenUtils.readPublicKey("/publicKey4k.pem");
-        String token = TokenUtils.encryptClaims(publicKey, "/Token1.json");
+        String token = TokenUtils.signEncryptClaims(signingKey, null, publicKey, null, "/Token1.json", true);
 
         String uri = baseURL.toExternalForm() + "pem/endp/verifyKeyLocationAsPEMResource";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
