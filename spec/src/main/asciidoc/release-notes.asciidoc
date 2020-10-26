@@ -35,6 +35,7 @@ A full list of changes delivered in the 1.2 release can be found at link:https:/
 
 === Other Changes
 
+- Update to Jakarta APIs for MP 4.0 (https://github.com/eclipse/microprofile-jwt-auth/pull/143[#143])
 - New TCK tests
 - TCK tests now use `Jose4J` to sign and encrypt the tokens.
 
