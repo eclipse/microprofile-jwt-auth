@@ -29,6 +29,7 @@
     <description>Eclipse MicroProfile JWT Feature - TCK</description>
 
     <properties>
+        <version.microprofile.config>1.4</version.microprofile.config>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
         <version.testng>6.10</version.testng>
         <version.jose4j>0.7.0</version.jose4j>
@@ -50,8 +51,7 @@
         <dependency>
             <groupId>org.eclipse.microprofile.config</groupId>
             <artifactId>microprofile-config-api</artifactId>
-            <!-- TODO: Update to the MP 3.3 compliant version -->
-            <version>1.3</version>
+            <version>${version.microprofile.config}</version>
         </dependency>
 
         <dependency>
