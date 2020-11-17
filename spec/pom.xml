@@ -35,8 +35,8 @@
         <license>Apache License v 2.0</license>
         <maven.build.timestamp.format>MMMM dd, yyyy</maven.build.timestamp.format>
         <revisiondate>${maven.build.timestamp}</revisiondate>
-        <config.spec.pdf>${project.build.directory}/generated-docs/${project.build.finalName}.pdf</config.spec.pdf>
-        <config.spec.html>${project.build.directory}/generated-docs/${project.build.finalName}.html</config.spec.html>
+        <config.spec.pdf>${project.build.directory}/generated-docs/${project.artifactId}.pdf</config.spec.pdf>
+        <config.spec.html>${project.build.directory}/generated-docs/${project.artifactId}.html</config.spec.html>
     </properties>
 
     <build>
