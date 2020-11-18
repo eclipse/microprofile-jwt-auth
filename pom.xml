@@ -41,6 +41,8 @@
         <version.jakarta.ejb.api>3.2.6</version.jakarta.ejb.api>
         <version.jakarta.security.jacc-api>1.6.1</version.jakarta.security.jacc-api>
 
+        <revremark>Draft</revremark>
+        <inceptionYear>2017</inceptionYear>
     </properties>
 
     <licenses>
@@ -204,6 +206,11 @@
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>1.6</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -326,10 +333,30 @@
                         <exclude>.editorconfig</exclude>
                         <exclude>sandbox/**</exclude>
                         <exclude>.github/**</exclude>
+                        <exclude>**/license.html</exclude>
+                        <exclude>**/license-efsl.adoc</exclude>
+                        <exclude>**/LICENSE*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <name>currentYear</name>
+                            <pattern>yyyy</pattern>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
