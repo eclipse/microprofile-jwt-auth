@@ -29,7 +29,7 @@
     <description>Eclipse MicroProfile JWT Feature - TCK</description>
 
     <properties>
-        <version.microprofile.config>1.4</version.microprofile.config>
+        <version.microprofile.config>2.0</version.microprofile.config>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
         <version.testng>6.10</version.testng>
         <version.jose4j>0.7.0</version.jose4j>
