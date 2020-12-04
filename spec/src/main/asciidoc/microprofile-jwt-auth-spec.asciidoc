@@ -16,7 +16,7 @@
 //
 
 = Eclipse MicroProfile Interoperable JWT RBAC
-:author: Scott Stark; David Blevins; Pedro Igor Silva
+:author: Scott Stark; David Blevins; Pedro Igor Silva; Sergey Beryozkin; Rudy De Busscher; Roberto Cortez
 :email: microprofile@googlegroups.com
 :version-label!:
 :sectanchors:
