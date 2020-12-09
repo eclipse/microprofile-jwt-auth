@@ -22,8 +22,8 @@
  * <p>Interoperable JWT RBAC for Microprofile
  *
  * <h2>Overview</h2>
- * This package contains the primary interfaces and support classes for the JSON Web Tokens(JWT) for role based
- * access control(RBAC) of MicroProfile microservice endpoints. The primary class is the JsonWebToken interface
+ * This package contains the primary interfaces and support classes for the JSON Web Tokens (JWT) for Role Based
+ * Access Control (RBAC) of MicroProfile microservice endpoints. The primary class is the JsonWebToken interface
  * that defines the view of the current authenticated user and associated JWT claims. It is available for injection
  * as well as the user principal available from the container security API.
  *

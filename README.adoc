@@ -21,9 +21,9 @@
 
 ## Introduction
 
-Today, the most common solutions involving RESTful and microservices security are based on http://openid.net/connect/[OpenID Connect(OIDC)], https://tools.ietf.org/html/rfc6749[OAuth2] and https://tools.ietf.org/html/rfc7519[JSON Web Token (JWT)] standards.
+Today, the most common solutions involving RESTful and microservices security are based on http://openid.net/connect/[OpenID Connect (OIDC)], https://tools.ietf.org/html/rfc6749[OAuth2] and https://tools.ietf.org/html/rfc7519[JSON Web Token (JWT)] standards.
 
-This specification outlines how the signed JWT tokens issued by OIDC and other trusted providers can be verified and their claims used for role based access control(RBAC) of microservice endpoints.
+This specification outlines how the signed JWT tokens issued by OIDC and other trusted providers can be verified and their claims used for Role Based Access Control (RBAC) of microservice endpoints.
 
 ## Motivation
 
