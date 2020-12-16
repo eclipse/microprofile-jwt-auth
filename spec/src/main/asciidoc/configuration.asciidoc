@@ -251,7 +251,7 @@ MicroProfile JWT implementations are required to throw a `DeploymentException` i
 #### `mp.jwt.verify.publickey.location`
 
 The `mp.jwt.verify.publickey.location` configuration property allows for an external or internal location
-of Public Verification Key to be specified.  The value may be a relative path or a URL.
+of Public Verification Key to be specified.  The value may be a relative path or an URL.
 
 MicroProfile JWT implementations are required to check the path at startup or deploy time.
 Reloading the Public Key from the location at runtime as well as the frequency of any such
