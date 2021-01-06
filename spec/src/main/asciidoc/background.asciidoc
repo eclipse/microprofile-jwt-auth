@@ -16,8 +16,8 @@
 //
 
 ## Introduction
-This specification outlines a proposal for using http://openid.net/connect/[OpenID Connect(OIDC)] based
-https://tools.ietf.org/html/rfc7519[JSON Web Tokens(JWT)] for role based access control(RBAC) of microservice endpoints.
+This specification outlines a proposal for using http://openid.net/connect/[OpenID Connect (OIDC)] based
+https://tools.ietf.org/html/rfc7519[JSON Web Tokens (JWT)] for Role Based Access Control (RBAC) of microservice endpoints.
 
 
 ## Motivation
@@ -52,8 +52,8 @@ any information within a security token
 * Support for both delegation and impersonation of identities
 
 Today, the most common solutions involving RESTful and microservices security are based on https://tools.ietf.org/html/rfc6749[OAuth2],
-http://openid.net/connect/[OpenID Connect(OIDC)] and
-https://tools.ietf.org/html/rfc7519[JSON Web Tokens(JWT)]  standards.
+http://openid.net/connect/[OpenID Connect (OIDC)] and
+https://tools.ietf.org/html/rfc7519[JSON Web Tokens (JWT)]  standards.
 
 ### Token Based Authentication
 Token Based Authentication mechanisms allow systems to authenticate, authorize and verify identities based on a security token. Usually, the following entities are involved:
