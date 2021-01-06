@@ -70,8 +70,7 @@ public interface JsonWebToken extends Principal {
 
     /**
      * The sub(Subject) claim identifies the principal that is the subject of
-     * the JWT. This is the token issuing
-     * IDP subject, not the
+     * the JWT. This is the token issuing IDP subject.
      *
      * @return the sub claim.
      */
