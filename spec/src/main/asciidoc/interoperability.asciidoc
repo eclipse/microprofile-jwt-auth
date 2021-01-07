@@ -146,8 +146,7 @@ public interface JsonWebToken extends Principal {
 
     /**
      * The sub(Subject) claim identifies the principal that is the subject of
-     * the JWT. This is the token issuing
-     * IDP subject, not the
+     * the JWT. This is the token issuing IDP subject.
      *
      * @return the sub claim.
      */
@@ -247,7 +246,7 @@ public interface JsonWebToken extends Principal {
 
 ### Additional Claims
 The JWT can contain any number of other custom and standard claims, and these are
-made available from the JsonWebToken getOtherClaim(String) method. An example
+made available from the JsonWebToken getClaim(String) method. An example
 MP-JWT that contains additional "auth_time", "preferred_username", "acr",
 "nbf", "aud" and "roles" claims is:
 
