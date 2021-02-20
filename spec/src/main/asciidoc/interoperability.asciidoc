@@ -380,13 +380,13 @@ for more information.
 
 ## Marking a JAX-RS Application as Requiring MP-JWT Access Control
 Since the MicroProfile does not specify a deployment format, and currently does
-not rely on servlet metadata descriptors, we have added an `org.eclipse.microprofile.jwt.LoginConfig`
+not rely on servlet metadata descriptors, we have added an `org.eclipse.microprofile.auth.LoginConfig`
 annotation that provides the same information as the web.xml login-config
 element. It's intended usage is to mark a JAX-RS `Application` as requiring
 MicroProfile JWT RBAC as shown in the following sample:
 
 ```java
-import org.eclipse.microprofile.annotation.LoginConfig;
+import org.eclipse.microprofile.auth.LoginConfig;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
