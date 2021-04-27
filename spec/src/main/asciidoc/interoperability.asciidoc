@@ -629,7 +629,7 @@ public class RolesEndpoint {
 <1> Injection of a non-proxyable raw type like java.lang.Long must happen in a RequestScoped bean as
 the producer will have dependendent scope.
 <2> Injection of the raw MP-JWT token string.
-<3> Injection of the jti token id as an `Optional<String>` wapper.
+<3> Injection of the jti token id as an `Optional<String>` wrapper.
 <4> Injection of the issued at time claim using an `@Claim` that references the
 claim name using the Claims.iat enum value.
 <5> Injection of a custom claim that does exist will result in an Optional<Long>
