@@ -16,32 +16,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.eclipse.microprofile</groupId>
+        <artifactId>microprofile-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+
     <groupId>org.eclipse.microprofile.jwt</groupId>
     <artifactId>microprofile-jwt-auth-parent</artifactId>
     <version>1.3-SNAPSHOT</version>
-    <name>MicroProfile JWT Auth Parent</name>
-    <description>Eclipse MicroProfile JWT Feature - Parent POM</description>
-    <packaging>pom</packaging>
 
-    <url>http://microprofile.io</url>
+    <packaging>pom</packaging>
+    <name>MicroProfile JWT Auth</name>
+    <url>https://github.com/eclipse/microprofile-jwt-auth</url>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <checkstyle.version>2.17</checkstyle.version>
-        <checkstyle.methodNameFormat>^_?[a-z][a-zA-Z0-9]*$</checkstyle.methodNameFormat>
-        <autorelease>false</autorelease>
-
-        <version.jakarta.api>8.0.0</version.jakarta.api>
-        <version.jakarta.annotation.api>1.3.5</version.jakarta.annotation.api>
-        <version.jakarta.enterprise.cdi.api>2.0.2</version.jakarta.enterprise.cdi.api>
-        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
-        <version.jakarta.ws.rs.api>2.1.6</version.jakarta.ws.rs.api>
-        <version.jakarta.ejb.api>3.2.6</version.jakarta.ejb.api>
         <version.jakarta.security.jacc-api>1.6.1</version.jakarta.security.jacc-api>
+        <version.jakarta.ejb.api>3.2.6</version.jakarta.ejb.api>
+        <version.microprofile.config>2.0</version.microprofile.config>
+        <version.jose4j>0.7.0</version.jose4j>
+        <version.osgi.versioning>1.1.0</version.osgi.versioning>
 
-        <revremark>Draft</revremark>
         <inceptionYear>2017</inceptionYear>
     </properties>
 
@@ -50,7 +45,6 @@
             <name>Apache License, Version 2.0</name>
             <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
 
@@ -66,10 +60,32 @@
 
     <developers>
         <developer>
+            <id>starksm64</id>
             <name>Scott M Stark</name>
             <url>https://github.com/starksm64</url>
-            <organization>Red Hat</organization>
-            <organizationUrl>https://www.jboss.org</organizationUrl>
+            <organization>Red Hat Inc.</organization>
+            <organizationUrl>https://redhat.com</organizationUrl>
+        </developer>
+        <developer>
+            <id>dblevins</id>
+            <name>David Blevins</name>
+            <url>https://github.com/dblevins</url>
+            <organization>Tomitribe</organization>
+            <organizationUrl>https://tomitribe.com</organizationUrl>
+        </developer>
+        <developer>
+            <id>sberyozkin</id>
+            <name>Sergey Beryozkin1</name>
+            <url>https://github.com/sberyozkin</url>
+            <organization>Red Hat Inc.</organization>
+            <organizationUrl>https://redhat.com</organizationUrl>
+        </developer>
+        <developer>
+            <id>radcortez</id>
+            <name>Roberto Cortez</name>
+            <url>https://radcortez.com</url>
+            <organization>Red Hat Inc.</organization>
+            <organizationUrl>https://redhat.com</organizationUrl>
         </developer>
     </developers>
 
@@ -80,347 +96,54 @@
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>ossrh</id>
-            <name>Sonatype OSSRH - Release Staging Area</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <name>Sonatype OSSRH Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-            <uniqueVersion>true</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <modules>
-        <module>api</module>
-        <module>tck</module>
-        <module>spec</module>
-    </modules>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>jakarta.platform</groupId>
-                <artifactId>jakarta.jakartaee-api</artifactId>
-                <version>${version.jakarta.api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.enterprise</groupId>
-                <artifactId>jakarta.enterprise.cdi-api</artifactId>
-                <version>${version.jakarta.enterprise.cdi.api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ws.rs</groupId>
-                <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>${version.jakarta.ws.rs.api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-                <version>${version.jakarta.annotation.api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.json</groupId>
-                <artifactId>jakarta.json-api</artifactId>
-                <version>${version.jakarta.json-api}</version>
+                <groupId>jakarta.security.jacc</groupId>
+                <artifactId>jakarta.security.jacc-api</artifactId>
+                <version>${version.jakarta.security.jacc-api}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>jakarta.ejb</groupId>
                 <artifactId>jakarta.ejb-api</artifactId>
                 <version>${version.jakarta.ejb.api}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
-                <groupId>jakarta.security.jacc</groupId>
-                <artifactId>jakarta.security.jacc-api</artifactId>
-                <version>${version.jakarta.security.jacc-api}</version>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.annotation.versioning</artifactId>
+                <version>${version.osgi.versioning}</version>
+                <scope>provided</scope>
             </dependency>
+
+            <!-- For TCK -->
             <dependency>
-                <groupId>org.jboss.arquillian</groupId>
-                <artifactId>arquillian-bom</artifactId>
-                <version>1.1.13.Final</version>
-                <scope>import</scope>
-                <type>pom</type>
+                <groupId>org.eclipse.microprofile.jwt</groupId>
+                <artifactId>microprofile-jwt-auth-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.microprofile.config</groupId>
+                <artifactId>microprofile-config-api</artifactId>
+                <version>${version.microprofile.config}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bitbucket.b_c</groupId>
+                <artifactId>jose4j</artifactId>
+                <version>${version.jose4j}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>repo.eclipse.org</id>
-            <name>Project Repository - Releases</name>
-            <url>https://repo.eclipse.org/content/groups/cbi/</url>
-        </pluginRepository>
-    </pluginRepositories>
+    <modules>
+        <module>spec</module>
+        <module>api</module>
+        <module>tck</module>
+    </modules>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
-                    <configuration>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <localCheckout>true</localCheckout>
-                        <useReleaseProfile>false</useReleaseProfile>
-                        <arguments>${arguments} -Prelease -Drevremark=${revremark}</arguments>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.eclipse.cbi.maven.plugins</groupId>
-                    <artifactId>eclipse-jarsigner-plugin</artifactId>
-                    <version>1.1.4</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${checkstyle.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>test-jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.1.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>verify-style</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <consoleOutput>true</consoleOutput>
-                    <failOnViolation>true</failOnViolation>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <failsOnError>true</failsOnError>
-                    <linkXRef>true</linkXRef>
-                    <logViolationsToConsole>true</logViolationsToConsole>
-                    <checkstyleRules>
-                        <module name="Checker">
-                            <module name="SuppressionCommentFilter" />
-                            <module name="FileLength">
-                                <property name="max" value="3500" />
-                                <property name="fileExtensions" value="java" />
-                            </module>
-                            <module name="FileTabCharacter" />
-                            <module name="TreeWalker">
-                                <module name="FileContentsHolder" />
-                                <module name="ConstantName">
-                                    <property name="format" value="^(([A-Z][A-Z0-9]*(_[A-Z0-9]+)*))$" />
-                                </module>
-                                <module name="LocalVariableName" />
-                                <module name="MethodName">
-                                    <property name="format" value="${checkstyle.methodNameFormat}" />
-                                </module>
-                                <module name="PackageName">
-                                    <property name="format" value="^[a-z]+([a-z0-9])*(\.[a-z][a-z0-9]*)*$" />
-                                </module>
-                                <module name="LocalFinalVariableName" />
-                                <module name="ParameterName" />
-                                <module name="StaticVariableName" />
-
-                                <module name="TypeName">
-                                    <property name="format" value="^_?[A-Z][a-zA-Z0-9]*$|packageinfo" />
-                                </module>
-                                <module name="AvoidStarImport">
-                                    <property name="excludes" value="java.io,java.net,java.util,javax.enterprise.inject.spi,javax.enterprise.context" />
-                                </module>
-                                <module name="IllegalImport" />
-                                <module name="RedundantImport" />
-                                <module name="UnusedImports" />
-                                <module name="LineLength">
-                                    <property name="max" value="150" />
-                                    <property name="ignorePattern" value="@version|@see" />
-                                </module>
-                                <module name="MethodLength">
-                                    <property name="max" value="250" />
-                                </module>
-                                <module name="ParameterNumber">
-                                    <property name="max" value="11" />
-                                </module>
-                                <module name="EmptyBlock">
-                                    <property name="option" value="text" />
-                                </module>
-                                <module name="NeedBraces" />
-                                <module name="LeftCurly">
-                                    <property name="option" value="EOL" />
-                                </module>
-                                <module name="RightCurly">
-                                    <property name="option" value="ALONE" />
-                                </module>
-                                <module name="EmptyStatement" />
-                                <module name="EqualsHashCode" />
-                                <module name="DefaultComesLast" />
-                                <module name="MissingSwitchDefault" />
-                                <module name="FallThrough" />
-                                <module name="MultipleVariableDeclarations" />
-                                <module name="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck">
-                                    <property name="severity" value="ignore" />
-                                </module>
-                                <module name="HideUtilityClassConstructor" />
-                                <module name="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck">
-                                    <property name="packageAllowed" value="false" />
-                                    <property name="protectedAllowed" value="true" />
-                                    <property name="publicMemberPattern" value="^serialVersionUID" />
-                                    <property name="severity" value="warning" />
-                                </module>
-                                <module name="UpperEll" />
-                            </module>
-                        </module>
-                    </checkstyleRules>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>0.12</version>
-                <executions>
-                    <execution>
-                        <id>rat-check</id>
-                        <goals><goal>check</goal></goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>.travis.yml.*</exclude>
-                        <exclude>bnd.bnd</exclude>
-                        <exclude>**/*.json</exclude>
-                        <exclude>**/*.jwk</exclude>
-                        <exclude>**/META-INF/services/*</exclude>
-                        <exclude>*.log</exclude>
-                        <exclude>.checkstyle</exclude>
-                        <exclude>.factorypath</exclude>
-                        <exclude>.editorconfig</exclude>
-                        <exclude>sandbox/**</exclude>
-                        <exclude>.github/**</exclude>
-                        <exclude>**/license.html</exclude>
-                        <exclude>**/license-efsl.adoc</exclude>
-                        <exclude>**/LICENSE*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>timestamp-property</id>
-                        <goals>
-                            <goal>timestamp-property</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <name>currentYear</name>
-                            <pattern>yyyy</pattern>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.3</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <serverId>ossrh</serverId>
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <configuration>
-                                    <gpgArguments>
-                                        <arg>--pinentry-mode</arg>
-                                        <arg>loopback</arg>
-                                    </gpgArguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
