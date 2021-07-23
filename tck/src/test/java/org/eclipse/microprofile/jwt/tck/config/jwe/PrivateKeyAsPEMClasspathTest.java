@@ -57,8 +57,8 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 /**
- * Validate that mp.jwt.decrypt.key.location property values of type resource path to a PEM
- * work to decrypt the JWT which is encrypted with publicKey4k.pem
+ * Validate that mp.jwt.decrypt.key.location property values of type resource path to a PEM work to decrypt the JWT
+ * which is encrypted with publicKey4k.pem
  */
 public class PrivateKeyAsPEMClasspathTest extends Arquillian {
 
@@ -69,11 +69,12 @@ public class PrivateKeyAsPEMClasspathTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key
-     * that is included as the mp.jwt.verify.publickey property.
-     * The root url is /
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is included as the
+     * mp.jwt.verify.publickey property. The root url is /
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createLocationDeployment() throws IOException {
@@ -90,21 +91,21 @@ public class PrivateKeyAsPEMClasspathTest extends Arquillian {
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PrivateKeyAsPEMClasspathTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(privateKey, "/privateKey4k.pem")
-            .addAsResource(publicKey, "/publicKey4k.pem")
-            .addClass(PrivateKeyEndpoint.class)
-            .addClass(PEMApplication.class)
-            .addClass(SimpleTokenUtils.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(configAsset, "microprofile-config.properties");
+                .create(WebArchive.class, "PrivateKeyAsPEMClasspathTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(privateKey, "/privateKey4k.pem")
+                .addAsResource(publicKey, "/publicKey4k.pem")
+                .addClass(PrivateKeyEndpoint.class)
+                .addClass(PEMApplication.class)
+                .addClass(SimpleTokenUtils.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(configAsset, "microprofile-config.properties");
         return webArchive;
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate specifying the mp.jwt.decrypt.key.location is a resource location of a private PEM key")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate specifying the mp.jwt.decrypt.key.location is a resource location of a private PEM key")
     public void testKeyAsLocationResource() throws Exception {
         Reporter.log("testKeyAsLocationResource, expect HTTP_OK");
 
@@ -114,8 +115,9 @@ public class PrivateKeyAsPEMClasspathTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "pem/endp/verifyKeyLocationAsPEMResource";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri);
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

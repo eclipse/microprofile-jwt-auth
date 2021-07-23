@@ -36,7 +36,6 @@ import org.eclipse.microprofile.jwt.ClaimValue;
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
-
 @Path("/endp")
 @RolesAllowed({"Echoer", "Tester"})
 @ApplicationScoped
@@ -77,21 +76,19 @@ public class ApplicationScopedEndpoint {
     private static JsonObject verifyRawToken(String injectedRawToken, String rawTokenQueryParam) {
         boolean pass = false;
         String msg;
-        if(injectedRawToken == null || injectedRawToken.length() == 0) {
-            msg = Claims.raw_token.name()+"value is null or empty, FAIL";
-        }
-        else if(injectedRawToken.equals(rawTokenQueryParam)) {
-            msg = Claims.raw_token.name()+" PASS";
+        if (injectedRawToken == null || injectedRawToken.length() == 0) {
+            msg = Claims.raw_token.name() + "value is null or empty, FAIL";
+        } else if (injectedRawToken.equals(rawTokenQueryParam)) {
+            msg = Claims.raw_token.name() + " PASS";
             pass = true;
-        }
-        else {
+        } else {
             msg = String.format("%s: %s != %s", Claims.raw_token.name(), injectedRawToken, rawTokenQueryParam);
         }
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .add("injectedRawToken", injectedRawToken)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .add("injectedRawToken", injectedRawToken)
+                .build();
         return result;
     }
 }

@@ -23,12 +23,14 @@ import java.security.Principal;
 
 /**
  * A representation of a claim in a {@link JsonWebToken}
- * @param <T> the expected type of the claim
+ *
+ * @param <T>
+ *            the expected type of the claim
  */
 public interface ClaimValue<T> extends Principal {
-
     /**
      * Access the name of the claim.
+     *
      * @return The name of the claim as seen in the JsonWebToken content
      */
     @Override
@@ -36,6 +38,7 @@ public interface ClaimValue<T> extends Principal {
 
     /**
      * Access the value of the claim.
+     *
      * @return the value of the claim.
      */
     T getValue();

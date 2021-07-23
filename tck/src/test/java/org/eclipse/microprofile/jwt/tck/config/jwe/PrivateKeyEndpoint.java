@@ -51,10 +51,10 @@ public class PrivateKeyEndpoint {
     @Inject
     @ConfigProperty(name = Names.DECRYPTOR_KEY_LOCATION)
     private Optional<String> location;
-    
+
     @PostConstruct
     private void init() {
-        log.info(String.format("PrivateKeyEndpoint.init, location: %s",  location.orElse("missing")));
+        log.info(String.format("PrivateKeyEndpoint.init, location: %s", location.orElse("missing")));
     }
 
     @GET
@@ -65,7 +65,7 @@ public class PrivateKeyEndpoint {
         boolean pass = false;
         String msg;
         // Check the location exists and is a valid PEM public key
-        if(location.isPresent()) {
+        if (location.isPresent()) {
             String locationValue = location.get();
             log.info(String.format("verifyKeyLocationAsPEMResource, location=%s", locationValue));
             try {
@@ -75,19 +75,17 @@ public class PrivateKeyEndpoint {
                 log.info(String.format("verifyKeyLocationAsPEMResource, privateKey=%s", privateKey));
                 msg = "key location as resource to PEM PASS";
                 pass = true;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 msg = String.format("Failed to read key with exception: %s", e.getMessage());
             }
-        }
-        else {
+        } else {
             msg = "no location property injected";
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
@@ -99,7 +97,7 @@ public class PrivateKeyEndpoint {
         boolean pass = false;
         String msg;
         // Check the location exists and is a valid PEM public key
-        if(location.isPresent()) {
+        if (location.isPresent()) {
             String locationValue = location.get();
             log.info(String.format("verifyKeyLocationAsJWKResource, location=%s", locationValue));
             try {
@@ -107,28 +105,25 @@ public class PrivateKeyEndpoint {
                 log.info(String.format("verifyKeyLocationAsJWKResource, locationValue=%s", jwkValue));
                 StringBuilder msgBuilder = new StringBuilder();
                 JsonObject jwk = Json.createReader(new StringReader(jwkValue)).readObject();
-                if(verifyJWK(jwk, kid, msgBuilder)) {
+                if (verifyJWK(jwk, kid, msgBuilder)) {
                     PrivateKey privateKey = SimpleTokenUtils.decodeJWKSPrivateKey(jwkValue);
                     log.info(String.format("verifyKeyLocationAsJWKResource, privateKey=%s", privateKey));
                     msg = "key location as resource to JWK PASS";
                     pass = true;
-                }
-                else {
+                } else {
                     msg = msgBuilder.toString();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 msg = String.format("Failed to read key with exception: %s", e.getMessage());
             }
-        }
-        else {
+        } else {
             msg = "no location property injected";
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
@@ -140,72 +135,70 @@ public class PrivateKeyEndpoint {
         boolean pass = false;
         String msg;
         // Check the location exists and is a valid PEM public key
-        if(location.isPresent()) {
+        if (location.isPresent()) {
             String locationValue = location.get();
             log.info(String.format("verifyKeyLocationAsJWKSResource, location=%s", locationValue));
             try {
                 String jwkValue = SimpleTokenUtils.readResource(locationValue);
                 log.info(String.format("verifyKeyLocationAsJWKResource, locationValue=%s", jwkValue));
                 StringBuilder msgBuilder = new StringBuilder();
-                JsonObject jwk = Json.createReader(new StringReader(jwkValue)).readObject().getJsonArray("keys").getJsonObject(0);
-                if(verifyJWK(jwk, kid, msgBuilder)) {
+                JsonObject jwk = Json.createReader(new StringReader(jwkValue)).readObject().getJsonArray("keys")
+                        .getJsonObject(0);
+                if (verifyJWK(jwk, kid, msgBuilder)) {
                     PrivateKey privateKey = SimpleTokenUtils.decodeJWKSPrivateKey(jwkValue);
                     log.info(String.format("verifyKeyLocationAsJWKResource, privateKey=%s", privateKey));
                     msg = "key location as resource to JWKS PASS";
                     pass = true;
-                }
-                else {
+                } else {
                     msg = msgBuilder.toString();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 msg = String.format("Failed to read key with exception: %s", e.getMessage());
             }
-        }
-        else {
+        } else {
             msg = "no location property injected";
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
     private boolean verifyJWK(JsonObject key, String kid, StringBuilder msg) {
 
         boolean pass = true;
-        if(!key.getJsonString("kty").getString().equals("RSA")) {
+        if (!key.getJsonString("kty").getString().equals("RSA")) {
             msg.append("key != RSA");
             pass = false;
         }
-        if(!key.getJsonString("use").getString().equals("enc")) {
+        if (!key.getJsonString("use").getString().equals("enc")) {
             msg.append("use != enc");
             pass = false;
         }
-        if(!key.getJsonString("kid").getString().equals(kid)) {
+        if (!key.getJsonString("kid").getString().equals(kid)) {
             log.info(String.format("kid != %s, was: %s", kid, key.getJsonString("kid").getString()));
             msg.append(String.format("kid != %s, was: %s", kid, key.getJsonString("kid").getString()));
             pass = false;
         }
-        if(!key.getJsonString("alg").getString().equals("RSA-OAEP")) {
+        if (!key.getJsonString("alg").getString().equals("RSA-OAEP")) {
             msg.append("alg != RSA-OAEP");
             pass = false;
         }
-        if(!key.getJsonString("e").getString().equals("AQAB")) {
+        if (!key.getJsonString("e").getString().equals("AQAB")) {
             msg.append("e != AQAB");
             pass = false;
         }
-        if(!key.getJsonString("n").getString().startsWith("vNrRiMGbg3g4d6oApaDCQ09LeCL8Y2ig336NzPlAtzsPscp7y")) {
+        if (!key.getJsonString("n").getString().startsWith("vNrRiMGbg3g4d6oApaDCQ09LeCL8Y2ig336NzPlAtzsPscp7y")) {
             msg.append("n != vNrRiMGbg3g4d6oApaDCQ09LeCL8Y2ig336NzPlAtzsPscp7y...");
             pass = false;
         }
-        if(!key.getJsonString("d").getString().startsWith("RQ_IHDigxB0MmUYD4o29PJwcvxwcK8YxPkmrVU-5CMiCXsPrL")) {
+        if (!key.getJsonString("d").getString().startsWith("RQ_IHDigxB0MmUYD4o29PJwcvxwcK8YxPkmrVU-5CMiCXsPrL")) {
             msg.append("n != RQ_IHDigxB0MmUYD4o29PJwcvxwcK8YxPkmrVU-5CMiCXsPrL...");
             pass = false;
         }
-        if(pass) {
+        if (pass) {
             msg.append("key as JWKS PASS");
         }
         return pass;

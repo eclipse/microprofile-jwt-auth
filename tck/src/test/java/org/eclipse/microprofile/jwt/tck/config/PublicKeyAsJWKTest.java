@@ -19,6 +19,11 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.config.Names.ISSUER;
+import static org.eclipse.microprofile.jwt.config.Names.VERIFIER_PUBLIC_KEY;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,14 +57,9 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.config.Names.ISSUER;
-import static org.eclipse.microprofile.jwt.config.Names.VERIFIER_PUBLIC_KEY;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
- * Validate that the bundled mp.jwt.verify.publickey config property as a literal JWK
- * is used to validate the JWT which is signed with privateKey4k.pem
+ * Validate that the bundled mp.jwt.verify.publickey config property as a literal JWK is used to validate the JWT which
+ * is signed with privateKey4k.pem
  */
 public class PublicKeyAsJWKTest extends Arquillian {
 
@@ -70,11 +70,12 @@ public class PublicKeyAsJWKTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded JWKS public key
-     * that is included as the mp.jwt.verify.publickey property.
-     * The root url is /jwks
+     * Create a CDI aware base web application archive that includes an embedded JWKS public key that is included as the
+     * mp.jwt.verify.publickey property. The root url is /jwks
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
     @Deployment(name = "jwk")
     public static WebArchive createDeploymentJWK() throws IOException {
@@ -98,22 +99,21 @@ public class PublicKeyAsJWKTest extends Arquillian {
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsJWKTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/signer-keyset4k.jwk")
-            .addClass(PublicKeyEndpoint.class)
-            .addClass(JwksApplication.class)
-            .addClass(SimpleTokenUtils.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(configAsset, "microprofile-config.properties")
-            ;
+                .create(WebArchive.class, "PublicKeyAsJWKTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/signer-keyset4k.jwk")
+                .addClass(PublicKeyEndpoint.class)
+                .addClass(JwksApplication.class)
+                .addClass(SimpleTokenUtils.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(configAsset, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that the embedded JWKS key is used to verify the JWT signature")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate that the embedded JWKS key is used to verify the JWT signature")
     public void testKeyAsJWK() throws Exception {
         Reporter.log("testKeyAsJWK, expect HTTP_OK");
 
@@ -124,10 +124,10 @@ public class PublicKeyAsJWKTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyAsJWK";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("kid", kid)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri)
+                .queryParam("kid", kid);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

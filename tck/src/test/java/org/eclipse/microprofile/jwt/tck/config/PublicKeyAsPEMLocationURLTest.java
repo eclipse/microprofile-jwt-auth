@@ -19,6 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -53,12 +56,9 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
- * Validate that mp.jwt.verify.publickey.location property values of type remote URL to a PEM
- * work to validate the JWT which is signed with privateKey4k.pem
+ * Validate that mp.jwt.verify.publickey.location property values of type remote URL to a PEM work to validate the JWT
+ * which is signed with privateKey4k.pem
  */
 public class PublicKeyAsPEMLocationURLTest extends Arquillian {
 
@@ -69,11 +69,12 @@ public class PublicKeyAsPEMLocationURLTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded JWK public key that
-     * is referenced via the mp.jwt.verify.publickey.location as a URL resource property.
-     * The root url is /pem
+     * Create a CDI aware base web application archive that includes an embedded JWK public key that is referenced via
+     * the mp.jwt.verify.publickey.location as a URL resource property. The root url is /pem
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createLocationURLDeployment() throws IOException {
@@ -93,44 +94,43 @@ public class PublicKeyAsPEMLocationURLTest extends Arquillian {
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsPEMLocationURLTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey4k.pem")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(PublicKeyEndpoint.class)
-            .addClass(PEMApplication.class)
-            .addClass(SimpleTokenUtils.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(configAsset, "microprofile-config.properties")
-            ;
+                .create(WebArchive.class, "PublicKeyAsPEMLocationURLTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey4k.pem")
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(PublicKeyEndpoint.class)
+                .addClass(PEMApplication.class)
+                .addClass(SimpleTokenUtils.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(configAsset, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
 
     @RunAsClient()
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate the http://localhost:8080/pem/endp/publicKey4k PEM endpoint")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate the http://localhost:8080/pem/endp/publicKey4k PEM endpoint")
     public void validateLocationUrlContents() throws Exception {
         URL locationURL = new URL(baseURL, "pem/endp/publicKey4k");
         Reporter.log("Begin validateLocationUrlContents");
 
         StringWriter content = new StringWriter();
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(locationURL.openStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(locationURL.openStream()))) {
             String line = reader.readLine();
-            while(line != null) {
+            while (line != null) {
                 content.write(line);
                 content.write('\n');
                 line = reader.readLine();
             }
         }
-        Reporter.log("Received: "+content);
+        Reporter.log("Received: " + content);
         String expected = TokenUtils.readResource("/publicKey4k.pem");
         Assert.assertEquals(content.toString(), expected);
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG, dependsOnMethods = { "validateLocationUrlContents" },
-        description = "Validate specifying the mp.jwt.verify.publickey.location as remote URL to a PEM key")
+    @Test(groups = TEST_GROUP_CONFIG, dependsOnMethods = {
+            "validateLocationUrlContents"}, description = "Validate specifying the mp.jwt.verify.publickey.location as remote URL to a PEM key")
     public void testKeyAsLocationUrl() throws Exception {
         Reporter.log("testKeyAsLocationUrl, expect HTTP_OK");
 
@@ -141,9 +141,9 @@ public class PublicKeyAsPEMLocationURLTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "pem/endp/verifyKeyLocationAsPEMUrl";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

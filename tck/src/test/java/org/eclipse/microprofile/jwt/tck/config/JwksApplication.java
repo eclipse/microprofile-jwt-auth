@@ -19,7 +19,6 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
-
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 

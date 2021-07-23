@@ -19,6 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -51,14 +54,11 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
  * Validate the handling of the JWT aud claim.
  *
- * Validate the aud claim against the {@linkplain Names#AUDIENCES} property is performed, and passes
- * if the jwt aud is contained in the {@linkplain Names#AUDIENCES} property.
+ * Validate the aud claim against the {@linkplain Names#AUDIENCES} property is performed, and passes if the jwt aud is
+ * contained in the {@linkplain Names#AUDIENCES} property.
  * 
  * This test checks against a claim containing multiple values.
  * 
@@ -76,11 +76,12 @@ public class AudArrayValidationTest extends Arquillian {
     private static String token;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key
-     * that is included as the mp.jwt.verify.publickey property.
-     * The root url is /
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is included as the
+     * mp.jwt.verify.publickey property. The root url is /
+     * 
      * @return the base base web application archive
-     * @throws Exception - on resource failure
+     * @throws Exception
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createDeployment() throws Exception {
@@ -96,14 +97,15 @@ public class AudArrayValidationTest extends Arquillian {
         // Location points to the PEM bundled in the deployment
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey4k.pem");
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
-        configProps.setProperty(Names.AUDIENCES, "aud3,badAud,aud1");  // matches json, should pass
+        configProps.setProperty(Names.AUDIENCES, "aud3,badAud,aud1"); // matches json, should pass
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "AudArrayValidationTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "AudArrayValidationTest.war")
-                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addAsResource(publicKey, "/publicKey4k.pem")
                 // Include the token for inspection by ApplicationArchiveProcessor
@@ -118,16 +120,15 @@ public class AudArrayValidationTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that JWT with aud that is contained in mp.jwt.verify.audiences returns HTTP_OK")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate that JWT with aud that is contained in mp.jwt.verify.audiences returns HTTP_OK")
     public void testRequiredAudMatch() throws Exception {
         Reporter.log("testRequiredAudMatch, expect HTTP_OK");
 
         String uri = baseURL.toExternalForm() + "endp/verifyAudIsOk";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

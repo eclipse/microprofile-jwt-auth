@@ -73,7 +73,7 @@ public class PublicKeyEndpoint {
     private Optional<String> location;
 
     @Inject
-    @ConfigProperty(name = Names.VERIFIER_PUBLIC_KEY_ALGORITHM, defaultValue="RS256")
+    @ConfigProperty(name = Names.VERIFIER_PUBLIC_KEY_ALGORITHM, defaultValue = "RS256")
     private String algorithm;
 
     @Inject
@@ -87,12 +87,13 @@ public class PublicKeyEndpoint {
     @PostConstruct
     private void init() {
         log.info(String.format("PublicKeyEndpoint.init, key: %s, location: %s, issuer: %s\n",
-                          key.orElse("Missing"), location.orElse("missing"),
-                          issuer.orElse("missing")));
+                key.orElse("Missing"), location.orElse("missing"),
+                issuer.orElse("missing")));
     }
 
     /**
      * Verify that the injected key is a PEM RSA public key
+     * 
      * @return json object for test result
      */
     @GET
@@ -104,14 +105,12 @@ public class PublicKeyEndpoint {
         String msg;
         // Check the injected iss claim against the config property
         String issValue = issuer.orElse("missing-issuer");
-        if(issValue == null || issValue.length() == 0) {
-            msg = Claims.iss.name()+" value is null or empty, FAIL";
-        }
-        else if(issValue.equals(iss)) {
-            msg = Claims.iss.name()+" PASS";
+        if (issValue == null || issValue.length() == 0) {
+            msg = Claims.iss.name() + " value is null or empty, FAIL";
+        } else if (issValue.equals(iss)) {
+            msg = Claims.iss.name() + " PASS";
             pass = true;
-        }
-        else {
+        } else {
             msg = String.format("%s: %s != %s", Claims.iss.name(), issValue, iss);
         }
 
@@ -119,37 +118,32 @@ public class PublicKeyEndpoint {
         try {
             if ("RS256".equals(algorithm)) {
                 PublicKey publicKey = SimpleTokenUtils.decodePublicKey(key.orElse("bad-key"));
-            if (publicKey instanceof RSAPublicKey) {
+                if (publicKey instanceof RSAPublicKey) {
                     msg += " | key as PEM PASS";
                     pass = true;
-                }
-                else {
+                } else {
                     pass = false;
                 }
-            }
-            else if ("ES256".equals(algorithm)) {
+            } else if ("ES256".equals(algorithm)) {
                 PublicKey publicKey = SimpleTokenUtils.decodeECPublicKey(key.orElse("bad-key"));
                 if (publicKey instanceof ECPublicKey) {
                     msg += " | key as PEM PASS";
                     pass = true;
-                }
-                else {
+                } else {
                     pass = false;
                 }
-            }
-            else {
+            } else {
                 pass = false;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             msg = String.format("Failed to read key with exception: %s", e.getMessage());
             pass = false;
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
@@ -161,7 +155,7 @@ public class PublicKeyEndpoint {
         boolean pass = false;
         String msg = null;
         // Check the location exists and is a valid PEM public key
-        if(location.isPresent()) {
+        if (location.isPresent()) {
             String locationValue = location.get();
             log.info(String.format("verifyKeyLocationAsPEMResource, location=%s", locationValue));
             try {
@@ -173,43 +167,38 @@ public class PublicKeyEndpoint {
                         log.info(String.format("verifyKeyLocationAsPEMResource, publicKey=%s", publicKey));
                         msg = "key location as resource to PEM PASS";
                         pass = true;
-                    }
-                    else {
+                    } else {
                         pass = false;
                     }
-                }
-                else if ("ES256".equals(algorithm)) {
+                } else if ("ES256".equals(algorithm)) {
                     PublicKey publicKey = SimpleTokenUtils.decodeECPublicKey(pemValue);
                     if (publicKey instanceof ECPublicKey) {
                         log.info(String.format("verifyKeyLocationAsPEMResource, publicKey=%s", publicKey));
                         msg = "key location as resource to PEM PASS";
                         pass = true;
-                    }
-                    else {
+                    } else {
                         pass = false;
                     }
-                }
-                else {
+                } else {
                     pass = false;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 msg = String.format("Failed to read key with exception: %s", e.getMessage());
             }
-        }
-        else {
+        } else {
             msg = "no location property injected";
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
     /**
      * Check the location exists and is a URL whose contents are valid PEM public key
+     * 
      * @return result of validation test
      */
     @GET
@@ -219,7 +208,7 @@ public class PublicKeyEndpoint {
     public JsonObject verifyKeyLocationAsPEMUrl() {
         boolean pass = false;
         String msg;
-        if(location.isPresent()) {
+        if (location.isPresent()) {
             String locationValue = location.get();
             log.info(String.format("verifyKeyLocationAsPEMUrl, location=%s", locationValue));
             try {
@@ -240,30 +229,27 @@ public class PublicKeyEndpoint {
                 log.info(String.format("verifyKeyLocationAsPEMUrl, publicKey=%s", publicKey));
                 msg = "key location as URL to PEM PASS";
                 pass = true;
-            }
-            catch (MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 msg = String.format("Failed to read location contents: %s", e.getMessage());
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 msg = String.format("Failed to parse location as URL: %s", e.getMessage());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 msg = String.format("Failed to read key with exception: %s", e.getMessage());
             }
-        }
-        else {
+        } else {
             msg = "no location property injected";
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
     /**
      * Verify that the injected key is a JWK public key
+     * 
      * @return json object for test result
      */
     @GET
@@ -281,20 +267,20 @@ public class PublicKeyEndpoint {
             JsonObject jwk = Json.createReader(new StringReader(jsonJwk)).readObject();
             pass = verifyJWK(jwk, kid, msgBuilder);
             msg = msgBuilder.toString();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             msg = String.format("Failed to read key with exception: %s", e.getMessage());
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
     /**
      * Verify that the injected key is a base64 encoded JWK public key
+     * 
      * @return json object for test result
      */
     @GET
@@ -308,28 +294,28 @@ public class PublicKeyEndpoint {
         // Check that the key exists and is a valid base64 JWK public key
         try {
             String base64Jwk = key.get();
-            log.info("verifyKeyAsBase64JWK, base64Jwk="+base64Jwk);
+            log.info("verifyKeyAsBase64JWK, base64Jwk=" + base64Jwk);
             byte[] data = Base64.getDecoder().decode(base64Jwk);
             String jsonJwk = new String(data);
-            log.info("verifyKeyAsBase64JWK, jsonJwk="+jsonJwk);
+            log.info("verifyKeyAsBase64JWK, jsonJwk=" + jsonJwk);
             StringBuilder msgBuilder = new StringBuilder();
             JsonObject jwk = Json.createReader(new StringReader(jsonJwk)).readObject();
             pass = verifyJWK(jwk, kid, msgBuilder);
             msg = msgBuilder.toString();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             msg = String.format("Failed to read key with exception: %s", e.getMessage());
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
     /**
      * Verify that the injected key is a JWKS public key
+     * 
      * @return json object for test result
      */
     @GET
@@ -346,15 +332,14 @@ public class PublicKeyEndpoint {
             StringBuilder msgBuilder = new StringBuilder();
             pass = verifyJWKS(jsonJwk, kid, msgBuilder);
             msg = msgBuilder.toString();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             msg = String.format("Failed to read key with exception: %s", e.getMessage());
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
@@ -366,7 +351,7 @@ public class PublicKeyEndpoint {
         boolean pass = false;
         String msg;
         // Check the location exists and is a valid PEM public key
-        if(location.isPresent()) {
+        if (location.isPresent()) {
             String locationValue = location.get();
             log.info(String.format("verifyKeyLocationAsJWKResource, location=%s", locationValue));
             try {
@@ -374,30 +359,27 @@ public class PublicKeyEndpoint {
                 log.info(String.format("verifyKeyLocationAsJWKResource, locationValue=%s", jwkValue));
                 StringBuilder msgBuilder = new StringBuilder();
                 JsonObject jwk = Json.createReader(new StringReader(jwkValue)).readObject();
-                if(verifyJWK(jwk, kid, msgBuilder)) {
+                if (verifyJWK(jwk, kid, msgBuilder)) {
                     if ("RS256".equals(algorithm)) {
                         PublicKey publicKey = SimpleTokenUtils.decodeJWKSPublicKey(jwkValue);
                         log.info(String.format("verifyKeyLocationAsJWKResource, publicKey=%s", publicKey));
                     }
                     msg = "key location as resource to JWK PASS";
                     pass = true;
-                }
-                else {
+                } else {
                     msg = msgBuilder.toString();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 msg = String.format("Failed to read key with exception: %s", e.getMessage());
             }
-        }
-        else {
+        } else {
             msg = "no location property injected";
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
@@ -409,41 +391,40 @@ public class PublicKeyEndpoint {
         boolean pass = false;
         String msg;
         // Check the location exists and is a valid PEM public key
-        if(location.isPresent()) {
+        if (location.isPresent()) {
             String locationValue = location.get();
             log.info(String.format("verifyKeyLocationAsJWKSResource, location=%s", locationValue));
             try {
                 String jwksValue = SimpleTokenUtils.readResource(locationValue);
                 log.info(String.format("verifyKeyLocationAsJWKSResource, locationValue=%s", jwksValue));
                 StringBuilder msgBuilder = new StringBuilder();
-                if(verifyJWKS(jwksValue, kid, msgBuilder)) {
+                if (verifyJWKS(jwksValue, kid, msgBuilder)) {
                     PublicKey publicKey = SimpleTokenUtils.decodeJWKSPublicKey(jwksValue);
                     log.info(String.format("verifyKeyLocationAsJWKSResource, publicKey=%s", publicKey));
                     msg = "key location as resource to JWKS PASS";
                     pass = true;
-                }
-                else {
+                } else {
                     msg = msgBuilder.toString();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 msg = String.format("Failed to read key with exception: %s", e.getMessage());
             }
-        }
-        else {
+        } else {
             msg = "no location property injected";
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
     /**
      * Check the location exists and is a URL whose contents are valid JWKS public key
-     * @param kid - expected kid of JWKS
+     * 
+     * @param kid
+     *            - expected kid of JWKS
      * @return result of validation test
      */
     @GET
@@ -453,7 +434,7 @@ public class PublicKeyEndpoint {
     public JsonObject verifyKeyLocationAsJWKSUrl(@QueryParam("kid") String kid) {
         boolean pass = false;
         String msg;
-        if(location.isPresent()) {
+        if (location.isPresent()) {
             String locationValue = location.get();
             log.info(String.format("verifyKeyLocationAsJWKSUrl, location=%s", locationValue));
             try {
@@ -477,33 +458,29 @@ public class PublicKeyEndpoint {
                     }
                     msg = "key location as URL to JWKS PASS";
                     pass = true;
-                }
-                else {
+                } else {
                     msg = msgBuilder.toString();
                 }
-            }
-            catch (MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 msg = String.format("Failed to read location contents: %s", e.getMessage());
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 msg = String.format("Failed to parse location as URL: %s", e.getMessage());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 msg = String.format("Failed to read key with exception: %s", e.getMessage());
             }
-        }
-        else {
+        } else {
             msg = "no location property injected";
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
     /**
      * Check a token with an iss matches the mp.jwt.verify.issuer value
+     * 
      * @return result of validation test
      */
     @GET
@@ -514,34 +491,32 @@ public class PublicKeyEndpoint {
         boolean pass = false;
         String msg;
 
-        if(!iss.getValue().isPresent()) {
+        if (!iss.getValue().isPresent()) {
             // The iss claim should be provided for this endpoint
             msg = String.format("MP-JWT missing iss claim");
-        }
-        else if(issuer.isPresent()) {
+        } else if (issuer.isPresent()) {
             String claimIss = iss.getValue().get();
             String configIss = issuer.get();
-            if(configIss.equals(claimIss)) {
+            if (configIss.equals(claimIss)) {
                 msg = String.format("endpoint accessed with iss(%s) = config.iss(%s) as expected PASS",
-                                    claimIss, configIss);
+                        claimIss, configIss);
                 pass = true;
-            }
-            else {
+            } else {
                 msg = String.format("mp.jwt.verify.issuer(%s) != jwt.iss(%s)", configIss, claimIss);
             }
-        }
-        else {
+        } else {
             msg = "No mp.jwt.verify.issuer provided";
         }
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 
     /**
      * An endpoint that returns the contents of the bundled /publicKey4k.pem key
+     * 
      * @return the /publicKey4k.pem classpath resource contents a PEM string
      */
     @GET
@@ -553,7 +528,9 @@ public class PublicKeyEndpoint {
     }
     /**
      * An endpoint that converts the bundled /publicKey4k.pem key in the corresponding JWKS format
-     * @param kid - the kid to use in the JWKS
+     * 
+     * @param kid
+     *            - the kid to use in the JWKS
      * @return the /publicKey4k.pem classpath resource contents a JWKS object
      */
     @GET
@@ -568,7 +545,7 @@ public class PublicKeyEndpoint {
         BigInteger nBI = publicKey.getModulus();
         byte[] nbytes = nBI.toByteArray();
         if ((nBI.bitLength() % 8 == 0) && nbytes[0] == 0 && nbytes.length > 1) {
-            byte[] tmp = new byte[nbytes.length-1];
+            byte[] tmp = new byte[nbytes.length - 1];
             System.arraycopy(nbytes, 1, tmp, 0, tmp.length);
             nbytes = tmp;
         }
@@ -576,19 +553,19 @@ public class PublicKeyEndpoint {
         BigInteger eBI = publicKey.getPublicExponent();
         byte[] ebytes = eBI.toByteArray();
         if ((eBI.bitLength() % 8 == 0) && ebytes[0] == 0 && ebytes.length > 1) {
-            byte[] tmp = new byte[nbytes.length-1];
+            byte[] tmp = new byte[nbytes.length - 1];
             System.arraycopy(nbytes, 1, tmp, 0, tmp.length);
             ebytes = tmp;
         }
         String e = new String(Base64.getUrlEncoder().withoutPadding().encode(ebytes));
 
         keyBuilder
-            .add("kty", "RSA")
-            .add("use", "sig")
-            .add("alg", "RS256")
-            .add("kid", kid)
-            .add("e", e)
-            .add("n", n);
+                .add("kty", "RSA")
+                .add("use", "sig")
+                .add("alg", "RS256")
+                .add("kid", kid)
+                .add("e", e)
+                .add("n", n);
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         arrayBuilder.add(keyBuilder);
         jwksBuilder.add("keys", arrayBuilder);
@@ -598,22 +575,25 @@ public class PublicKeyEndpoint {
 
     /**
      * Verify a JWKS object string against the expected values used by the tck
-     * @param jwksJson - JSON string for JWKS
-     * @param kid - the kid parameter to verify
-     * @param msg - builder to return failure messages in
+     * 
+     * @param jwksJson
+     *            - JSON string for JWKS
+     * @param kid
+     *            - the kid parameter to verify
+     * @param msg
+     *            - builder to return failure messages in
      * @return true if verified, false otherwise
      */
     private boolean verifyJWKS(String jwksJson, String kid, StringBuilder msg) {
         boolean pass;
         JsonObject jwks = Json.createReader(new StringReader(jwksJson)).readObject();
         JsonArray keys = jwks.getJsonArray("keys");
-        if(keys != null) {
+        if (keys != null) {
             JsonObject key = keys.getJsonObject(0);
             StringBuilder msgBuilder = new StringBuilder();
             pass = verifyJWK(key, kid, msgBuilder);
-        }
-        else {
-            msg.append("No keys member found in: "+jwks);
+        } else {
+            msg.append("No keys member found in: " + jwks);
             pass = false;
         }
         return pass;
@@ -623,51 +603,49 @@ public class PublicKeyEndpoint {
         boolean pass = true;
 
         String expectedKty = "RS256".equals(algorithm) ? "RSA" : "EC";
-        if(!key.getJsonString("kty").getString().equals(expectedKty)) {
+        if (!key.getJsonString("kty").getString().equals(expectedKty)) {
             msg.append("key != " + expectedKty);
             pass = false;
         }
-        if(!key.getJsonString("use").getString().equals("sig")) {
+        if (!key.getJsonString("use").getString().equals("sig")) {
             msg.append("use != sig");
             pass = false;
         }
-        if(!key.getJsonString("kid").getString().equals(kid)) {
+        if (!key.getJsonString("kid").getString().equals(kid)) {
             log.info(String.format("kid != %s, was: %s", kid, key.getJsonString("kid").getString()));
             msg.append(String.format("kid != %s, was: %s", kid, key.getJsonString("kid").getString()));
             pass = false;
         }
-        if(!key.getJsonString("alg").getString().equals(algorithm)) {
+        if (!key.getJsonString("alg").getString().equals(algorithm)) {
             msg.append("alg != " + algorithm);
             pass = false;
         }
         if ("RS256".equals(algorithm)) {
-            if(!key.getJsonString("e").getString().equals("AQAB")) {
+            if (!key.getJsonString("e").getString().equals("AQAB")) {
                 msg.append("e != AQAB");
                 pass = false;
             }
-            if(!key.getJsonString("n").getString().startsWith("tL6HShqY5H4y56rsCo7VdhT9")) {
+            if (!key.getJsonString("n").getString().startsWith("tL6HShqY5H4y56rsCo7VdhT9")) {
                 msg.append("n != tL6HShqY5H4y56rsCo7VdhT9...");
                 pass = false;
             }
-        }
-        else if ("ES256".equals(algorithm)) {
-            if(!key.getJsonString("crv").getString().equals("P-256")) {
+        } else if ("ES256".equals(algorithm)) {
+            if (!key.getJsonString("crv").getString().equals("P-256")) {
                 msg.append("crv != P-256");
                 pass = false;
             }
-            if(!key.getJsonString("x").getString().startsWith("w4HohvwOj21FBQE1Pr")) {
+            if (!key.getJsonString("x").getString().startsWith("w4HohvwOj21FBQE1Pr")) {
                 msg.append("x != w4HohvwOj21FBQE1Pr...");
                 pass = false;
             }
-            if(!key.getJsonString("y").getString().startsWith("osZEjUhZa79-kClcGm")) {
+            if (!key.getJsonString("y").getString().startsWith("osZEjUhZa79-kClcGm")) {
                 msg.append("y != osZEjUhZa79-kClcGm...");
                 pass = false;
             }
-        }
-        else {
+        } else {
             pass = false;
         }
-        if(pass) {
+        if (pass) {
             msg.append("key as JWKS PASS");
         }
         return pass;

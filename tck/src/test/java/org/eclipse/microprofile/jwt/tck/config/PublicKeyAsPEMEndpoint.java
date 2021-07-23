@@ -38,6 +38,6 @@ public class PublicKeyAsPEMEndpoint {
     @RolesAllowed("Echoer")
     public String echoInput(@Context SecurityContext sec, @QueryParam("input") String input) {
         Principal user = sec.getUserPrincipal();
-        return input + ", user="+user.getName();
+        return input + ", user=" + user.getName();
     }
 }

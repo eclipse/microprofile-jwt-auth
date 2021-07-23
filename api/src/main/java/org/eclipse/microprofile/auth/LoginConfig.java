@@ -27,8 +27,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A security annotation describing the authentication method and the associated realm name that
- * should be used for this application.
+ * A security annotation describing the authentication method and the associated realm name that should be used for this
+ * application.
  *
  * Note: this annotation may be removed in the future versions of the MP JWT specification.
  *
@@ -39,11 +39,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LoginConfig {
     /**
-     * The 'authMethod' is used to configure the "MP-JWT" authentication mechanism for the
-     * JAX-RS application. As a prerequisite to gaining access to any web resources
-     * which are protected by an authorization constraint, a user must have
-     * authenticated using the configured mechanism.
-     * Support for the other authentication mechanisms is optional.
+     * The 'authMethod' is used to configure the "MP-JWT" authentication mechanism for the JAX-RS application. As a
+     * prerequisite to gaining access to any web resources which are protected by an authorization constraint, a user
+     * must have authenticated using the configured mechanism. Support for the other authentication mechanisms is
+     * optional.
      *
      * @return the configured auth-method
      */

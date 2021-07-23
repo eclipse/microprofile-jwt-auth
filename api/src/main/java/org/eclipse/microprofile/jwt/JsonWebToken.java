@@ -24,18 +24,15 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * A read-only interface for the the claims required by Eclipse MicroProfile
- * conforming tokens. Additional information about the claims defined by OIDC
- * and RFC7519 can be found at https://www.iana.org/assignments/jwt/jwt.xhtml.
+ * A read-only interface for the the claims required by Eclipse MicroProfile conforming tokens. Additional information
+ * about the claims defined by OIDC and RFC7519 can be found at https://www.iana.org/assignments/jwt/jwt.xhtml.
  *
  * This is compatible with the pre-JSR 375 caller {@link Principal} api.
  */
 public interface JsonWebToken extends Principal {
-
     /**
-     * Returns the unique name of this principal. This either comes from the upn
-     * claim, or if that is missing, the preferred_username claim. Note that for
-     * guaranteed interoperability a upn claim should be used.
+     * Returns the unique name of this principal. This either comes from the upn claim, or if that is missing, the
+     * preferred_username claim. Note that for guaranteed interoperability a upn claim should be used.
      *
      * @return the unique name of this principal.
      */
@@ -43,8 +40,8 @@ public interface JsonWebToken extends Principal {
     String getName();
 
     /**
-     * Get the raw bearer token string originally passed in the authentication
-     * header
+     * Get the raw bearer token string originally passed in the authentication header
+     *
      * @return raw bear token string
      */
     default String getRawToken() {
@@ -53,6 +50,7 @@ public interface JsonWebToken extends Principal {
 
     /**
      * The iss(Issuer) claim identifies the principal that issued the JWT
+     *
      * @return the iss claim.
      */
     default String getIssuer() {
@@ -60,8 +58,8 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The aud(Audience) claim identifies the recipients that the JWT is
-     * intended for.
+     * The aud(Audience) claim identifies the recipients that the JWT is intended for.
+     *
      * @return the aud claim or null if the claim is not present
      */
     default Set<String> getAudience() {
@@ -69,8 +67,8 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The sub(Subject) claim identifies the principal that is the subject of
-     * the JWT. This is the token issuing IDP subject.
+     * The sub(Subject) claim identifies the principal that is the subject of the JWT. This is the token issuing IDP
+     * subject.
      *
      * @return the sub claim.
      */
@@ -79,13 +77,11 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The jti(JWT ID) claim provides a unique identifier for the JWT.
-     The identifier value MUST be assigned in a manner that ensures that
-     there is a negligible probability that the same value will be
-     accidentally assigned to a different data object; if the application
-     uses multiple issuers, collisions MUST be prevented among values
-     produced by different issuers as well.  The "jti" claim can be used
-     to prevent the JWT from being replayed.
+     * The jti(JWT ID) claim provides a unique identifier for the JWT. The identifier value MUST be assigned in a manner
+     * that ensures that there is a negligible probability that the same value will be accidentally assigned to a
+     * different data object; if the application uses multiple issuers, collisions MUST be prevented among values
+     * produced by different issuers as well. The "jti" claim can be used to prevent the JWT from being replayed.
+     *
      * @return the jti claim.
      */
     default String getTokenID() {
@@ -93,9 +89,9 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The exp (Expiration time) claim identifies the expiration time on or
-     * after which the JWT MUST NOT be accepted
-     * for processing in seconds since 1970-01-01T00:00:00Z UTC
+     * The exp (Expiration time) claim identifies the expiration time on or after which the JWT MUST NOT be accepted for
+     * processing in seconds since 1970-01-01T00:00:00Z UTC
+     *
      * @return the exp claim.
      */
     default long getExpirationTime() {
@@ -103,8 +99,9 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The iat(Issued at time) claim identifies the time at which the JWT was
-     * issued in seconds since 1970-01-01T00:00:00Z UTC
+     * The iat(Issued at time) claim identifies the time at which the JWT was issued in seconds since
+     * 1970-01-01T00:00:00Z UTC
+     *
      * @return the iat claim
      */
     default long getIssuedAtTime() {
@@ -112,10 +109,10 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The groups claim provides the group names the JWT principal has been
-     * granted.
+     * The groups claim provides the group names the JWT principal has been granted.
      *
      * This is a MicroProfile specific claim.
+     *
      * @return a possibly empty set of group names.
      */
     default Set<String> getGroups() {
@@ -124,13 +121,16 @@ public interface JsonWebToken extends Principal {
 
     /**
      * Access the names of all claims are associated with this token.
+     *
      * @return non-standard claim names in the token
      */
     Set<String> getClaimNames();
 
     /**
      * Verify is a given claim exists
-     * @param claimName - the name of the claim
+     *
+     * @param claimName
+     *            - the name of the claim
      * @return true if the JsonWebToken contains the claim, false otherwise
      */
     default boolean containsClaim(String claimName) {
@@ -140,8 +140,10 @@ public interface JsonWebToken extends Principal {
     /**
      * Access the value of the indicated claim.
      *
-     * @param <T> The claim type
-     * @param claimName - the name of the claim
+     * @param <T>
+     *            The claim type
+     * @param claimName
+     *            - the name of the claim
      * @return the value of the indicated claim if it exists, null otherwise.
      */
     <T> T getClaim(String claimName);
@@ -149,8 +151,10 @@ public interface JsonWebToken extends Principal {
     /**
      * Access the value of the indicated claim.
      *
-     * @param <T> The claim type
-     * @param claim - the claim
+     * @param <T>
+     *            The claim type
+     * @param claim
+     *            - the claim
      * @return the value of the indicated claim if it exists, null otherwise.
      */
     default <T> T getClaim(Claims claim) {
@@ -158,10 +162,12 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * A utility method to access a claim value in an {@linkplain Optional}
-     * wrapper
-     * @param claimName - the name of the claim
-     * @param <T> - the type of the claim value to return
+     * A utility method to access a claim value in an {@linkplain Optional} wrapper
+     *
+     * @param claimName
+     *            - the name of the claim
+     * @param <T>
+     *            - the type of the claim value to return
      * @return an Optional wrapper of the claim value
      */
     default <T> Optional<T> claim(String claimName) {
@@ -169,10 +175,12 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * A utility method to access a claim value in an {@linkplain Optional}
-     * wrapper
-     * @param claim - the claim
-     * @param <T> - the type of the claim value to return
+     * A utility method to access a claim value in an {@linkplain Optional} wrapper
+     *
+     * @param claim
+     *            - the claim
+     * @param <T>
+     *            - the type of the claim value to return
      * @return an Optional wrapper of the claim value
      */
     default <T> Optional<T> claim(Claims claim) {

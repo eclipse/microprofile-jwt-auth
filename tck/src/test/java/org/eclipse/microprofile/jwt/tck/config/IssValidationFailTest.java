@@ -19,6 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -46,14 +49,11 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
  * Validate the handling of the JWT iss claim.
  *
- * Validate the iss claim against the {@linkplain Names#ISSUER} property is performed, and fails
- * if the jwt iss does not match the {@linkplain Names#ISSUER} property.
+ * Validate the iss claim against the {@linkplain Names#ISSUER} property is performed, and fails if the jwt iss does not
+ * match the {@linkplain Names#ISSUER} property.
  */
 public class IssValidationFailTest extends Arquillian {
     /**
@@ -68,11 +68,12 @@ public class IssValidationFailTest extends Arquillian {
     private static String token;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key
-     * that is included as the mp.jwt.verify.publickey property.
-     * The root url is /
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is included as the
+     * mp.jwt.verify.publickey property. The root url is /
+     * 
      * @return the base base web application archive
-     * @throws Exception - on resource failure
+     * @throws Exception
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createDeployment() throws Exception {
@@ -95,7 +96,8 @@ public class IssValidationFailTest extends Arquillian {
 
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "IssValidationFailTest.war")
-                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addAsResource(publicKey, "/publicKey4k.pem")
                 // Include the token for inspection by ApplicationArchiveProcessor
@@ -110,16 +112,15 @@ public class IssValidationFailTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that JWK with iss that does not match mp.jwt.verify.issuer returns HTTP_UNAUTHORIZED")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate that JWK with iss that does not match mp.jwt.verify.issuer returns HTTP_UNAUTHORIZED")
     public void testNotRequiredIssMismatchFailure() throws Exception {
         Reporter.log("testNotRequiredIssMismatchFailure, expect HTTP_UNAUTHORIZED");
 
         String uri = baseURL.toExternalForm() + "endp/verifyIssIsOk";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 

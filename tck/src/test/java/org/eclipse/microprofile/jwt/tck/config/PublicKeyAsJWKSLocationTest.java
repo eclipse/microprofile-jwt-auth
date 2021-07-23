@@ -19,6 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -51,12 +54,9 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
- * Validate that config property values of type resource path to JWKS works to validate the JWT
- * which is signed with privateKey4k.pem
+ * Validate that config property values of type resource path to JWKS works to validate the JWT which is signed with
+ * privateKey4k.pem
  */
 public class PublicKeyAsJWKSLocationTest extends Arquillian {
 
@@ -67,11 +67,12 @@ public class PublicKeyAsJWKSLocationTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key that
-     * is referenced via the mp.jwt.verify.publickey.location as an embedded resource property.
-     * The root url is /jwks
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is referenced via
+     * the mp.jwt.verify.publickey.location as an embedded resource property. The root url is /jwks
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createLocationDeployment() throws IOException {
@@ -86,24 +87,23 @@ public class PublicKeyAsJWKSLocationTest extends Arquillian {
         configProps.store(configSW, "PublicKeyAsJWKSLocationTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "PublicKeyAsJWKSLocationTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey4k.pem")
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addAsResource(signerJwks, "/signer-keyset4k.jwk")
-            .addClass(PublicKeyEndpoint.class)
-            .addClass(JwksApplication.class)
-            .addClass(SimpleTokenUtils.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(configAsset, "microprofile-config.properties")
-            ;
+                .create(WebArchive.class, "PublicKeyAsJWKSLocationTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey4k.pem")
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addAsResource(signerJwks, "/signer-keyset4k.jwk")
+                .addClass(PublicKeyEndpoint.class)
+                .addClass(JwksApplication.class)
+                .addClass(SimpleTokenUtils.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(configAsset, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate specifying the mp.jwt.verify.publickey.location as resource path to a JWKS key")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate specifying the mp.jwt.verify.publickey.location as resource path to a JWKS key")
     public void testKeyAsLocation() throws Exception {
         Reporter.log("testKeyAsLocation, expect HTTP_OK");
 
@@ -114,10 +114,10 @@ public class PublicKeyAsJWKSLocationTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyLocationAsJWKSResource";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("kid", kid)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri)
+                .queryParam("kid", kid);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

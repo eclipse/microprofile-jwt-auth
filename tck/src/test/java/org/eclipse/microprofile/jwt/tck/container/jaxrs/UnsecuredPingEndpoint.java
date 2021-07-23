@@ -32,7 +32,6 @@ public class UnsecuredPingEndpoint {
     @GET
     @Path("/echo")
     public String echoInput(@Context SecurityContext sec, @QueryParam("input") String input) {
-        return "pinged, input="+input;
+        return "pinged, input=" + input;
     }
 }
-

@@ -21,20 +21,21 @@ package org.eclipse.microprofile.jwt.tck;
 
 public class TCKConstants {
     // TestNG groups
-    public static final String TEST_GROUP_UTILS="utils";
-    public static final String TEST_GROUP_UTILS_EXTRA="utils-extra";
-    public static final String TEST_GROUP_JWT="jwt";
-    public static final String TEST_GROUP_JAXRS="jaxrs";
-    public static final String TEST_GROUP_CDI="cdi";
-    public static final String TEST_GROUP_CDI_JSON="cdi-json";
-    public static final String TEST_GROUP_CDI_PROVIDER="cdi-provider";
-    public static final String TEST_GROUP_EJB="ejb-optional";
-    public static final String TEST_GROUP_SERVLET="servlet-optional";
-    public static final String TEST_GROUP_EE_SECURITY="ee-security-optional";
-    public static final String TEST_GROUP_JACC="jacc-optional";
-    public static final String TEST_GROUP_CONFIG="config";
+    public static final String TEST_GROUP_UTILS = "utils";
+    public static final String TEST_GROUP_UTILS_EXTRA = "utils-extra";
+    public static final String TEST_GROUP_JWT = "jwt";
+    public static final String TEST_GROUP_JAXRS = "jaxrs";
+    public static final String TEST_GROUP_CDI = "cdi";
+    public static final String TEST_GROUP_CDI_JSON = "cdi-json";
+    public static final String TEST_GROUP_CDI_PROVIDER = "cdi-provider";
+    public static final String TEST_GROUP_EJB = "ejb-optional";
+    public static final String TEST_GROUP_SERVLET = "servlet-optional";
+    public static final String TEST_GROUP_EE_SECURITY = "ee-security-optional";
+    public static final String TEST_GROUP_JACC = "jacc-optional";
+    public static final String TEST_GROUP_CONFIG = "config";
     // The expected JWT iss value
     public static final String TEST_ISSUER = "https://server.example.com";
 
-    private TCKConstants() {}
+    private TCKConstants() {
+    }
 }

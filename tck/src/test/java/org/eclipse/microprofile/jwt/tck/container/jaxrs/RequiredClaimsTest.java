@@ -57,9 +57,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test to ensure that a MP-JWT containing only the minimum set of
- * claims required by the specification can deploy and be used
- * safely without a validation error
+ * Test to ensure that a MP-JWT containing only the minimum set of claims required by the specification can deploy and
+ * be used safely without a validation error
  */
 public class RequiredClaimsTest extends Arquillian {
 
@@ -80,16 +79,20 @@ public class RequiredClaimsTest extends Arquillian {
 
     /**
      * Create a CDI aware base web application archive
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
     @Deployment(testable = true)
     public static WebArchive createDeployment() throws IOException {
-        URL config = RequiredClaimsTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
+        URL config =
+                RequiredClaimsTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = RequiredClaimsTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "RequiredClaimsTest.war")
-                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addClass(RequiredClaimsEndpoint.class)
                 .addClass(TCKApplication.class)
@@ -98,7 +101,6 @@ public class RequiredClaimsTest extends Arquillian {
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
-
 
     @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
@@ -110,8 +112,7 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that the token issuer claim is as expected")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that the token issuer claim is as expected")
     public void verifyIssuerClaim() throws Exception {
         Reporter.log("Begin verifyIssuerClaim");
         String uri = baseURL.toExternalForm() + "endp/verifyIssuer";
@@ -119,7 +120,8 @@ public class RequiredClaimsTest extends Arquillian {
                 .target(uri)
                 .queryParam(Claims.iss.name(), TEST_ISSUER)
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -129,8 +131,7 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that the token sub claim is as expected")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that the token sub claim is as expected")
     public void verifySubClaim() throws Exception {
         Reporter.log("Begin verifySubClaim");
         String uri = baseURL.toExternalForm() + "endp/verifySUB";
@@ -138,7 +139,8 @@ public class RequiredClaimsTest extends Arquillian {
                 .target(uri)
                 .queryParam(Claims.sub.name(), "24400320")
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -148,8 +150,7 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that the jti claim is as expected")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that the jti claim is as expected")
     public void verifyJTI() throws Exception {
         Reporter.log("Begin verifyJTI\n");
         String uri = baseURL.toExternalForm() + "endp/verifyJTI";
@@ -157,7 +158,8 @@ public class RequiredClaimsTest extends Arquillian {
                 .target(uri)
                 .queryParam(Claims.jti.name(), "a-f2b2180c")
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -167,8 +169,7 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that the uPN claim is as expected")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that the uPN claim is as expected")
     public void verifyUPN() throws Exception {
         Reporter.log("Begin verifyUPN\n");
         String uri = baseURL.toExternalForm() + "endp/verifyUPN";
@@ -176,7 +177,8 @@ public class RequiredClaimsTest extends Arquillian {
                 .target(uri)
                 .queryParam(Claims.upn.name(), "jdoe@example.com")
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -186,8 +188,7 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that the aud claim is as expected")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that the aud claim is as expected")
     public void verifyAudience() throws Exception {
         Reporter.log("Begin verifyAudience\n");
         String uri = baseURL.toExternalForm() + "endp/verifyAudience";
@@ -195,7 +196,8 @@ public class RequiredClaimsTest extends Arquillian {
                 .target(uri)
                 .queryParam(Claims.aud.name(), null)
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -205,8 +207,7 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that the aud claim is as expected")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that the aud claim is as expected")
     public void verifyOptionalAudience() throws Exception {
         Reporter.log("Begin verifyOptionalAudience\n");
         String uri = baseURL.toExternalForm() + "endp/verifyOptionalAudience";
@@ -214,7 +215,8 @@ public class RequiredClaimsTest extends Arquillian {
                 .target(uri)
                 .queryParam(Claims.aud.name(), null)
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -224,8 +226,7 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that the iat claim is as expected")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that the iat claim is as expected")
     public void verifyIssuedAt() throws Exception {
         Reporter.log("Begin verifyIssuedAt\n");
         String uri = baseURL.toExternalForm() + "endp/verifyIssuedAt";
@@ -233,7 +234,8 @@ public class RequiredClaimsTest extends Arquillian {
                 .target(uri)
                 .queryParam(Claims.iat.name(), iatClaim)
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -243,8 +245,7 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that the exp claim is as expected")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that the exp claim is as expected")
     public void verifyExpiration() throws Exception {
         Reporter.log("Begin verifyExpiration\n");
         String uri = baseURL.toExternalForm() + "endp/verifyExpiration";
@@ -252,7 +253,8 @@ public class RequiredClaimsTest extends Arquillian {
                 .target(uri)
                 .queryParam(Claims.exp.name(), expClaim)
                 .queryParam(Claims.auth_time.name(), authTimeClaim);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
@@ -262,24 +264,22 @@ public class RequiredClaimsTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that HTTP 401 status is returned if the token contains no exp claim")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that HTTP 401 status is returned if the token contains no exp claim")
     public void verifyTokenWithoutExpiration() throws Exception {
         PrivateKey pk = TokenUtils.readPrivateKey("/privateKey.pem");
         String tokenWithoutExp =
-            TokenUtils.signClaims(pk, "1", "/TokenWithoutExp.json", Collections.singleton(InvalidClaims.EXP), null);
+                TokenUtils.signClaims(pk, "1", "/TokenWithoutExp.json", Collections.singleton(InvalidClaims.EXP), null);
         Reporter.log("Begin verifyTokenWithoutExpiration\n");
         String uri = baseURL.toExternalForm() + "endp/verifyTokenWithoutExpiration";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,
-            "Bearer " + tokenWithoutExp).get();
+                "Bearer " + tokenWithoutExp).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that HTTP 401 status is returned if the token contains no 'upn', 'preferred_username' and 'sub' claims")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that HTTP 401 status is returned if the token contains no 'upn', 'preferred_username' and 'sub' claims")
     public void verifyTokenWithoutName() throws Exception {
         String tokenWithoutName = TokenUtils.signClaims("/TokenWithoutName.json");
         Reporter.log("Begin verifyTokenWithoutName\n");
@@ -287,23 +287,23 @@ public class RequiredClaimsTest extends Arquillian {
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,
-            "Bearer " + tokenWithoutName).get();
+                "Bearer " + tokenWithoutName).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JWT,
-            description = "Verify that HTTP 401 status is returned if the token 'iat' claim is older than 'exp' claim")
+    @Test(groups = TEST_GROUP_JWT, description = "Verify that HTTP 401 status is returned if the token 'iat' claim is older than 'exp' claim")
     public void verifyTokenWithIatOlderThanExp() throws Exception {
         PrivateKey pk = TokenUtils.readPrivateKey("/privateKey.pem");
         String tokenWithIatOlderThanExp =
-            TokenUtils.signClaims(pk, "1", "/TokenWithIatOlderThanExp.json", Collections.singleton(InvalidClaims.IAT), null);
+                TokenUtils.signClaims(pk, "1", "/TokenWithIatOlderThanExp.json",
+                        Collections.singleton(InvalidClaims.IAT), null);
         Reporter.log("Begin verifyTokenWithIatOlderThanExp\n");
         String uri = baseURL.toExternalForm() + "endp/verifyTokenWithIatOlderThanExp";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri);
         Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,
-            "Bearer " + tokenWithIatOlderThanExp).get();
+                "Bearer " + tokenWithIatOlderThanExp).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 }

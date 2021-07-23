@@ -19,6 +19,8 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI_PROVIDER;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
@@ -47,11 +49,8 @@ import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI_PROVIDER;
-
 /**
- * Tests that the {@linkplain java.security.Principal} can be used as an injection type
- * for the authenticated user
+ * Tests that the {@linkplain java.security.Principal} can be used as an injection type for the authenticated user
  */
 public class PrincipalInjectionTest extends Arquillian {
 
@@ -59,7 +58,7 @@ public class PrincipalInjectionTest extends Arquillian {
      * The test generated JWT token string
      */
     private static String token;
-    
+
     /**
      * The base URL for the container under test
      */
@@ -68,16 +67,20 @@ public class PrincipalInjectionTest extends Arquillian {
 
     /**
      * Create a CDI aware base web application archive
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
-    @Deployment(testable=true)
+    @Deployment(testable = true)
     public static WebArchive createDeployment() throws IOException {
-        URL config = PrincipalInjectionTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
+        URL config =
+                PrincipalInjectionTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = PrincipalInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "PrincipalInjectionTest.war")
-                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addClass(PrincipalInjectionEndpoint.class)
                 .addClass(TCKApplication.class)
@@ -87,20 +90,20 @@ public class PrincipalInjectionTest extends Arquillian {
         return webArchive;
     }
 
-    @BeforeClass(alwaysRun=true)
+    @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
         token = TokenUtils.generateTokenString("/Token1.json");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI_PROVIDER,
-        description = "Verify that the injected authenticated principal is as expected")
+    @Test(groups = TEST_GROUP_CDI_PROVIDER, description = "Verify that the injected authenticated principal is as expected")
     public void verifyInjectedPrincipal() throws Exception {
-        Reporter.log("Begin verifyInjectedPrincipal, baseURL="+baseURL.toExternalForm() );
+        Reporter.log("Begin verifyInjectedPrincipal, baseURL=" + baseURL.toExternalForm());
         String uri = baseURL.toExternalForm() + "endp/verifyInjectedPrincipal";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+                .target(uri);
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

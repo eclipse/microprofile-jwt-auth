@@ -42,17 +42,17 @@ import org.testng.annotations.Test;
  */
 public class TokenUtilsTest {
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Illustrate validation of alg")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Illustrate validation of alg")
     public void testFailAlgorithm() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ALG);
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, invalidFields);
         validateToken(token);
     }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of alg")
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Deprecated: Illustrate validation of alg")
     public void testFailAlgorithmDeprecated() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ALG);
@@ -66,7 +66,7 @@ public class TokenUtilsTest {
         String token = TokenUtils.signClaims("/Token1.json");
         validateToken(token);
     }
-    
+
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT")
     public void testValidToken1024BitKeyLength() throws Exception {
         KeyPair pair = TokenUtils.generateKeyPair(1024);
@@ -80,15 +80,15 @@ public class TokenUtilsTest {
         validateToken(token, SignatureAlgorithm.ES256, null);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT",
-        expectedExceptions = {InvalidJwtException.class})
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT", expectedExceptions = {
+            InvalidJwtException.class})
     public void testSignedByRSKeyVerifiedByECKey() throws Exception {
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256);
         validateToken(token, SignatureAlgorithm.ES256, null);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT",
-            expectedExceptions = {InvalidJwtException.class})
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT", expectedExceptions = {
+            InvalidJwtException.class})
     public void testSignedByECKeyVerifiedByRSKey() throws Exception {
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.ES256);
         validateToken(token, SignatureAlgorithm.RS256, null);
@@ -101,17 +101,17 @@ public class TokenUtilsTest {
         validateToken(token);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Illustrate validation of issuer")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Illustrate validation of issuer")
     public void testFailIssuer() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, invalidFields);
         validateToken(token);
     }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of issuer")
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Deprecated: Illustrate validation of issuer")
     public void testFailIssuerDeprecated() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
@@ -120,17 +120,17 @@ public class TokenUtilsTest {
         validateToken(token);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-        description = "Illustrate validation of signer")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Illustrate validation of signer")
     public void testFailSignature() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, invalidFields);
         validateToken(token);
     }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of signer")
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Deprecated: Illustrate validation of signer")
     public void testFailSignatureDeprecated() throws Exception {
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
@@ -139,8 +139,8 @@ public class TokenUtilsTest {
         validateToken(token);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-        description = "Illustrate validation of exp")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Illustrate validation of exp")
     public void testFailExpired() throws Exception {
         Map<String, Long> timeClaims = new HashMap<>();
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
@@ -148,9 +148,9 @@ public class TokenUtilsTest {
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, invalidFields, timeClaims);
         validateToken(token);
     }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of exp")
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Deprecated: Illustrate validation of exp")
     public void testFailExpiredDeprecated() throws Exception {
         Map<String, Long> timeClaims = new HashMap<>();
         Set<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
@@ -160,8 +160,8 @@ public class TokenUtilsTest {
         validateToken(token);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-        description = "Illustrate validation of exp that has just expired")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Illustrate validation of exp that has just expired")
     public void testFailJustExpired() throws Exception {
         Map<String, Long> timeClaims = new HashMap<>();
         // Set exp to 61 seconds in past
@@ -170,9 +170,9 @@ public class TokenUtilsTest {
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, null, timeClaims);
         validateToken(token);
     }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Deprecated: Illustrate validation of exp that has just expired")
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Deprecated: Illustrate validation of exp that has just expired")
     public void testFailJustExpiredDeprecated() throws Exception {
         Map<String, Long> timeClaims = new HashMap<>();
         // Set exp to 61 seconds in past
@@ -183,8 +183,7 @@ public class TokenUtilsTest {
         validateToken(token);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS,
-        description = "Illustrate validation of exp that is in grace period")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of exp that is in grace period")
     public void testExpGrace() throws Exception {
         Map<String, Long> timeClaims = new HashMap<>();
         // Set exp to 45 seconds in past
@@ -193,9 +192,8 @@ public class TokenUtilsTest {
         String token = TokenUtils.signClaims("/Token1.json", SignatureAlgorithm.RS256, null, timeClaims);
         validateToken(token, exp);
     }
-    
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS,
-            description = "Deprecated: Illustrate validation of exp that is in grace period")
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Deprecated: Illustrate validation of exp that is in grace period")
     public void testExpGraceDeprecated() throws Exception {
         Map<String, Long> timeClaims = new HashMap<>();
         // Set exp to 45 seconds in past
@@ -215,12 +213,14 @@ public class TokenUtilsTest {
     }
 
     private void validateToken(String token, SignatureAlgorithm algorithm, Long expectedExpValue) throws Exception {
-        PublicKey publicKey = algorithm == SignatureAlgorithm.RS256 ? TokenUtils.readPublicKey("/publicKey.pem")
+        PublicKey publicKey = algorithm == SignatureAlgorithm.RS256
+                ? TokenUtils.readPublicKey("/publicKey.pem")
                 : TokenUtils.readECPublicKey("/ecPublicKey.pem");
-        validateToken(token, publicKey, algorithm, expectedExpValue);    
+        validateToken(token, publicKey, algorithm, expectedExpValue);
     }
 
-    private void validateToken(String token, PublicKey publicKey, SignatureAlgorithm algorithm, Long expectedExpValue) throws Exception {
+    private void validateToken(String token, PublicKey publicKey, SignatureAlgorithm algorithm, Long expectedExpValue)
+            throws Exception {
 
         int expGracePeriodSecs = 60;
 
@@ -233,7 +233,7 @@ public class TokenUtilsTest {
         builder.setRequireIssuedAt();
         // 'RS256' is required
         builder.setJwsAlgorithmConstraints(
-           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, algorithm.getAlgorithm()));
+                new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, algorithm.getAlgorithm()));
 
         // issuer must be equal to TCKConstants.TEST_ISSUER
         builder.setExpectedIssuer(true, TCKConstants.TEST_ISSUER);
@@ -252,12 +252,11 @@ public class TokenUtilsTest {
         Assert.assertEquals(claimsSet.getAudience().size(), 1);
         Assert.assertEquals(claimsSet.getAudience().get(0), "s6BhdRkqt3");
         if (expectedExpValue != null) {
-            Assert.assertEquals(claimsSet.getExpirationTime().getValue(), (long)expectedExpValue);
+            Assert.assertEquals(claimsSet.getExpirationTime().getValue(), (long) expectedExpValue);
             Assert.assertEquals(claimsSet.getIssuedAt().getValue(), expectedExpValue - 5);
             Assert.assertEquals(NumericDate.fromSeconds(claimsSet.getClaimValue("auth_time", Long.class)).getValue(),
                     expectedExpValue - 5);
-        }
-        else {
+        } else {
             Assert.assertNotNull(claimsSet.getExpirationTime());
             long exp = claimsSet.getExpirationTime().getValue();
             Assert.assertEquals(claimsSet.getIssuedAt().getValue(), exp - 300);
@@ -269,11 +268,11 @@ public class TokenUtilsTest {
         Assert.assertEquals(claimsSet.getClaimValue("customInteger", Long.class), Long.valueOf(123456789));
         Assert.assertEquals(claimsSet.getClaimValue("customDouble", Double.class), 3.141592653589793);
         Assert.assertTrue(claimsSet.getClaimValue("customBoolean", Boolean.class));
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("roles")).size(), 1);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("groups")).size(), 4);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customStringArray")).size(), 3);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customIntegerArray")).size(), 4);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customDoubleArray")).size(), 5);
-        Assert.assertEquals(((Map<?, ?>)claimsSet.getClaimsMap().get("customObject")).size(), 3);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("roles")).size(), 1);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("groups")).size(), 4);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("customStringArray")).size(), 3);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("customIntegerArray")).size(), 4);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("customDoubleArray")).size(), 5);
+        Assert.assertEquals(((Map<?, ?>) claimsSet.getClaimsMap().get("customObject")).size(), 3);
     }
 }

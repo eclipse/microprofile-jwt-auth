@@ -20,15 +20,11 @@
 package org.eclipse.microprofile.jwt.tck.util;
 
 /**
- * An enum used to identify which version of the MP-JWT a TCK test war is
- * targeting. The target version can be found by loading the META-INF/MPJWTTESTVERSION
- * resource from the test war and converting it to the MpJwtTestVersion value.
+ * An enum used to identify which version of the MP-JWT a TCK test war is targeting. The target version can be found by
+ * loading the META-INF/MPJWTTESTVERSION resource from the test war and converting it to the MpJwtTestVersion value.
  */
 public enum MpJwtTestVersion {
-    MPJWT_V_1_0,
-    MPJWT_V_1_1,
-    MPJWT_V_1_2
-    ;
+    MPJWT_V_1_0, MPJWT_V_1_1, MPJWT_V_1_2;
 
     public static final String VERSION_LOCATION = "META-INF/MPJWTTESTVERSION";
     public static final String MANIFEST_NAME = "MPJWTTESTVERSION";

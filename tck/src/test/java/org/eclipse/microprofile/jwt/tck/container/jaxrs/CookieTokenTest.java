@@ -19,6 +19,18 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashSet;
+
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -31,17 +43,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashSet;
-
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
-
 public class CookieTokenTest extends Arquillian {
     @ArquillianResource
     private URL baseURL;
@@ -51,89 +52,86 @@ public class CookieTokenTest extends Arquillian {
         URL config = InvalidTokenTest.class.getResource("/META-INF/microprofile-config-cookie.properties");
         URL publicKey = InvalidTokenTest.class.getResource("/publicKey.pem");
         return ShrinkWrap
-            .create(WebArchive.class, "CookieTokenTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(TCKApplication.class)
-            .addClass(RolesEndpoint.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(config, "microprofile-config.properties");
+                .create(WebArchive.class, "CookieTokenTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(TCKApplication.class)
+                .addClass(RolesEndpoint.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(config, "microprofile-config.properties");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate a request with a valid JWT in a Cookie")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with a valid JWT in a Cookie")
     public void validCookieJwt() throws Exception {
         String token = TokenUtils.generateTokenString("/Token1.json");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello");
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
-            .cookie("jwt", token)
-            .get();
+                .request(TEXT_PLAIN)
+                .cookie("jwt", token)
+                .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         Assert.assertEquals(reply, "hello, user=jdoe@example.com");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate a request with a different Cookie name from the one configured fais with " +
-                        "HTTP_UNAUTHORIZED")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with a different Cookie name from the one configured fais with "
+            +
+            "HTTP_UNAUTHORIZED")
     public void wrongCookieName() throws Exception {
         String token = TokenUtils.generateTokenString("/Token1.json");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello");
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
-            .cookie("Bearer", token)
-            .get();
+                .request(TEXT_PLAIN)
+                .cookie("Bearer", token)
+                .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate a request without empty token in a Cookie fails with HTTP_UNAUTHORIZED")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request without empty token in a Cookie fails with HTTP_UNAUTHORIZED")
     public void emptyCookie() {
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello");
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
-            .cookie("jwt", "")
-            .get();
+                .request(TEXT_PLAIN)
+                .cookie("jwt", "")
+                .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate a request with valid token in Header but endpoints expects Cookie fails with " +
-                        "HTTP_UNAUTHORIZED")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with valid token in Header but endpoints expects Cookie fails with "
+            +
+            "HTTP_UNAUTHORIZED")
     public void ignoreHeaderIfCookieSet() throws Exception {
         String token = TokenUtils.generateTokenString("/Token1.json");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello");
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-            .get();
+                .request(TEXT_PLAIN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
-
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate a request with expired token in a Cookie fails with HTTP_UNAUTHORIZED")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with expired token in a Cookie fails with HTTP_UNAUTHORIZED")
     public void expiredCookie() throws Exception {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
@@ -141,13 +139,12 @@ public class CookieTokenTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello")
-            ;
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
-            .cookie("jwt", token)
-            .get();
+                .request(TEXT_PLAIN)
+                .cookie("jwt", token)
+                .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 }
