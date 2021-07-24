@@ -42,53 +42,51 @@ import org.testng.annotations.Test;
  */
 public class TokenUtilsSignEncryptTest {
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS,
-        description = "Illustrate an encryption of the nested JWT")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate an encryption of the nested JWT")
     public void testEncryptSignedClaims() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json");
         validateToken(token, true);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS,
-            description = "Illustrate an encryption of the nested JWT")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate an encryption of the nested JWT")
     public void testEncryptECSignedClaims() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.ES256);
         validateToken(token, SignatureAlgorithm.ES256, true);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT",
-            expectedExceptions = {InvalidJwtException.class})
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT", expectedExceptions = {
+            InvalidJwtException.class})
     public void testNestedSignedByRSKeyVerifiedByECKey() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.RS256);
         validateToken(token, SignatureAlgorithm.ES256, true);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT",
-            expectedExceptions = {InvalidJwtException.class})
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT", expectedExceptions = {
+            InvalidJwtException.class})
     public void testNestedSignedByECKeyVerifiedByRSKey() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.ES256);
         validateToken(token, SignatureAlgorithm.RS256, true);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Illustrate validation failure if signed token is encrypted and no 'cty' header is set")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Illustrate validation failure if signed token is encrypted and no 'cty' header is set")
     public void testEncryptSignedClaimsWithoutCty() throws Exception {
         PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey.pem");
         PublicKey encryptionKey = TokenUtils.readPublicKey("/publicKey.pem");
         String token =
-            TokenUtils.signEncryptClaims(signingKey, "1", encryptionKey, "2", "/Token1.json", false);
+                TokenUtils.signEncryptClaims(signingKey, "1", encryptionKey, "2", "/Token1.json", false);
         validateToken(token, true);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {JoseException.class},
-            description = "Illustrate validation failure if signed token is used")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            JoseException.class}, description = "Illustrate validation failure if signed token is used")
     public void testValidateSignedToken() throws Exception {
         String token = TokenUtils.signClaims("/Token1.json");
         validateToken(token, false);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {InvalidJwtException.class},
-            description = "Illustrate validation failure if encrypted token without nested token is used")
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
+            InvalidJwtException.class}, description = "Illustrate validation failure if encrypted token without nested token is used")
     public void testValidateEncryptedOnlyToken() throws Exception {
         String token = TokenUtils.encryptClaims("/Token1.json");
         validateToken(token, false);
@@ -98,10 +96,11 @@ public class TokenUtilsSignEncryptTest {
         validateToken(jweCompact, SignatureAlgorithm.RS256, jwtExpected);
     }
 
-    private void validateToken(String jweCompact, SignatureAlgorithm signatureAlgorithm, boolean jwtExpected) throws Exception {
+    private void validateToken(String jweCompact, SignatureAlgorithm signatureAlgorithm, boolean jwtExpected)
+            throws Exception {
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setAlgorithmConstraints(
-           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RSA-OAEP"));
+                new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RSA-OAEP"));
         jwe.setCompactSerialization(jweCompact);
         RSAPrivateKey privateKey = (RSAPrivateKey) TokenUtils.readPrivateKey("/privateKey.pem");
         jwe.setKey(privateKey);
@@ -111,13 +110,13 @@ public class TokenUtilsSignEncryptTest {
             if (!"JWT".equals(jwe.getHeader("cty"))) {
                 throw new InvalidJwtException("'cty' header is missing", Collections.emptyList(), null);
             }
-        }
-        else {
+        } else {
             Assert.assertNull(jwe.getHeader("cty"));
         }
 
         // verify the nested token
-        PublicKey publicKey = signatureAlgorithm == SignatureAlgorithm.RS256 ? TokenUtils.readPublicKey("/publicKey.pem")
+        PublicKey publicKey = signatureAlgorithm == SignatureAlgorithm.RS256
+                ? TokenUtils.readPublicKey("/publicKey.pem")
                 : TokenUtils.readECPublicKey("/ecPublicKey.pem");
 
         int expGracePeriodSecs = 60;
@@ -131,7 +130,8 @@ public class TokenUtilsSignEncryptTest {
         builder.setRequireIssuedAt();
         // 'RS256' is required
         builder.setJwsAlgorithmConstraints(
-           new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, signatureAlgorithm.getAlgorithm()));
+                new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST,
+                        signatureAlgorithm.getAlgorithm()));
 
         // issuer must be equal to TCKConstants.TEST_ISSUER
         builder.setExpectedIssuer(true, TCKConstants.TEST_ISSUER);
@@ -157,11 +157,11 @@ public class TokenUtilsSignEncryptTest {
         Assert.assertEquals(claimsSet.getClaimValueAsString("customString"), "customStringValue");
         Assert.assertEquals(claimsSet.getClaimValue("customInteger", Long.class), Long.valueOf(123456789));
         Assert.assertEquals(claimsSet.getClaimValue("customDouble", Double.class), 3.141592653589793);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("roles")).size(), 1);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("groups")).size(), 4);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customStringArray")).size(), 3);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customIntegerArray")).size(), 4);
-        Assert.assertEquals(((List<?>)claimsSet.getClaimsMap().get("customDoubleArray")).size(), 5);
-        Assert.assertEquals(((Map<?, ?>)claimsSet.getClaimsMap().get("customObject")).size(), 3);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("roles")).size(), 1);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("groups")).size(), 4);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("customStringArray")).size(), 3);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("customIntegerArray")).size(), 4);
+        Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("customDoubleArray")).size(), 5);
+        Assert.assertEquals(((Map<?, ?>) claimsSet.getClaimsMap().get("customObject")).size(), 3);
     }
 }

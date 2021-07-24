@@ -19,6 +19,17 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.ejb;
 
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
@@ -35,16 +46,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
  * Basic EJB container integration tests
@@ -63,22 +64,24 @@ public class EjbTest extends Arquillian {
 
     /**
      * Create a CDI aware base web application archive
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
-    @Deployment(testable=true)
+    @Deployment(testable = true)
     public static WebArchive createDeployment() throws IOException {
         URL publicKey = EjbTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "EjbTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(EjbEndpoint.class)
-            .addClass(IService.class)
-            .addClass(ServiceEJB.class)
-            .addClass(TCKApplication.class)
-            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            ;
+                .create(WebArchive.class, "EjbTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(EjbEndpoint.class)
+                .addClass(IService.class)
+                .addClass(ServiceEJB.class)
+                .addClass(TCKApplication.class)
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
@@ -89,47 +92,44 @@ public class EjbTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TCKConstants.TEST_GROUP_EJB,
-        description = "Validate a request with MP-JWT to a secured method propagates to a secured ejb method")
+    @Test(groups = TCKConstants.TEST_GROUP_EJB, description = "Validate a request with MP-JWT to a secured method propagates to a secured ejb method")
     public void callEjbEcho() throws Exception {
         String uri = baseURL.toExternalForm() + "endp/getEJBEcho";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         System.out.println(reply);
     }
 
     @RunAsClient
-    @Test(groups = TCKConstants.TEST_GROUP_EJB,
-        description = "Validate a request with MP-JWT PolicyContext.getContext() Subject has a JsonWebToken")
+    @Test(groups = TCKConstants.TEST_GROUP_EJB, description = "Validate a request with MP-JWT PolicyContext.getContext() Subject has a JsonWebToken")
     public void getSubjectClass() throws Exception {
         String uri = baseURL.toExternalForm() + "endp/getEJBSubjectClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         System.out.println(reply);
     }
 
     @RunAsClient
-    @Test(groups = TCKConstants.TEST_GROUP_EJB,
-        description = "Validate a request with MP-JWT SecurityContext.getUserPrincipal() is a JsonWebToken")
+    @Test(groups = TCKConstants.TEST_GROUP_EJB, description = "Validate a request with MP-JWT SecurityContext.getUserPrincipal() is a JsonWebToken")
     public void testEJBPrincipalClass() throws Exception {
         String uri = baseURL.toExternalForm() + "endp/getEJBPrincipalClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         String[] ifaces = reply.split(",");
         boolean hasJsonWebToken = false;
-        for(String iface : ifaces) {
+        for (String iface : ifaces) {
             hasJsonWebToken |= iface.equals(JsonWebToken.class.getTypeName());
         }
         Assert.assertTrue(hasJsonWebToken, "EJB PrincipalClass has JsonWebToken interface");

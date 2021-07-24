@@ -41,17 +41,21 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 
 /**
- * Scaled down version of tck TokenUtils that has no JWT library dependencies so that it
- * can be embedded in the tck wars without needing a JWT library on the server side.
+ * Scaled down version of tck TokenUtils that has no JWT library dependencies so that it can be embedded in the tck wars
+ * without needing a JWT library on the server side.
  */
 public class SimpleTokenUtils {
-    private SimpleTokenUtils(){}
+    private SimpleTokenUtils() {
+    }
 
     /**
      * Decode a PEM encoded private key string to an RSA PrivateKey
-     * @param pemEncoded - PEM string for private key
+     * 
+     * @param pemEncoded
+     *            - PEM string for private key
      * @return PrivateKey
-     * @throws Exception on decode failure
+     * @throws Exception
+     *             on decode failure
      */
     public static PrivateKey decodePrivateKey(final String pemEncoded) throws Exception {
         byte[] encodedBytes = toEncodedBytes(pemEncoded);
@@ -63,45 +67,52 @@ public class SimpleTokenUtils {
 
     /**
      * Decode a PEM encoded public key string to an RSA PublicKey
-     * @param pemEncoded - PEM string for public key
+     * 
+     * @param pemEncoded
+     *            - PEM string for public key
      * @return RSAPublicKey
-     * @throws Exception on decode failure
+     * @throws Exception
+     *             on decode failure
      */
     public static RSAPublicKey decodePublicKey(String pemEncoded) throws Exception {
         byte[] encodedBytes = toEncodedBytes(pemEncoded);
 
         X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        return (RSAPublicKey)kf.generatePublic(spec);
+        return (RSAPublicKey) kf.generatePublic(spec);
     }
 
     /**
      * Decode a PEM encoded public key string to an EC PublicKey
-     * @param pemEncoded - PEM string for public key
+     * 
+     * @param pemEncoded
+     *            - PEM string for public key
      * @return ECPublicKey
-     * @throws Exception on decode failure
+     * @throws Exception
+     *             on decode failure
      */
     public static ECPublicKey decodeECPublicKey(String pemEncoded) throws Exception {
         byte[] encodedBytes = toEncodedBytes(pemEncoded);
 
         X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedBytes);
         KeyFactory kf = KeyFactory.getInstance("EC");
-        return (ECPublicKey)kf.generatePublic(spec);
+        return (ECPublicKey) kf.generatePublic(spec);
     }
 
     /**
      * Decode a JWK(S) encoded public key string to an RSA PublicKey
-     * @param jwksValue - JWKS string value
+     * 
+     * @param jwksValue
+     *            - JWKS string value
      * @return RSAPublicKey from RSAPublicKeySpec
      */
     public static RSAPublicKey decodeJWKSPublicKey(String jwksValue) throws Exception {
         JsonObject jwks = Json.createReader(new StringReader(jwksValue)).readObject();
         JsonArray keys = jwks.getJsonArray("keys");
         JsonObject jwk;
-        if(keys != null) {
+        if (keys != null) {
             jwk = keys.getJsonObject(0);
-        }
-        else {
+        } else {
             jwk = jwks;
         }
         String e = jwk.getString("e");
@@ -113,22 +124,23 @@ public class SimpleTokenUtils {
         BigInteger modulus = new BigInteger(1, nbytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
         RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, publicExponent);
-        return (RSAPublicKey)kf.generatePublic(rsaPublicKeySpec);
+        return (RSAPublicKey) kf.generatePublic(rsaPublicKeySpec);
     }
 
     /**
      * Decode a JWK(S) encoded private key string to an RSA PrivateKey
-     * @param jwksValue - JWKS string value
+     * 
+     * @param jwksValue
+     *            - JWKS string value
      * @return PrivateKey from RSAPrivateKeySpec
      */
     public static PrivateKey decodeJWKSPrivateKey(String jwksValue) throws Exception {
         JsonObject jwks = Json.createReader(new StringReader(jwksValue)).readObject();
         JsonArray keys = jwks.getJsonArray("keys");
         JsonObject jwk;
-        if(keys != null) {
+        if (keys != null) {
             jwk = keys.getJsonObject(0);
-        }
-        else {
+        } else {
             jwk = jwks;
         }
         String d = jwk.getString("d");
@@ -156,20 +168,23 @@ public class SimpleTokenUtils {
     }
     /**
      * Read a classpath resource into a string and return it.
-     * @param resName - classpath resource name
+     * 
+     * @param resName
+     *            - classpath resource name
      * @return the resource content as a string
-     * @throws IOException - on failure
+     * @throws IOException
+     *             - on failure
      */
     public static String readResource(String resName) throws IOException {
         // Strip any classpath: prefix
-        if(resName.startsWith("classpath:")) {
+        if (resName.startsWith("classpath:")) {
             resName = resName.substring(10);
         }
         InputStream is = SimpleTokenUtils.class.getResourceAsStream(resName);
         StringWriter sw = new StringWriter();
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
             String line = br.readLine();
-            while(line != null) {
+            while (line != null) {
                 sw.write(line);
                 sw.write('\n');
                 line = br.readLine();

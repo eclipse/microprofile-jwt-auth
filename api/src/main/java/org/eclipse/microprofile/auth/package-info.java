@@ -19,13 +19,13 @@
  */
 
 /**
- * <p>Metadata for JWT RBAC for Microprofile
+ * <p>
+ * Metadata for JWT RBAC for Microprofile
  *
- * <h2>Overview</h2>
- * This package contains supporting metadata classes:
+ * <h2>Overview</h2> This package contains supporting metadata classes:
  * <ul>
- *     <li>LoginConfig: an annotation that is used by a JAX-RS Application to define the authentication
- *     method and associated security realm.</li>
+ * <li>LoginConfig: an annotation that is used by a JAX-RS Application to define the authentication method and
+ * associated security realm.</li>
  * </ul>
  *
  *

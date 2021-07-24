@@ -36,11 +36,9 @@ import javax.ws.rs.core.SecurityContext;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 /**
- * Validate that the injection of a {@linkplain Principal} works when using the MP-JWT feature.
- * This validates that the MP-JWT implementation is not interfering with the CDI built in
- * Principal bean.
- * This also validates that the {@linkplain SecurityContext#getUserPrincipal()} is also an
- * instance of the {@linkplain JsonWebToken} interface.
+ * Validate that the injection of a {@linkplain Principal} works when using the MP-JWT feature. This validates that the
+ * MP-JWT implementation is not interfering with the CDI built in Principal bean. This also validates that the
+ * {@linkplain SecurityContext#getUserPrincipal()} is also an instance of the {@linkplain JsonWebToken} interface.
  */
 @Path("/endp")
 @RequestScoped
@@ -61,33 +59,29 @@ public class PrincipalInjectionEndpoint {
         Principal jwtPrincipal = context.getUserPrincipal();
         if (jwtPrincipal == null) {
             msg = "SecurityContext#principal value is null, FAIL";
-        }
-        else if (jwtPrincipal instanceof JsonWebToken) {
+        } else if (jwtPrincipal instanceof JsonWebToken) {
             msg = "SecurityContext#getUserPrincipal is JsonWebToken, PASS";
             pass = true;
-        }
-        else {
+        } else {
             msg = String.format("principal: JsonWebToken != %s", jwtPrincipal.getClass().getCanonicalName());
         }
         // Validate that the injection built-in principal name matches the JsonWebToken name
-        if(pass) {
+        if (pass) {
             pass = false;
             if (principal == null) {
                 msg = "Injected principal value is null, FAIL";
-            }
-            else if (!principal.getName().equals(jwtPrincipal.getName())) {
+            } else if (!principal.getName().equals(jwtPrincipal.getName())) {
                 msg = "Injected principal#name != jwtPrincipal#name, FAIL";
-            }
-            else {
+            } else {
                 msg += "\nInjected Principal#getName matches, PASS";
                 pass = true;
             }
         }
 
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
     }
 

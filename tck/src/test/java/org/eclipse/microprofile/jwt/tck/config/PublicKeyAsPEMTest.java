@@ -19,6 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
@@ -48,12 +51,9 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
- * Validate that the bundled mp.jwt.verify.publickey config property as a literal PEM
- * is used to validate the JWT which is signed with privateKey4k.pem
+ * Validate that the bundled mp.jwt.verify.publickey config property as a literal PEM is used to validate the JWT which
+ * is signed with privateKey4k.pem
  */
 public class PublicKeyAsPEMTest extends Arquillian {
 
@@ -64,11 +64,12 @@ public class PublicKeyAsPEMTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key
-     * that is included as the mp.jwt.verify.publickey property.
-     * The root url is /
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is included as the
+     * mp.jwt.verify.publickey property. The root url is /
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createDeployment() throws IOException {
@@ -78,7 +79,8 @@ public class PublicKeyAsPEMTest extends Arquillian {
 
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "PublicKeyAsPEMTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addClass(PublicKeyEndpoint.class)
                 .addClass(TCKApplication.class)
@@ -90,8 +92,7 @@ public class PublicKeyAsPEMTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that the embedded PEM key is used to sign the JWT")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate that the embedded PEM key is used to sign the JWT")
     public void testKeyAsPEM() throws Exception {
         Reporter.log("testKeyAsPEM, expect HTTP_OK");
 
@@ -102,9 +103,9 @@ public class PublicKeyAsPEMTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "endp/verifyKeyAsPEM";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

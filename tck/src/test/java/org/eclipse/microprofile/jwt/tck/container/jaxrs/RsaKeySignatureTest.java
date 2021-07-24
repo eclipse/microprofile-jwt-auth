@@ -62,45 +62,49 @@ public class RsaKeySignatureTest extends Arquillian {
 
     /**
      * Create a CDI aware base web application archive
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
-    @Deployment(testable=true)
+    @Deployment(testable = true)
     public static WebArchive createDeployment() throws IOException {
-        URL config = RsaKeySignatureTest.class.getResource("/META-INF/microprofile-config-rsakey1024-location.properties");
+        URL config =
+                RsaKeySignatureTest.class.getResource("/META-INF/microprofile-config-rsakey1024-location.properties");
         URL publicKey = RsaKeySignatureTest.class.getResource("/rsaPublicKey1024bit.jwk");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "RsaKeySignatureTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/rsaPublicKey1024bit.jwk")
-            .addClass(RolesEndpoint.class)
-            .addClass(TCKApplication.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(config, "microprofile-config.properties");
+                .create(WebArchive.class, "RsaKeySignatureTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/rsaPublicKey1024bit.jwk")
+                .addClass(RolesEndpoint.class)
+                .addClass(TCKApplication.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(config, "microprofile-config.properties");
         return webArchive;
     }
 
-    @BeforeClass(alwaysRun=true)
+    @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
-        RSAPrivateKey privateKey = (RSAPrivateKey)TokenUtils.readJwkPrivateKey("/rsaPrivateKey1024bit.jwk");
+        RSAPrivateKey privateKey = (RSAPrivateKey) TokenUtils.readJwkPrivateKey("/rsaPrivateKey1024bit.jwk");
         Assert.assertEquals(privateKey.getModulus().bitLength(), 1024);
-        RSAPublicKey publicKey = (RSAPublicKey)TokenUtils.readJwkPublicKey("/rsaPublicKey1024bit.jwk");
+        RSAPublicKey publicKey = (RSAPublicKey) TokenUtils.readJwkPublicKey("/rsaPublicKey1024bit.jwk");
         Assert.assertEquals(publicKey.getModulus().bitLength(), 1024);
         token = TokenUtils.signClaims(privateKey, "1024bit", "/Token1.json");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-        description = "Validate a request with MP-JWT succeeds with HTTP_OK, and replies with hello, user={token upn claim}")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT succeeds with HTTP_OK, and replies with hello, user={token upn claim}")
     public void callEcho() throws Exception {
         Reporter.log("callEcho, expect HTTP_OK");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("input", "hello");
-        
-        Response response = echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri)
+                .queryParam("input", "hello");
+
+        Response response =
+                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         // Must return hello, user={token upn claim}

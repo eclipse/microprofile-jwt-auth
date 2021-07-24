@@ -36,24 +36,24 @@ public class TokenUtilsExtraTest {
     @Test(groups = TEST_GROUP_UTILS_EXTRA, description = "Used to generate a 2048 bit length key testing pair")
     public void testKeyPairGeneration2048Length() throws Exception {
         KeyPair keyPair = TokenUtils.generateKeyPair(2048);
-        RSAPrivateKey privateKey = (RSAPrivateKey)keyPair.getPrivate();
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         Assert.assertEquals(privateKey.getModulus().bitLength(), 2048);
-        RSAPublicKey publicKey = (RSAPublicKey)keyPair.getPublic();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         Assert.assertEquals(publicKey.getModulus().bitLength(), 2048);
     }
 
     @Test(groups = TEST_GROUP_UTILS_EXTRA, description = "Used to generate a 1024 bit length key testing pair")
     public void testKeyPairGeneration1024Length() throws Exception {
         KeyPair keyPair = TokenUtils.generateKeyPair(1024);
-        RSAPrivateKey privateKey = (RSAPrivateKey)keyPair.getPrivate();
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         Assert.assertEquals(privateKey.getModulus().bitLength(), 1024);
-        RSAPublicKey publicKey = (RSAPublicKey)keyPair.getPublic();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         Assert.assertEquals(publicKey.getModulus().bitLength(), 1024);
     }
 
     @Test(groups = TEST_GROUP_UTILS_EXTRA, description = "Test initial key validation")
     public void testReadPrivateKey() throws Exception {
-        RSAPrivateKey privateKey = (RSAPrivateKey)TokenUtils.readPrivateKey("/privateKey.pem");
+        RSAPrivateKey privateKey = (RSAPrivateKey) TokenUtils.readPrivateKey("/privateKey.pem");
         Assert.assertEquals(privateKey.getModulus().bitLength(), 2048);
     }
 

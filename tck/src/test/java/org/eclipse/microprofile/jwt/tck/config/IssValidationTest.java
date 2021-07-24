@@ -19,6 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -51,9 +54,6 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
  * Validate the handling of the JWT iss claim.
  *
@@ -72,11 +72,12 @@ public class IssValidationTest extends Arquillian {
     private static String token;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key
-     * that is included as the mp.jwt.verify.publickey property.
-     * The root url is /
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is included as the
+     * mp.jwt.verify.publickey property. The root url is /
+     * 
      * @return the base base web application archive
-     * @throws Exception - on resource failure
+     * @throws Exception
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createDeployment() throws Exception {
@@ -91,40 +92,39 @@ public class IssValidationTest extends Arquillian {
         Properties configProps = new Properties();
         // Location points to the PEM bundled in the deployment
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey4k.pem");
-        //configProps.setProperty(Names.REQUIRE_ISS, "true");
+        // configProps.setProperty(Names.REQUIRE_ISS, "true");
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "IssValidationTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "IssValidationTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addAsResource(publicKey, "/publicKey4k.pem")
-            // Include the token for inspection by ApplicationArchiveProcessor
-            .add(new StringAsset(token), "MP-JWT")
-            .addClass(PublicKeyEndpoint.class)
-            .addClass(TCKApplication.class)
-            .addClass(SimpleTokenUtils.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(configAsset, "microprofile-config.properties")
-            ;
+                .create(WebArchive.class, "IssValidationTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addAsResource(publicKey, "/publicKey4k.pem")
+                // Include the token for inspection by ApplicationArchiveProcessor
+                .add(new StringAsset(token), "MP-JWT")
+                .addClass(PublicKeyEndpoint.class)
+                .addClass(TCKApplication.class)
+                .addClass(SimpleTokenUtils.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(configAsset, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that JWK with iss that matches mp.jwt.verify.issuer returns HTTP_OK")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate that JWK with iss that matches mp.jwt.verify.issuer returns HTTP_OK")
     public void testRequiredIss() throws Exception {
         Reporter.log("testRequiredIss, expect HTTP_OK");
 
         String uri = baseURL.toExternalForm() + "endp/verifyIssIsOk";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

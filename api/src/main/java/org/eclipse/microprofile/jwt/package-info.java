@@ -19,20 +19,20 @@
  */
 
 /**
- * <p>Interoperable JWT RBAC for Microprofile
+ * <p>
+ * Interoperable JWT RBAC for Microprofile
  *
- * <h2>Overview</h2>
- * This package contains the primary interfaces and support classes for the JSON Web Tokens (JWT) for Role Based
- * Access Control (RBAC) of MicroProfile microservice endpoints. The primary class is the JsonWebToken interface
- * that defines the view of the current authenticated user and associated JWT claims. It is available for injection
- * as well as the user principal available from the container security API.
+ * <h2>Overview</h2> This package contains the primary interfaces and support classes for the JSON Web Tokens (JWT) for
+ * Role Based Access Control (RBAC) of MicroProfile microservice endpoints. The primary class is the JsonWebToken
+ * interface that defines the view of the current authenticated user and associated JWT claims. It is available for
+ * injection as well as the user principal available from the container security API.
  *
  * The supporting classes in this package include:
  * <ul>
- *     <li>Claim: a qualifier annotation used to mark a JWT claim value injection point</li>
- *     <li>Claims: this is an enum that defines the names and types of the JWT claims standardized through
- *     RFC7519, OIDC, etc.</li>
- *     <li>ClaimValue: this is a proxyable/injectable interface that represents the value of a single JWT claim.</li>
+ * <li>Claim: a qualifier annotation used to mark a JWT claim value injection point</li>
+ * <li>Claims: this is an enum that defines the names and types of the JWT claims standardized through RFC7519, OIDC,
+ * etc.</li>
+ * <li>ClaimValue: this is a proxyable/injectable interface that represents the value of a single JWT claim.</li>
  * </ul>
  *
  *

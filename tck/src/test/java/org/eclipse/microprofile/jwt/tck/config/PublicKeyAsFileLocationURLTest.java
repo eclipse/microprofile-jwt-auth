@@ -19,6 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,12 +57,9 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
- * Validate that config property values of type file URL to PEM works to validate the JWT
- * which is signed with privateKey4k.pem
+ * Validate that config property values of type file URL to PEM works to validate the JWT which is signed with
+ * privateKey4k.pem
  */
 public class PublicKeyAsFileLocationURLTest extends Arquillian {
 
@@ -70,11 +70,12 @@ public class PublicKeyAsFileLocationURLTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key that
-     * is referenced via the mp.jwt.verify.publickey.location as a URL resource property.
-     * The root url is /pem
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is referenced via
+     * the mp.jwt.verify.publickey.location as a URL resource property. The root url is /pem
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createLocationURLDeployment() throws IOException {
@@ -84,7 +85,7 @@ public class PublicKeyAsFileLocationURLTest extends Arquillian {
         InputStream reader = publicKey.openStream();
         byte[] data = new byte[1024];
         int bytes = reader.read(data);
-        while(bytes > 0) {
+        while (bytes > 0) {
             writer.write(data, 0, bytes);
             bytes = reader.read(data);
         }
@@ -101,7 +102,8 @@ public class PublicKeyAsFileLocationURLTest extends Arquillian {
         StringAsset configAsset = new StringAsset(configSW.toString());
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "PublicKeyAsFileLocationURLTest.war")
-                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_1.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey4k.pem")
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addClass(PublicKeyEndpoint.class)
@@ -114,8 +116,7 @@ public class PublicKeyAsFileLocationURLTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate specifying the mp.jwt.verify.publickey.location as file URL to a PEM key")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate specifying the mp.jwt.verify.publickey.location as file URL to a PEM key")
     public void testKeyAsLocationUrl() throws Exception {
         Reporter.log("testKeyAsLocationUrl, expect HTTP_OK");
 
@@ -126,10 +127,10 @@ public class PublicKeyAsFileLocationURLTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "pem/endp/verifyKeyLocationAsPEMUrl";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("kid", kid)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri)
+                .queryParam("kid", kid);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

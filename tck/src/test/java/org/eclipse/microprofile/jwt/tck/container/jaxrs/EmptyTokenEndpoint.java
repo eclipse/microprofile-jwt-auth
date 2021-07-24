@@ -19,13 +19,13 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import org.eclipse.microprofile.jwt.JsonWebToken;
-
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 @Path("/endp")
 public class EmptyTokenEndpoint {
@@ -36,9 +36,9 @@ public class EmptyTokenEndpoint {
     @Path("/verifyEmptyToken")
     public JsonObject verifyEmptyToken() {
         boolean pass = jsonWebToken.getName() == null &&
-                       jsonWebToken.getClaimNames() == null &&
-                       jsonWebToken.getClaim("") == null &&
-                       jsonWebToken.getRawToken() == null;
+                jsonWebToken.getClaimNames() == null &&
+                jsonWebToken.getClaim("") == null &&
+                jsonWebToken.getRawToken() == null;
 
         return Json.createObjectBuilder().add("pass", pass).build();
     }
@@ -47,8 +47,8 @@ public class EmptyTokenEndpoint {
     @Path("/verifyNonEmptyToken")
     public JsonObject verifyNonEmptyToken() {
         boolean pass = jsonWebToken.getName() != null &&
-                       jsonWebToken.getClaimNames() != null &&
-                       jsonWebToken.getRawToken() != null;
+                jsonWebToken.getClaimNames() != null &&
+                jsonWebToken.getRawToken() != null;
 
         return Json.createObjectBuilder().add("pass", pass).build();
     }

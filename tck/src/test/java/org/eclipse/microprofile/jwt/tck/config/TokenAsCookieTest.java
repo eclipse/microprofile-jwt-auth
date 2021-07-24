@@ -19,6 +19,22 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.eclipse.microprofile.jwt.config.Names.ISSUER;
+import static org.eclipse.microprofile.jwt.config.Names.TOKEN_HEADER;
+import static org.eclipse.microprofile.jwt.config.Names.VERIFIER_PUBLIC_KEY_LOCATION;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Properties;
+
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesEndpoint;
@@ -34,21 +50,6 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Properties;
-
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.eclipse.microprofile.jwt.config.Names.ISSUER;
-import static org.eclipse.microprofile.jwt.config.Names.TOKEN_HEADER;
-import static org.eclipse.microprofile.jwt.config.Names.VERIFIER_PUBLIC_KEY_LOCATION;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
 
 public class TokenAsCookieTest extends Arquillian {
     @ArquillianResource
@@ -66,29 +67,29 @@ public class TokenAsCookieTest extends Arquillian {
 
         URL publicKey = InvalidTokenTest.class.getResource("/publicKey.pem");
         return ShrinkWrap
-            .create(WebArchive.class, "TokenAsCookie.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(TCKApplication.class)
-            .addClass(RolesEndpoint.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(config, "microprofile-config.properties");
+                .create(WebArchive.class, "TokenAsCookie.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(TCKApplication.class)
+                .addClass(RolesEndpoint.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(config, "microprofile-config.properties");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate a request with a valid JWT in a Cookie with default name")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with a valid JWT in a Cookie with default name")
     public void validJwt() throws Exception {
         String token = TokenUtils.generateTokenString("/Token1.json");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello");
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(TEXT_PLAIN)
-            .cookie("Bearer", token)
-            .get();
+                .request(TEXT_PLAIN)
+                .cookie("Bearer", token)
+                .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String reply = response.readEntity(String.class);
         Assert.assertEquals(reply, "hello, user=jdoe@example.com");

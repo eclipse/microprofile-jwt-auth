@@ -57,8 +57,8 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 /**
- * Validate that config property values of type resource path to JWK works to decrypt the JWT
- * which is encrypted with publicKey4k.jwk
+ * Validate that config property values of type resource path to JWK works to decrypt the JWT which is encrypted with
+ * publicKey4k.jwk
  */
 public class PrivateKeyAsJWKClasspathTest extends Arquillian {
 
@@ -69,11 +69,12 @@ public class PrivateKeyAsJWKClasspathTest extends Arquillian {
     private URL baseURL;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key that
-     * is referenced via the mp.jwt.verify.publickey.location as an embedded resource property.
-     * The root url is /jwks
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is referenced via
+     * the mp.jwt.verify.publickey.location as an embedded resource property. The root url is /jwks
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createLocationDeployment() throws IOException {
@@ -90,7 +91,8 @@ public class PrivateKeyAsJWKClasspathTest extends Arquillian {
         StringAsset configAsset = new StringAsset(configSW.toString());
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "PrivateKeyAsJWKClasspathTest.war")
-                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey4k.pem")
                 .addAsResource(decryptorJwk, "/decryptorPrivateKey.jwk")
                 .addClass(PrivateKeyEndpoint.class)
@@ -102,8 +104,7 @@ public class PrivateKeyAsJWKClasspathTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate specifying the mp.jwt.decrypt.key.location as resource path to a JWK key")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate specifying the mp.jwt.decrypt.key.location as resource path to a JWK key")
     public void testKeyAsLocation() throws Exception {
         Reporter.log("testKeyAsLocation, expect HTTP_OK");
 
@@ -114,9 +115,10 @@ public class PrivateKeyAsJWKClasspathTest extends Arquillian {
 
         String uri = baseURL.toExternalForm() + "jwks/endp/verifyKeyLocationAsJWKResource";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("kid", kid);
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri)
+                .queryParam("kid", kid);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

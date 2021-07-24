@@ -23,10 +23,8 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 /**
- * This has no @LoginConfig and should not be deployment with MP-JWT
- * authentication.
+ * This has no @LoginConfig and should not be deployment with MP-JWT authentication.
  */
 @ApplicationPath("/")
 public class UnsecureTCKApplication extends Application {
 }
-

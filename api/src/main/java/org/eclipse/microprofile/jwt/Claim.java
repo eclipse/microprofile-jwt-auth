@@ -19,16 +19,16 @@
  */
 package org.eclipse.microprofile.jwt;
 
-import javax.enterprise.util.Nonbinding;
-import javax.inject.Qualifier;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.enterprise.util.Nonbinding;
+import javax.inject.Qualifier;
+
 /**
- * Annotation used to signify an injection point for a {@link ClaimValue} from
- * a {@link JsonWebToken}
+ * Annotation used to signify an injection point for a {@link ClaimValue} from a {@link JsonWebToken}
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
@@ -36,6 +36,7 @@ import java.lang.annotation.Target;
 public @interface Claim {
     /**
      * The value specifies the id name the claim to inject
+     *
      * @return the claim name
      * @see JsonWebToken#getClaim(String)
      */
@@ -43,11 +44,10 @@ public @interface Claim {
     String value() default "";
 
     /**
-     * An alternate way of specifying a claim name using the {@linkplain Claims}
-     * enum
+     * An alternate way of specifying a claim name using the {@linkplain Claims} enum
+     *
      * @return the claim enum
      */
     @Nonbinding
     Claims standard() default Claims.UNKNOWN;
-
 }

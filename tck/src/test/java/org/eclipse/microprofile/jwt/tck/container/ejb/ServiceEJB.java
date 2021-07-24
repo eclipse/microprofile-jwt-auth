@@ -50,19 +50,19 @@ public class ServiceEJB implements IService {
         System.out.printf("ServiceEJB.getPrincipalClass, user=%s, class=%s\n", user.getName(), user.getClass());
         HashSet<Class> interfaces = new HashSet<>();
         Class current = user.getClass();
-        while(current.equals(Object.class) == false) {
+        while (current.equals(Object.class) == false) {
             Class[] tmp = current.getInterfaces();
-            for(Class c : tmp) {
+            for (Class c : tmp) {
                 interfaces.add(c);
             }
             current = current.getSuperclass();
         }
         StringBuilder tmp = new StringBuilder();
-        for(Class iface : interfaces) {
+        for (Class iface : interfaces) {
             tmp.append(iface.getTypeName());
             tmp.append(',');
         }
-        tmp.setLength(tmp.length()-1);
+        tmp.setLength(tmp.length() - 1);
         return tmp.toString();
     }
     @RolesAllowed("Tester")

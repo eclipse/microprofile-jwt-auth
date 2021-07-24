@@ -19,6 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
+
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -48,14 +51,11 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
-
 /**
  * Validate the handling of the JWT aud claim.
  *
- * Validate the aud claim against the {@linkplain Names#AUDIENCES} property is performed, and fails
- * if the jwt aud does not match the {@linkplain Names#AUDIENCES} property.
+ * Validate the aud claim against the {@linkplain Names#AUDIENCES} property is performed, and fails if the jwt aud does
+ * not match the {@linkplain Names#AUDIENCES} property.
  */
 public class AudValidationBadAudTest extends Arquillian {
     /**
@@ -70,11 +70,12 @@ public class AudValidationBadAudTest extends Arquillian {
     private static String token;
 
     /**
-     * Create a CDI aware base web application archive that includes an embedded PEM public key
-     * that is included as the mp.jwt.verify.publickey property.
-     * The root url is /
+     * Create a CDI aware base web application archive that includes an embedded PEM public key that is included as the
+     * mp.jwt.verify.publickey property. The root url is /
+     * 
      * @return the base base web application archive
-     * @throws Exception - on resource failure
+     * @throws Exception
+     *             - on resource failure
      */
     @Deployment()
     public static WebArchive createDeployment() throws Exception {
@@ -90,14 +91,15 @@ public class AudValidationBadAudTest extends Arquillian {
         // Location points to the PEM bundled in the deployment
         configProps.setProperty(Names.VERIFIER_PUBLIC_KEY_LOCATION, "/publicKey4k.pem");
         configProps.setProperty(Names.ISSUER, TCKConstants.TEST_ISSUER);
-        configProps.setProperty(Names.AUDIENCES, "notAValidAudience");  // does not match json, should fail
+        configProps.setProperty(Names.AUDIENCES, "notAValidAudience"); // does not match json, should fail
         StringWriter configSW = new StringWriter();
         configProps.store(configSW, "AudValidationBadAudTest microprofile-config.properties");
         StringAsset configAsset = new StringAsset(configSW.toString());
 
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "AudValidationBadAudTest.war")
-                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addAsResource(publicKey, "/publicKey4k.pem")
                 // Include the token for inspection by ApplicationArchiveProcessor
@@ -112,16 +114,15 @@ public class AudValidationBadAudTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CONFIG,
-        description = "Validate that JWK with aud that is not contained in mp.jwt.verify.audiences returns HTTP_UNAUTHORIZED")
+    @Test(groups = TEST_GROUP_CONFIG, description = "Validate that JWK with aud that is not contained in mp.jwt.verify.audiences returns HTTP_UNAUTHORIZED")
     public void testRequiredAudMismatchFailure() throws Exception {
         Reporter.log("testRequiredAudMismatchFailure, expect HTTP_UNAUTHORIZED");
 
         String uri = baseURL.toExternalForm() + "endp/verifyAudIsOk";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            ;
-        Response response = echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer "+token).get();
+                .target(uri);
+        Response response =
+                echoEndpointTarget.request(APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 

@@ -22,7 +22,7 @@ package org.eclipse.microprofile.jwt;
 import javax.enterprise.util.AnnotationLiteral;
 
 /**
- *  Annotation literal for {@link Claim}
+ * Annotation literal for {@link Claim}
  */
 public class ClaimLiteral extends AnnotationLiteral<Claim> implements Claim {
     private static final long serialVersionUID = 1L;
@@ -38,14 +38,18 @@ public class ClaimLiteral extends AnnotationLiteral<Claim> implements Claim {
 
     /**
      * Construct a Claim literal from a string name of a claim
-     * @param value - the string name for claim
+     * 
+     * @param value
+     *            - the string name for claim
      */
     public ClaimLiteral(String value) {
         this.value = value;
     }
     /**
      * Construct a Claim literal from a standard claim defined in {@linkplain Claims}
-     * @param standard - the claim enum value
+     * 
+     * @param standard
+     *            - the claim enum value
      */
     public ClaimLiteral(Claims standard) {
         this.standard = standard;

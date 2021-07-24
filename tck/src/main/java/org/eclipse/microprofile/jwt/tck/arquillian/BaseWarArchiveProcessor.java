@@ -19,16 +19,16 @@
  */
 package org.eclipse.microprofile.jwt.tck.arquillian;
 
+import java.util.logging.Logger;
+
 import org.jboss.arquillian.container.test.spi.client.deployment.ApplicationArchiveProcessor;
 import org.jboss.arquillian.test.spi.TestClass;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-import java.util.logging.Logger;
-
 /**
- * A base ApplicationArchiveProcessor for illustrating use and simplifying common implementations.
- * TODO: flesh out the stubs more
+ * A base ApplicationArchiveProcessor for illustrating use and simplifying common implementations. TODO: flesh out the
+ * stubs more
  */
 public abstract class BaseWarArchiveProcessor implements ApplicationArchiveProcessor {
     private static Logger log = Logger.getLogger(BaseWarArchiveProcessor.class.getName());
@@ -38,24 +38,25 @@ public abstract class BaseWarArchiveProcessor implements ApplicationArchiveProce
         if (!(appArchive instanceof WebArchive)) {
             return;
         }
-        log.info("Preparing archive: "+appArchive);
+        log.info("Preparing archive: " + appArchive);
         WebArchive war = WebArchive.class.cast(appArchive);
         // Add WEB-INF resources
         String[] webInfRes = getWebInfResources();
-        for(String resName : webInfRes) {
+        for (String resName : webInfRes) {
             war.addAsWebInfResource(resName);
         }
 
         // Add WEB-INF/lib libraries
         String[] artifactNames = getWebInfLibArtifacts();
         // TODO; use shrinkwrap resolvers
-        for (String mvnArtifact: artifactNames) {
+        for (String mvnArtifact : artifactNames) {
             // Resolve this artifact...
         }
     }
 
     /**
      * Called to get names of WEB-INF resources
+     * 
      * @return names of classpath resources to add to the WEB-INF directory, empty for none
      */
     protected String[] getWebInfResources() {
@@ -65,6 +66,7 @@ public abstract class BaseWarArchiveProcessor implements ApplicationArchiveProce
 
     /**
      * groupId:artifactId:version dependencies to include in WEB-INF/lib directory
+     * 
      * @return names of mvn dependencies to include, empty for none
      */
     protected String[] getWebInfLibArtifacts() {

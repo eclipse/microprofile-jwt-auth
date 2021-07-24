@@ -19,7 +19,8 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jacc;
 
-import org.eclipse.microprofile.jwt.JsonWebToken;
+import java.security.Principal;
+import java.util.Set;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.RolesAllowed;
@@ -30,8 +31,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
-import java.security.Principal;
-import java.util.Set;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 @Path("/endp")
 @DenyAll

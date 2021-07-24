@@ -51,7 +51,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Tests of injection of JsonWebToken claims using {@linkplain org.eclipse.microprofile.jwt.ClaimValue} interface wrappers.
+ * Tests of injection of JsonWebToken claims using {@linkplain org.eclipse.microprofile.jwt.ClaimValue} interface
+ * wrappers.
  */
 public class ApplicationScopedInjectionTest extends Arquillian {
 
@@ -69,34 +70,37 @@ public class ApplicationScopedInjectionTest extends Arquillian {
 
     /**
      * Create a CDI aware base web application archive
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
-    @Deployment(testable=true)
+    @Deployment(testable = true)
     public static WebArchive createDeployment() throws IOException {
-        URL config = ApplicationScopedInjectionTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
+        URL config = ApplicationScopedInjectionTest.class
+                .getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = ApplicationScopedInjectionTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
-            .create(WebArchive.class, "ApplicationScopedInjectionTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(ApplicationScopedEndpoint.class)
-            .addClass(TCKApplication.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(config, "microprofile-config.properties");
+                .create(WebArchive.class, "ApplicationScopedInjectionTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(ApplicationScopedEndpoint.class)
+                .addClass(TCKApplication.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(config, "microprofile-config.properties");
         System.out.printf("WebArchive: %s\n", webArchive.toString(true));
         return webArchive;
     }
 
-    @BeforeClass(alwaysRun=true)
+    @BeforeClass(alwaysRun = true)
     public static void generateToken() throws Exception {
         token1 = TokenUtils.generateTokenString("/Token1.json");
         token2 = TokenUtils.generateTokenString("/Token2.json");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI,
-        description = "Verify that the raw token injected as claim value is as expected")
+    @Test(groups = TEST_GROUP_CDI, description = "Verify that the raw token injected as claim value is as expected")
     public void verifyInjectedRawTokenClaimValue() throws Exception {
         Reporter.log("Begin verifyInjectedRawTokenClaimValue\n");
         String uri = baseURL.toExternalForm() + "endp/verifyInjectedRawTokenClaimValue";
@@ -105,8 +109,7 @@ public class ApplicationScopedInjectionTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI,
-        description = "Verify that JsonWebToken.getRawToken returns the raw token as expected")
+    @Test(groups = TEST_GROUP_CDI, description = "Verify that JsonWebToken.getRawToken returns the raw token as expected")
     public void verifyInjectedRawTokenJwt() throws Exception {
         Reporter.log("Begin verifyInjectedRawTokenJwt\n");
         String uri = baseURL.toExternalForm() + "endp/verifyInjectedRawTokenProvider";
@@ -115,8 +118,7 @@ public class ApplicationScopedInjectionTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_CDI,
-        description = "Verify that the raw token injected as provider is as expected")
+    @Test(groups = TEST_GROUP_CDI, description = "Verify that the raw token injected as provider is as expected")
     public void verifyInjectedRawToken1Provider() throws Exception {
         Reporter.log("Begin verifyInjectedRawTokenProvider\n");
         String uri = baseURL.toExternalForm() + "endp/verifyInjectedRawTokenProvider";
@@ -128,7 +130,8 @@ public class ApplicationScopedInjectionTest extends Arquillian {
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam(Claims.raw_token.name(), token);
-        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));

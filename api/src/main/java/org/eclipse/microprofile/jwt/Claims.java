@@ -19,19 +19,20 @@
  */
 package org.eclipse.microprofile.jwt;
 
+import java.util.Set;
 
 import javax.json.JsonObject;
-import java.util.Set;
 
 /**
  * This enum represents the standardized claims that the MP-JWT specification allows for in terms of interoperability.
  * For every claim in this enum, an MP-JWT implementation must return a value of the indicated type from
- * {@link JsonWebToken#getClaim(String)} method. An implementation is free to include
- * any additional claims, and users of {@link JsonWebToken#getClaim(String)} can expect that the JSON-P corresponding
- * Java type is seen based on the JSON type of the claim.
+ * {@link JsonWebToken#getClaim(String)} method. An implementation is free to include any additional claims, and users
+ * of {@link JsonWebToken#getClaim(String)} can expect that the JSON-P corresponding Java type is seen based on the JSON
+ * type of the claim.
  *
  * The set of included claims is defined by IANA, see https://www.iana.org/assignments/jwt/jwt.xhtml
  */
+// @formatter:off
 public enum Claims {
     // The base set of required claims that MUST have non-null values in the JsonWebToken
     iss("Issuer", String.class),
@@ -90,8 +91,10 @@ public enum Claims {
     UNKNOWN("A catch all for any unknown claim", Void.class)
     ;
 
+    // @formatter:on
     private String description;
     private Class<?> type;
+
     Claims(final String description, final Class<?> type) {
         this.description = description;
         this.type = type;
@@ -106,6 +109,7 @@ public enum Claims {
 
     /**
      * The required type of the claim
+     *
      * @return type of the claim
      */
     public Class<?> getType() {

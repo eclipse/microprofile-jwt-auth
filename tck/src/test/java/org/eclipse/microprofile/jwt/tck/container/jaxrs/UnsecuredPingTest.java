@@ -19,6 +19,17 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -30,19 +41,8 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
-
 /**
- * A basic test of an unsecured JAX-RS endpoint to validate the test harness
- * without including JWT authentication.
+ * A basic test of an unsecured JAX-RS endpoint to validate the test harness without including JWT authentication.
  */
 public class UnsecuredPingTest extends Arquillian {
     /**
@@ -53,15 +53,18 @@ public class UnsecuredPingTest extends Arquillian {
 
     /**
      * Create a CDI aware base web application archive
+     * 
      * @return the base base web application archive
-     * @throws IOException - on resource failure
+     * @throws IOException
+     *             - on resource failure
      */
-    @Deployment(testable=true)
+    @Deployment(testable = true)
     public static WebArchive createDeployment() throws IOException {
         URL publicKey = UnsecuredPingTest.class.getResource("/publicKey.pem");
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "UnsecuredPingTest.war")
-                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()), MpJwtTestVersion.MANIFEST_NAME)
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_0.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(publicKey, "/publicKey.pem")
                 .addClass(UnsecuredPingEndpoint.class)
                 .addClass(UnsecureTCKApplication.class)
@@ -75,9 +78,8 @@ public class UnsecuredPingTest extends Arquillian {
     public void callEchoNoAuth() throws Exception {
         String uri = baseURL.toExternalForm() + "ping/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-            .target(uri)
-            .queryParam("input", "hello")
-            ;
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget.request(TEXT_PLAIN).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
     }

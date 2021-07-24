@@ -61,10 +61,9 @@ public class AudienceValidationEndpoint {
         log.info(String.format("AudienceValidationEndpoint.init, aud: %s\n", aud));
     }
 
-
-    
     /**
      * Check a token with an aud claim matches one of the mp.jwt.verify.audiences values
+     * 
      * @return result of validation test
      */
     @GET
@@ -75,38 +74,35 @@ public class AudienceValidationEndpoint {
         boolean pass = false;
         String msg;
 
-        if(!aud.getValue().isPresent()) {
+        if (!aud.getValue().isPresent()) {
             // The aud claim should be provided for this endpoint
             msg = "MP-JWT missing aud claim, or injection of claim failed";
-        }
-        else if(audiences.isPresent()) {
-            
+        } else if (audiences.isPresent()) {
+
             Set<String> claimAud = aud.getValue().get();
             String[] configAud = audiences.get().split(",");
-            boolean match = false;            
-            for (String oneAud: claimAud) {                
-                for(int j=0; j <configAud.length; j++) {
-                    if (oneAud.equals(configAud[j])){
+            boolean match = false;
+            for (String oneAud : claimAud) {
+                for (int j = 0; j < configAud.length; j++) {
+                    if (oneAud.equals(configAud[j])) {
                         match = true;
                     }
                 }
             }
-            if(match) {
+            if (match) {
                 msg = String.format("endpoint accessed with audiences(%s) = config.audiences(%s) as expected PASS",
-                                    claimAud, Arrays.toString(configAud));
+                        claimAud, Arrays.toString(configAud));
                 pass = true;
-            }
-            else {
+            } else {
                 msg = String.format("mp.jwt.verify.audiences(%s) != jwt.aud(%s)", Arrays.toString(configAud), claimAud);
             }
-        }
-        else {
+        } else {
             msg = "No mp.jwt.verify.audiences provided";
         }
         JsonObject result = Json.createObjectBuilder()
-            .add("pass", pass)
-            .add("msg", msg)
-            .build();
+                .add("pass", pass)
+                .add("msg", msg)
+                .build();
         return result;
-    }  
+    }
 }

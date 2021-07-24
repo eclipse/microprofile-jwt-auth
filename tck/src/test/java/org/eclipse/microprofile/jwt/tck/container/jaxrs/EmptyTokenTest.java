@@ -19,6 +19,21 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
+
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -31,20 +46,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
-
 public class EmptyTokenTest extends Arquillian {
     @ArquillianResource
     private URL baseURL;
@@ -54,18 +55,18 @@ public class EmptyTokenTest extends Arquillian {
         URL config = InvalidTokenTest.class.getResource("/META-INF/microprofile-config-publickey-location.properties");
         URL publicKey = InvalidTokenTest.class.getResource("/publicKey.pem");
         return ShrinkWrap
-            .create(WebArchive.class, "EmptyTokenTest.war")
-            .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()), MpJwtTestVersion.MANIFEST_NAME)
-            .addAsResource(publicKey, "/publicKey.pem")
-            .addClass(TCKApplication.class)
-            .addClass(EmptyTokenEndpoint.class)
-            .addAsWebInfResource("beans.xml", "beans.xml")
-            .addAsManifestResource(config, "microprofile-config.properties");
+                .create(WebArchive.class, "EmptyTokenTest.war")
+                .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_1_2.name()),
+                        MpJwtTestVersion.MANIFEST_NAME)
+                .addAsResource(publicKey, "/publicKey.pem")
+                .addClass(TCKApplication.class)
+                .addClass(EmptyTokenEndpoint.class)
+                .addAsWebInfResource("beans.xml", "beans.xml")
+                .addAsManifestResource(config, "microprofile-config.properties");
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate that an empty JWT in injected in the endpoint")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate that an empty JWT in injected in the endpoint")
     public void emptyToken() {
         String uri = baseURL.toExternalForm() + "endp/verifyEmptyToken";
         WebTarget echoEndpointTarget = ClientBuilder.newClient().target(uri);
@@ -78,34 +79,33 @@ public class EmptyTokenTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate that a token sent to an unauthenticated / unauthorized endpoint is verified")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate that a token sent to an unauthenticated / unauthorized endpoint is verified")
     public void invalidToken() {
         String uri = baseURL.toExternalForm() + "endp/verifyEmptyToken";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello");
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(APPLICATION_JSON)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + "something")
-            .get();
+                .request(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + "something")
+                .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS,
-          description = "Validate that a token sent to an unauthenticated / unauthorized endpoint is verified and " +
-                        "injected as non-empty")
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate that a token sent to an unauthenticated / unauthorized endpoint is verified and "
+            +
+            "injected as non-empty")
     public void validToken() throws Exception {
         String token = TokenUtils.generateTokenString("/Token1.json");
         String uri = baseURL.toExternalForm() + "endp/verifyNonEmptyToken";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                                                    .target(uri)
-                                                    .queryParam("input", "hello");
+                .target(uri)
+                .queryParam("input", "hello");
         Response response = echoEndpointTarget
-            .request(APPLICATION_JSON)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-            .get();
+                .request(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_OK);
         String replyString = response.readEntity(String.class);
         JsonReader jsonReader = Json.createReader(new StringReader(replyString));
