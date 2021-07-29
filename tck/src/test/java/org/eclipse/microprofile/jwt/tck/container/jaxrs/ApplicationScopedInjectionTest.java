@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2021 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -69,6 +69,7 @@ public class ApplicationScopedInjectionTest extends Arquillian {
 
     /**
      * Create a CDI aware base web application archive
+     *
      * @return the base base web application archive
      * @throws IOException - on resource failure
      */
@@ -109,7 +110,7 @@ public class ApplicationScopedInjectionTest extends Arquillian {
         description = "Verify that JsonWebToken.getRawToken returns the raw token as expected")
     public void verifyInjectedRawTokenJwt() throws Exception {
         Reporter.log("Begin verifyInjectedRawTokenJwt\n");
-        String uri = baseURL.toExternalForm() + "endp/verifyInjectedRawTokenProvider";
+        String uri = baseURL.toExternalForm() + "endp/verifyInjectedRawTokenJwt";
         verifyInjectedToken(uri, token1);
         verifyInjectedToken(uri, token2);
     }
