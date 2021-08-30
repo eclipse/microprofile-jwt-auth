@@ -32,7 +32,7 @@
         <version.microprofile.config>2.0</version.microprofile.config>
         <version.shrinkwrap.resolvers>2.2.6</version.shrinkwrap.resolvers>
         <version.testng>6.10</version.testng>
-        <version.jose4j>0.7.0</version.jose4j>
+        <version.jose4j>0.7.9</version.jose4j>
         <checkstyle.methodNameFormat>^_?[a-z][a-zA-Z0-9_]*$</checkstyle.methodNameFormat>
         <asciidoctor-maven.version>1.5.5</asciidoctor-maven.version>
         <asciidoctorj-pdf.version>1.5.0-alpha.15</asciidoctorj-pdf.version>
