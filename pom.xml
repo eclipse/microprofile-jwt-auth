@@ -34,7 +34,7 @@
         <version.jakarta.security.jacc-api>1.6.1</version.jakarta.security.jacc-api>
         <version.jakarta.ejb.api>3.2.6</version.jakarta.ejb.api>
         <version.microprofile.config>2.0</version.microprofile.config>
-        <version.jose4j>0.7.0</version.jose4j>
+        <version.jose4j>0.7.9</version.jose4j>
         <version.osgi.versioning>1.1.0</version.osgi.versioning>
 
         <inceptionYear>2017</inceptionYear>
