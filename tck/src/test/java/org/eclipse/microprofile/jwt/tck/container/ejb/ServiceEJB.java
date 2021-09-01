@@ -23,8 +23,6 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 
@@ -32,6 +30,8 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.ejb.SessionContext;
+import jakarta.ejb.Stateless;
 
 @Stateless
 public class ServiceEJB implements IService {

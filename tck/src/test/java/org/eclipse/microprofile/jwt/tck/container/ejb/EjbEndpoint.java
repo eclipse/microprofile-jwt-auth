@@ -19,10 +19,9 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.ejb;
 
-import javax.ejb.EJB;
-
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

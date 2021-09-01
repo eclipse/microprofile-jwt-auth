@@ -24,7 +24,6 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ejb.EJB;
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
@@ -38,6 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.jwt.tck.container.ejb.IService;
+
+import jakarta.ejb.EJB;
 
 @ServletSecurity(@HttpConstraint(rolesAllowed = {"Tester"}))
 @WebServlet("/ServiceServlet/*")
