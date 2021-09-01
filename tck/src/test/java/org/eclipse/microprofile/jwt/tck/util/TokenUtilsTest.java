@@ -266,7 +266,7 @@ public class TokenUtilsTest {
 
         Assert.assertEquals(claimsSet.getClaimValueAsString("customString"), "customStringValue");
         Assert.assertEquals(claimsSet.getClaimValue("customInteger", Long.class), Long.valueOf(123456789));
-        Assert.assertEquals(claimsSet.getClaimValue("customDouble", Double.class), 3.141592653589793);
+        Assert.assertEquals(claimsSet.getClaimValue("customDouble", Double.class), Double.valueOf(3.141592653589793));
         Assert.assertTrue(claimsSet.getClaimValue("customBoolean", Boolean.class));
         Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("roles")).size(), 1);
         Assert.assertEquals(((List<?>) claimsSet.getClaimsMap().get("groups")).size(), 4);

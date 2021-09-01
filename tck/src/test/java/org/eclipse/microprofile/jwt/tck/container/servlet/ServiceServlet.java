@@ -81,7 +81,7 @@ public class ServiceServlet extends HttpServlet {
     }
     private String getSubject(HttpServletResponse response) throws IOException {
         try {
-            Subject subject = (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
+            Subject subject = (Subject) PolicyContext.getContext("jakarta.security.auth.Subject.container");
             Set<? extends Principal> principalSet = subject.getPrincipals(JsonWebToken.class);
             if (principalSet.size() > 0) {
                 return "subject.getPrincipals(JsonWebToken.class) ok";

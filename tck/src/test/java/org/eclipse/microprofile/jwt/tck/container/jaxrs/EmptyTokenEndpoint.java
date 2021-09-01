@@ -19,13 +19,13 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import javax.inject.Inject;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
 import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import jakarta.inject.Inject;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 
 @Path("/endp")
 public class EmptyTokenEndpoint {

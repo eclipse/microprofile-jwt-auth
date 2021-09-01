@@ -23,14 +23,15 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.Resource;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.RolesAllowed;
 
 @Stateless
 public class ServiceEJB implements IService {
@@ -67,7 +68,7 @@ public class ServiceEJB implements IService {
     }
     @RolesAllowed("Tester")
     public String getSubjectClass() throws Exception {
-        Subject subject = (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
+        Subject subject = (Subject) PolicyContext.getContext("jakarta.security.auth.Subject.container");
         System.out.printf("ServiceEJB.getSubjectClass, subject=%s\n", subject);
         Set<? extends Principal> principalSet = subject.getPrincipals(JsonWebToken.class);
         if (principalSet.size() > 0) {
