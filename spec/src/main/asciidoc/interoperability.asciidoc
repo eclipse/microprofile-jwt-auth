@@ -58,7 +58,7 @@ exp:: Identifies the expiration time on or after which the JWT MUST NOT be accep
     Implementers MAY provide for some small leeway, usually no more than a few minutes, to account for clock skew.
     Its value MUST be a number containing a NumericDate value. https://tools.ietf.org/html/rfc7519#section-4.1.4[RFC7519, Section 4.1.4]
 upn (or preferred_username or sub):: MP-JWT "upn" claim is the user principal name in the java.security.Principal interface, and is the caller
-    principal name in javax.security.enterprise.identitystore.IdentityStore. If this claim is missing, fallback to
+    principal name in jakarta.security.enterprise.identitystore.IdentityStore. If this claim is missing, fallback to
     the http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims["preferred_username", OIDC Section 5.1] should be
     attempted, and if that claim is missing, fallback to the "sub" claim should be used.
 
@@ -364,11 +364,11 @@ The current complete set of valid claim types is therefore, (excluding the inval
 * java.lang.Long and long
 * java.lang.Boolean and boolean
 * java.util.Set<java.lang.String>
-* javax.json.JsonValue.TRUE/FALSE
-* javax.json.JsonString
-* javax.json.JsonNumber
-* javax.json.JsonArray
-* javax.json.JsonObject
+* jakarta.json.JsonValue.TRUE/FALSE
+* jakarta.json.JsonString
+* jakarta.json.JsonNumber
+* jakarta.json.JsonArray
+* jakarta.json.JsonObject
 
 Custom claims not handled by the Claims enum must be any of the types defined in the previous acceptable claim
 types list.
@@ -388,8 +388,8 @@ MicroProfile JWT RBAC as shown in the following sample:
 ```java
 import org.eclipse.microprofile.auth.LoginConfig;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
 @LoginConfig(authMethod = "MP-JWT", realmName = "TCK-MP-JWT")
 @ApplicationPath("/")
@@ -452,7 +452,7 @@ verified before it can be accessed via `JsonWebToken` interface.
 Endpoints which need to control the authentication process themselves can check if a token is available by calling
 a `JsonWebToken.getRawToken()` method.
 
-#### Injection of `JsonWebToken` claims via Raw Type, `ClaimValue`, `javax.enterprise.inject.Instance` and JSON-P Types
+#### Injection of `JsonWebToken` claims via Raw Type, `ClaimValue`, `jakarta.enterprise.inject.Instance` and JSON-P Types
 
 This specification requires support for injection of claims from the current
 `JsonWebToken` using the `org.eclipse.microprofile.jwt.Claim` qualifier:
@@ -508,11 +508,11 @@ The current complete set of valid claim types is:
 * java.lang.Long and long
 * java.lang.Boolean and boolean
 * java.util.Set<java.lang.String>
-* javax.json.JsonValue.TRUE/FALSE
-* javax.json.JsonString
-* javax.json.JsonNumber
-* javax.json.JsonArray
-* javax.json.JsonObject
+* jakarta.json.JsonValue.TRUE/FALSE
+* jakarta.json.JsonString
+* jakarta.json.JsonNumber
+* jakarta.json.JsonArray
+* jakarta.json.JsonObject
 * java.util.Optional wrapper of the above types.
 * org.eclipse.microprofile.jwt.ClaimValue wrapper of the above types.
 
@@ -634,7 +634,7 @@ the producer will have dependendent scope.
 claim name using the Claims.iat enum value.
 <5> Injection of a custom claim that does exist will result in an Optional<Long>
 value for which isPresent() will return false.
-<6> Another injection of a non-proxyable raw type like java.lang.Long, but the use of the javax.enterprise.inject.Instance interface
+<6> Another injection of a non-proxyable raw type like java.lang.Long, but the use of the jakarta.enterprise.inject.Instance interface
 allows for injection to occur in non-RequestScoped contexts.
 <7> Injection of a JsonArray of role names via a custom "roles" claim.
 
@@ -644,24 +644,24 @@ claims while the `Claims` enum approach guards against typos.
 
 #### Handling of Non-RequestScoped Injection of Claim Values
 
-MP-JWT implementations are required to support a claim value injection into @ApplicationScoped scoped beans. A warning may be issued when the injection point is not an `org.eclipse.microprofile.jwt.ClaimValue` or `javax.inject.Provider` interface.
+MP-JWT implementations are required to support a claim value injection into @ApplicationScoped scoped beans. A warning may be issued when the injection point is not an `org.eclipse.microprofile.jwt.ClaimValue` or `jakarta.inject.Provider` interface.
 
-MP-JWT implementations are required to generate a `javax.enterprise.inject.spi.DeploymentException` for a claim value injection into Passivation capable beans, for example, @SessionScoped.
+MP-JWT implementations are required to generate a `jakarta.enterprise.inject.spi.DeploymentException` for a claim value injection into Passivation capable beans, for example, @SessionScoped.
 
 MP JWT implementations may issue a warning for any other context with a lifetime greater than @RequestScoped.
 
 [NOTE]
 If one needs to inject a claim value into a scope with a lifetime greater than @RequestScoped, such as
-@ApplicationScoped or @SessionScoped, one can also use the javax.enterprise.inject.Instance interface to do so.
+@ApplicationScoped or @SessionScoped, one can also use the jakarta.enterprise.inject.Instance interface to do so.
 
 ### JAX-RS Container API Integration
 The behavior of the following JAX-RS security related methods is required for
 MP-JWT implementations.
 
-#### `javax.ws.rs.core.SecurityContext.getUserPrincipal()`
+#### `jakarta.ws.rs.core.SecurityContext.getUserPrincipal()`
 The `java.security.Principal` returned from these methods MUST be an instance of `org.eclipse.microprofile.jwt.JsonWebToken`.
 
-#### `javax.ws.rs.core.SecurityContext#isUserInRole(String)`
+#### `jakarta.ws.rs.core.SecurityContext#isUserInRole(String)`
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "groups" claim.
 
@@ -676,13 +676,13 @@ In terms of mapping between the MP-JWT claims and role names used in @RolesAllow
 ### Recommendations for Optional Container Integration
 This section describes the expected behaviors for Java EE container APIs other than JAX-RS.
 
-#### javax.security.enterprise.identitystore.IdentityStore.getCallerGroups(CredentialValidationResult)
+#### jakarta.security.enterprise.identitystore.IdentityStore.getCallerGroups(CredentialValidationResult)
 This method should return the set of names found in the "groups" claim in the JWT if it exists, an empty set otherwise.
 
-#### javax.ejb.SessionContext.getCallerPrincipal()
+#### jakarta.ejb.SessionContext.getCallerPrincipal()
 The java.security.Principal returned from this method MUST be an instance of `org.eclipse.microprofile.jwt.JsonWebToken`.
 
-#### javax.ejb.SessionContext#isCallerInRole(String)
+#### jakarta.ejb.SessionContext#isCallerInRole(String)
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "groups" claim.
 
@@ -690,22 +690,22 @@ role name that has been mapped to a group name in the MP-JWT "groups" claim.
 If a deployment with a web.xml descriptor contains a login-config element, an MP-JWT implementation should view the
 web.xml metadata as an override to the deployment annotation.
 
-#### javax.servlet.http.HttpServletRequest.getUserPrincipal()
+#### jakarta.servlet.http.HttpServletRequest.getUserPrincipal()
 The java.security.Principal returned from this method MUST be an instance of org.eclipse.microprofile.jwt.JsonWebToken.
 
-#### javax.servlet.http.HttpServletRequest#isUserInRole(String)
+#### jakarta.servlet.http.HttpServletRequest#isUserInRole(String)
 This method MUST return true for any name that is included in the MP-JWT "groups" claim, as well as for any
 role name that has been mapped to a group name in the MP-JWT "groups" claim.
 
-#### javax.security.jacc.PolicyContext.getContext("javax.security.auth.Subject.container")
-The javax.security.auth.Subject returned by the PolicyContext.getContext(String key) method with the standard
-"javax.security.auth.Subject.container" key, MUST return a Subject that has a `java.security.Principal` of type
+#### jakarta.security.jacc.PolicyContext.getContext("javax.security.auth.Subject.container")
+The jakarta.security.auth.Subject returned by the PolicyContext.getContext(String key) method with the standard
+"jakarta.security.auth.Subject.container" key, MUST return a Subject that has a `java.security.Principal` of type
 `org.eclipse.microprofile.jwt.JsonWebToken` amongst it's set of `Principal`s returned by `getPrincipals()``. Similarly,
 `Subject#getPrincipals(JsonWebToken.class)` must return a set with at least one value. This means that following code
 snipet must not throw an AssertionError:
 
 ```java
-    Subject subject = (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
+    Subject subject = (Subject) PolicyContext.getContext("jakarta.security.auth.Subject.container");
     Set<? extends Principal> principalSet = subject.getPrincipals(JsonWebToken.class);
     assert principalSet.size() > 0;
 ```
