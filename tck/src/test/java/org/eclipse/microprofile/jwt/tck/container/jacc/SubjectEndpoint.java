@@ -23,13 +23,13 @@ import java.security.Principal;
 import java.util.Set;
 
 import javax.security.auth.Subject;
-import javax.security.jacc.PolicyContext;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.security.jacc.PolicyContext;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Context;
@@ -43,7 +43,7 @@ public class SubjectEndpoint {
     @Path("/getSubjectClass")
     @RolesAllowed("Tester")
     public String getSubjectClass(@Context SecurityContext sec) throws Exception {
-        Subject subject = (Subject) PolicyContext.getContext("jakarta.security.auth.Subject.container");
+        Subject subject = (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
         Set<? extends Principal> principalSet = subject.getPrincipals(JsonWebToken.class);
         if (principalSet.size() > 0) {
             return "subject.getPrincipals(JWTPrincipal.class) ok";

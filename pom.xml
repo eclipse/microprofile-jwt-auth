@@ -31,7 +31,7 @@
     <url>https://github.com/eclipse/microprofile-jwt-auth</url>
 
     <properties>
-        <version.jakarta.security.jacc-api>1.6.1</version.jakarta.security.jacc-api>
+        <version.jakarta.authorization-api>2.0.0</version.jakarta.authorization-api>
         <version.jakarta.ejb.api>4.0.0</version.jakarta.ejb.api>
         <version.microprofile.config>3.0-RC4</version.microprofile.config>
         <version.jose4j>0.7.9</version.jose4j>
@@ -99,9 +99,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>jakarta.security.jacc</groupId>
-                <artifactId>jakarta.security.jacc-api</artifactId>
-                <version>${version.jakarta.security.jacc-api}</version>
+                <groupId>jakarta.authorization</groupId>
+                <artifactId>jakarta.authorization-api</artifactId>
+                <version>${version.jakarta.authorization-api}</version>
                 <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
