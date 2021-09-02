@@ -27,15 +27,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
@@ -51,6 +42,15 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Tests of injection of JsonWebToken claims using {@linkplain org.eclipse.microprofile.jwt.ClaimValue} interface

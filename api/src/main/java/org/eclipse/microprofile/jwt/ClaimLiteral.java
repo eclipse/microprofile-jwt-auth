@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt;
 
-import javax.enterprise.util.AnnotationLiteral;
+import jakarta.enterprise.util.AnnotationLiteral;
 
 /**
  * Annotation literal for {@link Claim}

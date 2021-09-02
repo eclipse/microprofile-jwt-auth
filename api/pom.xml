@@ -40,4 +40,20 @@
         </dependency>
     </dependencies>
 
+    <build> 
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.revelc.code.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${version.plugin.formatter}</version>
+                    <configuration>
+                        <excludes>
+                            <exclude>org/eclipse/microprofile/jwt/Claims.java</exclude> 
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

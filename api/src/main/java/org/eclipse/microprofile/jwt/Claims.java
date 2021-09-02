@@ -21,7 +21,7 @@ package org.eclipse.microprofile.jwt;
 
 import java.util.Set;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 
 /**
  * This enum represents the standardized claims that the MP-JWT specification allows for in terms of interoperability.
