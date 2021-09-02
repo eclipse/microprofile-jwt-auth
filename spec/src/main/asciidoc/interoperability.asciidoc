@@ -698,14 +698,14 @@ This method MUST return true for any name that is included in the MP-JWT "groups
 role name that has been mapped to a group name in the MP-JWT "groups" claim.
 
 #### jakarta.security.jacc.PolicyContext.getContext("javax.security.auth.Subject.container")
-The jakarta.security.auth.Subject returned by the PolicyContext.getContext(String key) method with the standard
-"jakarta.security.auth.Subject.container" key, MUST return a Subject that has a `java.security.Principal` of type
+The javax.security.auth.Subject returned by the PolicyContext.getContext(String key) method with the standard
+"javax.security.auth.Subject.container" key, MUST return a Subject that has a `java.security.Principal` of type
 `org.eclipse.microprofile.jwt.JsonWebToken` amongst it's set of `Principal`s returned by `getPrincipals()``. Similarly,
 `Subject#getPrincipals(JsonWebToken.class)` must return a set with at least one value. This means that following code
 snipet must not throw an AssertionError:
 
 ```java
-    Subject subject = (Subject) PolicyContext.getContext("jakarta.security.auth.Subject.container");
+    Subject subject = (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
     Set<? extends Principal> principalSet = subject.getPrincipals(JsonWebToken.class);
     assert principalSet.size() > 0;
 ```
