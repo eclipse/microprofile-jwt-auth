@@ -19,10 +19,10 @@
  */
 package org.eclipse.microprofile.jwt.tck.config;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-
 import org.eclipse.microprofile.auth.LoginConfig;
+
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
 /**
  * A JAX-RS application marked as requiring MP-JWT authentication with /pem root path

@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.ejb;
 
-import javax.ejb.Local;
+import jakarta.ejb.Local;
 
 @Local
 public interface IService {

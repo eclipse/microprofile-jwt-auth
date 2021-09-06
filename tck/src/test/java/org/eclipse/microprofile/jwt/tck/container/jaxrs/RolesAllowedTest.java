@@ -19,7 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs;
 
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CDI;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_CONFIG;
 import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_EE_SECURITY;
@@ -29,11 +29,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
-
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
@@ -49,6 +44,11 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Tests of the MP-JWT auth method authorization behavior as expected by the MP-JWT RBAC 1.0 spec

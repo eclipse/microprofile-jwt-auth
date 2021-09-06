@@ -14,6 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+[[release_notes_20]]
+=== Release Notes for MicroProfile JWT 2.0
+
+==== Incompatible Changes
+This release aligns with Jakarta EE 9.1 (link:https://github.com/eclipse/microprofile-jwt-auth/issues/246[246]), so it won't work with earlier versions of Jakarta or Java EE.
+
+==== API/SPI Changes
+There are no functional changes introduced in this release, except the dependency updating from javax to jakarta.
+
+==== Other Changes
+- TCK Jose4j dependency has been bumped to 0.7.9 to support running TCK with Java 17 (link:https://github.com/eclipse/microprofile-jwt-auth/issues/251[251])
+- TCK ApplicationScopedInjectionTest has been fixed (link:https://github.com/eclipse/microprofile-jwt-auth/pull/250[250])
+
 [[release_notes_12]]
 == Release Notes for MicroProfile JWT 1.2
 

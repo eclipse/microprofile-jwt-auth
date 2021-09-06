@@ -19,16 +19,11 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jacc;
 
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
@@ -45,6 +40,11 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Tests of accessing the JACC Subject to validate it contains a JsonWebToken principal
@@ -89,7 +89,7 @@ public class SubjectTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TCKConstants.TEST_GROUP_JACC, description = "Validate a request with MP-JWT PolicyContext.getContext(javax.security.auth.Subject.containe) has a JsonWebToken")
+    @Test(groups = TCKConstants.TEST_GROUP_JACC, description = "Validate a request with MP-JWT PolicyContext.getContext(jakarta.security.auth.Subject.containe) has a JsonWebToken")
     public void getSubjectClass() throws Exception {
         String uri = baseURL.toExternalForm() + "endp/getSubjectClass";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()

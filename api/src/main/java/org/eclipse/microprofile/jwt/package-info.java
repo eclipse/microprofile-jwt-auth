@@ -37,5 +37,5 @@
  *
  *
  */
-@org.osgi.annotation.versioning.Version("1.1")
+@org.osgi.annotation.versioning.Version("2.0")
 package org.eclipse.microprofile.jwt;
