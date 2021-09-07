@@ -104,4 +104,46 @@
             </plugin>
         </plugins>
     </build>
+
+    
+    <profiles>
+        <profile>
+            <id>container</id>
+            <properties>
+                <tck.testSuite>tck-base-suite.xml</tck.testSuite>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <!--
+                    These need to be specified as system properties on mvn command line:
+                    mvn -Pcontainer -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck \
+                    -Dtck.container.version=1.0-SNAPSHOT test
+                    -->
+                    <groupId>${tck.container.groupId}</groupId>
+                    <artifactId>${tck.container.artifactId}</artifactId>
+                    <version>${tck.container.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>container-full</id>
+            <properties>
+                <tck.testSuite>tck-full-suite.xml</tck.testSuite>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <!--
+                    These need to be specified as system properties on mvn command line:
+                    mvn -Pcontainer -Dtck.container.groupId=org.wildfly.swarm -Dtck.container.artifactId=jwt-auth-tck \
+                    -Dtck.container.version=1.0-SNAPSHOT test
+                    -->
+                    <groupId>${tck.container.groupId}</groupId>
+                    <artifactId>${tck.container.artifactId}</artifactId>
+                    <version>${tck.container.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>    
 </project>
