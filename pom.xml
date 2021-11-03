@@ -33,7 +33,7 @@
     <properties>
         <version.jakarta.authorization-api>2.0.0</version.jakarta.authorization-api>
         <version.jakarta.ejb.api>4.0.0</version.jakarta.ejb.api>
-        <version.microprofile.config>3.0-RC4</version.microprofile.config>
+        <version.microprofile.config>3.0</version.microprofile.config>
         <version.jose4j>0.7.9</version.jose4j>
         <version.osgi.versioning>1.1.0</version.osgi.versioning>
 
