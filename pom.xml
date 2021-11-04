@@ -107,6 +107,13 @@
             <organization>IBM</organization>
             <organizationUrl>https://www.ibm.com</organizationUrl>
         </developer>
+        <developer>
+            <id>teddyjtorres</id>
+            <name>Teddy Torres</name>
+            <url>https://github.com/teddyjtorres</url>
+            <organization>IBM</organization>
+            <organizationUrl>https://www.ibm.com</organizationUrl>
+        </developer>
     </developers>
 
     <scm>
