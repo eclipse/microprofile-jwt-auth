@@ -89,59 +89,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                            <goals>    
-                                <goal>test-jar</goal>
-                            </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${version.plugin.javadoc}</version>
-                <configuration>
-                    <attach>true</attach>
-                    <doclint>none</doclint>
-                    <doctitle>${project.name}</doctitle>
-                    <windowtitle>${project.name}</windowtitle>
-                    <header><![CDATA[<br>${project.name} v${project.version}]]></header>
-                    <bottom>
-                        <![CDATA[
-                        Copyright &#169; ${inceptionYear} &#x2013; {currentYear} {organizationName}. All rights reserved.
-                        <br>
-                        Use is subject to <a href="{@docRoot}/licenses/${spec.license}.html" target="_top">license terms</a>.
-                        ]]>
-                    </bottom>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <profiles>
