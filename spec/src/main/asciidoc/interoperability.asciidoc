@@ -23,7 +23,7 @@ issue tokens using the MP-JWT format in a way that service providers can underst
 gather information about a subject. To that end, the requirements for the MicroProfile JWT are:
 
 1. Be usable as an authentication token.
-2. Be usable as an authorization token that contains Java EE application level roles indirectly granted via a
+2. Be usable as an authorization token that contains Jakarta EE application level roles indirectly granted via a
 groups claim.
 3. Can be mapped to IdentityStore in https://www.jcp.org/en/jsr/detail?id=375[JSR375].
 4. Can support additional standard claims described in https://www.iana.org/assignments/jwt/jwt.xhtml[IANA JWT Assignments]
@@ -416,9 +416,9 @@ invalid MP-JWT token if any of the following conditions are not met:
 6. The token must have at least one of "upn" or "preferred_username" or "sub" claim for Java Principal to have a name. Tokens from which no Principal name can be deduced must be rejected with an HTTP_UNAUTHENTICATED(401) error.
 7. The signed JWT token verification and encrypted JWT token decryption failures must lead to an HTTP_UNAUTHENTICATED(401) error.
 
-## Mapping MP-JWT Tokens to Java EE Container APIs
+## Mapping MP-JWT Tokens to Jakarta EE Container APIs
 
-The requirements of how a JWT should be exposed via the various Java EE container
+The requirements of how a JWT should be exposed via the various Jakarta EE container
 APIs is discussed in this section. For the 1.0 release, the only mandatory container
 integration is with the JAX-RS container, and injection of the MP-JWT types.
 
@@ -674,7 +674,7 @@ The expectations for use of the various security annotations described in sectio
 In terms of mapping between the MP-JWT claims and role names used in @RolesAllowed, the role names that have been mapped to group names in the MP-JWT "groups" claim, MUST result in an allowing authorization decision wherever the security constraint has been applied.
 
 ### Recommendations for Optional Container Integration
-This section describes the expected behaviors for Java EE container APIs other than JAX-RS.
+This section describes the expected behaviors for Jakarta EE container APIs other than JAX-RS.
 
 #### jakarta.security.enterprise.identitystore.IdentityStore.getCallerGroups(CredentialValidationResult)
 This method should return the set of names found in the "groups" claim in the JWT if it exists, an empty set otherwise.
@@ -711,5 +711,5 @@ snipet must not throw an AssertionError:
 ```
 
 ## Mapping MP-JWT Token to Other Container APIs
-For non-Java EE containers that provide access to some form of `java.security.Principal` representation of an authenticated
+For non-Jakarta EE containers that provide access to some form of `java.security.Principal` representation of an authenticated
 caller, the caller principal MUST be compatible with the `org.eclipse.microprofile.jwt.JsonWebToken` interface.
