@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2022 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -84,17 +84,17 @@ public class InvalidTokenTest extends Arquillian {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.EXP);
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
-        System.out.printf("jwt: %s\n", token);
 
-        String uri = baseURL.toExternalForm() + "endp/echo";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                .target(uri)
-                .queryParam("input", "hello");
-        Response response =
-                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
-        String reply = response.readEntity(String.class);
-        System.out.printf("Reply: %s\n", reply);
+        callEchoAndExpectUnauthorized(token);
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with aged token fails with HTTP_UNAUTHORIZED")
+    public void callEchoAgedToken() throws Exception {
+        String token = TokenUtils.generateTokenString("/Token1.json");
+        Thread.sleep(5000);
+
+        callEchoAndExpectUnauthorized(token);
     }
 
     @RunAsClient
@@ -103,17 +103,8 @@ public class InvalidTokenTest extends Arquillian {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ISSUER);
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
-        System.out.printf("jwt: %s\n", token);
 
-        String uri = baseURL.toExternalForm() + "endp/echo";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                .target(uri)
-                .queryParam("input", "hello");
-        Response response =
-                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
-        String reply = response.readEntity(String.class);
-        System.out.printf("Reply: %s\n", reply);
+        callEchoAndExpectUnauthorized(token);
     }
 
     @RunAsClient
@@ -122,17 +113,8 @@ public class InvalidTokenTest extends Arquillian {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.SIGNER);
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
-        System.out.printf("jwt: %s\n", token);
 
-        String uri = baseURL.toExternalForm() + "endp/echo";
-        WebTarget echoEndpointTarget = ClientBuilder.newClient()
-                .target(uri)
-                .queryParam("input", "hello");
-        Response response =
-                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
-        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
-        String reply = response.readEntity(String.class);
-        System.out.printf("Reply: %s\n", reply);
+        callEchoAndExpectUnauthorized(token);
     }
 
     @RunAsClient
@@ -141,14 +123,19 @@ public class InvalidTokenTest extends Arquillian {
         HashSet<TokenUtils.InvalidClaims> invalidFields = new HashSet<>();
         invalidFields.add(TokenUtils.InvalidClaims.ALG);
         String token = TokenUtils.generateTokenString("/Token1.json", invalidFields);
+
+        callEchoAndExpectUnauthorized(token);
+    }
+
+    private void callEchoAndExpectUnauthorized(String token) throws Exception {
         System.out.printf("jwt: %s\n", token);
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
                 .queryParam("input", "hello");
-        Response response =
-                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Response response = echoEndpointTarget.request(TEXT_PLAIN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
         String reply = response.readEntity(String.class);
         System.out.printf("Reply: %s\n", reply);

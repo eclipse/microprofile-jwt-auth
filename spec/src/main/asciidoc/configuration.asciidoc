@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Eclipse Microprofile Contributors:
+// Copyright (c) 2016-2022 Eclipse Microprofile Contributors:
 // Red Hat, IBM, Tomitribe
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -412,7 +412,7 @@ Please see <<verification-publickey-location, mp.jwt.publickey.location>> for al
 [[claims-verification]]
 ## Verification of JWT token claims
 
-MP JWT specification currently supports the verification of the token `iss` issuer and `aud` audience claims which is done after the token signature has been verified or the token has been decrypted.
+MP JWT specification currently supports the verification of the token `iss` issuer, `aud` audience, and `iat` issued at claims which is done after the token signature has been verified or the token has been decrypted.
 
 [[verify-issuer]]
 ### `mp.jwt.verify.issuer`
@@ -425,6 +425,15 @@ Note that since this property verifies the `iss` claim value, it will be effecti
 ### `mp.jwt.verify.audiences`
 
 The `mp.jwt.verify.audiences` config property is a comma delimited list of allowable values for the `aud` claim.  If specified, a MicroProfile JWT implementation must verify the `aud` claim of incoming JWTs is present and at least one value in the claim matches one of the configured values of `mp.jwt.verify.audiences`.
+
+[[verify-token-age]]
+### `mp.jwt.verify.token.age`
+
+The `mp.jwt.verify.token.age` config property allows for the number of seconds since `iat` to be specified.  A MicroProfile JWT implementation must verify the `iat` claim of incoming JWTs is present and the configured value of `mp.jwt.verify.token.age` since `iat` has not elapsed. Implementers MAY provide for some small leeway, usually no more than a few minutes, to account for clock skew.
+
+[[verify-clock-skew]]
+### `mp.jwt.verify.clock.skew`
+The `mp.jwt.verify.clock.skew` config property allows for the clock skew in seconds used during the token expiry and age verification to be specified. Default value is 60 seconds.
 
 ## Requirements for accepting signed and encrypted tokens
 
