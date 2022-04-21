@@ -433,7 +433,7 @@ The `mp.jwt.verify.token.age` config property allows for the number of seconds s
 
 [[verify-clock-skew]]
 ### `mp.jwt.verify.clock.skew`
-The `mp.jwt.verify.clock.skew` config property allows for the clock skew in seconds used during the token expiry and age verification to be specified. Default value is 60 seconds.
+The `mp.jwt.verify.clock.skew` config property allows for the clock skew in seconds used during the token expiry and age verification to be specified.
 
 ## Requirements for accepting signed and encrypted tokens
 
