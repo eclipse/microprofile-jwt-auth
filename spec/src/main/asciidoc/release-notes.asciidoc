@@ -14,6 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+[[release_notes_21]]
+== Release Notes for MicroProfile JWT 2.1
+
+A full list of changes delivered in the 2.1 release can be found at link:https://github.com/eclipse/microprofile-jwt-auth/milestone/11?closed=1[MicroProfile JWT 2.1 Milestone].
+
+=== Spec Changes
+
+- `mp.jwt.verify.token.age` property for restricting a token age has been introduced (link:https://github.com/eclipse/microprofile-jwt-auth/pull/284[284]).
+- `mp.jwt.verify.clock.skew` property for configuring a leeway for the token expiry and age verification has been introduced (link:https://github.com/eclipse/microprofile-jwt-auth/pull/284[284]).
+- Remaining Java EE references have been replaced with Jakarta EE references (link:https://github.com/eclipse/microprofile-jwt-auth/pull/281[281]).
+
 [[release_notes_20]]
 == Release Notes for MicroProfile JWT 2.0
 
