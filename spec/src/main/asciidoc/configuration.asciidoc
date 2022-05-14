@@ -258,16 +258,6 @@ Reloading the Public Key from the location at runtime as well as the frequency o
 reloading is beyond the scope of this specification and any such feature should be
 considered vendor-specific.
 
-#### `mp.jwt.verify.publickey.algorithm`
-
-The `mp.jwt.verify.publickey.algorithm` configuration property allows for specifying which Public Key Signature Algorithm
-is supported by the MP JWT endpoint. This property can be be set to either `RS256` or `ES256`. Default value is `RS256`.
-Support for the other asymmetric signature algorithms such as `RS512`, `ES512` and others is optional.
-
-`mp.jwt.verify.publickey.algorithm` will provide an additional hint how to read the Public Key in the PKCS#8 PEM format as both RSA and EC Public Keys in the PKCS#8 PEM format may only have a standard `-----BEGIN PUBLIC KEY-----` header and footer.
-
-It is also recommended to use this property to whitelist the token signature algorithm. For example, MP JWT implementations should only allow an `mp.jwt.verify.publickey.algorithm` algorithm instead of both `RS256` and `ES256` when verifying a token signature.
-
 ##### Relative Path
 
 Relative or non-URL paths supplied as the location are resolved in the following order:
@@ -362,6 +352,16 @@ See https://docs.oracle.com/javase/8/docs/api/java/net/URL.html[java.net.URL] ja
 
 Parsing of the `InputStream` occurs as defined in <<Supported Public Key Formats>> and must
 return Public Key text in one of the supported formats.
+
+#### `mp.jwt.verify.publickey.algorithm`
+
+The `mp.jwt.verify.publickey.algorithm` configuration property allows for specifying which Public Key Signature Algorithm
+is supported by the MP JWT endpoint. This property can be be set to either `RS256` or `ES256`. Default value is `RS256`.
+Support for the other asymmetric signature algorithms such as `RS512`, `ES512` and others is optional.
+
+`mp.jwt.verify.publickey.algorithm` will provide an additional hint how to read the Public Key in the PKCS#8 PEM format as both RSA and EC Public Keys in the PKCS#8 PEM format may only have a standard `-----BEGIN PUBLIC KEY-----` header and footer.
+
+It is also recommended to use this property to whitelist the token signature algorithm. For example, MP JWT implementations should only allow an `mp.jwt.verify.publickey.algorithm` algorithm instead of both `RS256` and `ES256` when verifying a token signature.
 
 [[encrypted-jwt-tokens]]
 ## Encrypted JWT claims and nested tokens
