@@ -381,7 +381,7 @@ Note that two types of keys are required to implement a JWE encryption scheme:
 * Content encryption key - typically a generated secret key which is used to encrypt a plaintext such as a JSON representation of the token claims.
 * Key management key - public RSA key which is used to encrypt a content encryption key. `mp.jwt.decrypt.key.location` must point to a private RSA key matching this key.
 
-Key management key algorithm which must be supported is https://tools.ietf.org/html/rfc7518#section-4.3[RSA-OAEP] (RSAES using Optimal Asymmetric Encryption Padding) with a key length 2048 bits or higher.
+Key management key algorithms which must be supported are https://tools.ietf.org/html/rfc7518#section-4.3[RSA-OAEP] (RSAES using Optimal Asymmetric Encryption Padding and SHA-1) and https://tools.ietf.org/html/rfc7518#section-4.3[RSA-OAEP-256] (RSAES using Optimal Asymmetric Encryption Padding and SHA-256) with a public RSA key length 2048 bits or higher.
 
 Content encryption algorithm which must be supported is https://tools.ietf.org/html/rfc7518#section-5.3[A256GCM] (AES in Galois/Counter Mode (GCM)).
 
@@ -408,6 +408,13 @@ See the <<claims-verification, Verification of JWT token claims>> section how to
 The `mp.jwt.decrypt.key.location` config property allows for an external or internal location
 of Private Decryption Key to be specified.  The value may be a relative path or a URL.
 Please see <<verification-publickey-location, mp.jwt.publickey.location>> for all the information about the supported locations and <<encrypted-jwt-tokens, Encrypted JWT claims and nested tokens>> section for the additional recommendations.
+
+#### `mp.jwt.decrypt.key.algorithm`
+
+The `mp.jwt.decrypt.key.algorithm` configuration property allows for specifying which key management key algorithm
+is supported by the MP JWT endpoint. Algorithms which must be supported are either `RSA-OAEP` or `RSA-OAEP-256`. Default value is `RSA-OAEP` but `RSA-OAEP-256` will become a default value in one of the next major releases.
+
+Support for the other key management key algorithm such as `RSA-OAEP-384`, `RSA-OAEP-512` and others is optional.
 
 [[claims-verification]]
 ## Verification of JWT token claims

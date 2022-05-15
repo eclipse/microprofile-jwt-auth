@@ -393,6 +393,32 @@ public class TokenUtils {
      */
     public static String encryptClaims(PublicKey pk, String kid, String jsonResName, Set<InvalidClaims> invalidClaims,
             Map<String, Long> timeClaims) throws Exception {
+        return encryptClaims(pk, null, kid, jsonResName, invalidClaims, timeClaims);
+    }
+
+    /**
+     * Utility method to generate a JWT string from a JSON resource file that is encrypted by the public key, possibly
+     * with invalid fields.
+     *
+     * @param pk
+     *            - the public key to encrypt the token with
+     * @param keyAlgorithm
+     *            - the key encryption algorithm
+     * @param kid
+     *            - the kid header to assign to the token
+     * @param jsonResName
+     *            - name of test resources file
+     * @param invalidClaims
+     *            - the set of claims that should be added with invalid values to test failure modes
+     * @param timeClaims
+     *            - used to return the exp, iat, auth_time claims
+     * @return the JWT string
+     * @throws Exception
+     *             on parse failure
+     */
+    public static String encryptClaims(PublicKey pk, KeyManagementAlgorithm keyAlgorithm, String kid,
+            String jsonResName, Set<InvalidClaims> invalidClaims,
+            Map<String, Long> timeClaims) throws Exception {
         if (invalidClaims == null) {
             invalidClaims = Collections.emptySet();
         }
@@ -409,7 +435,7 @@ public class TokenUtils {
             key = pk;
         }
 
-        return encryptString(key, kid, claims.toJson(), false);
+        return encryptString(key, keyAlgorithm, kid, claims.toJson(), false);
     }
 
     /**
@@ -525,11 +551,47 @@ public class TokenUtils {
             String jsonResName,
             boolean setContentType) throws Exception {
 
-        String nestedJwt = signClaims(signingKey, signingKid, jsonResName, null, null);
-        return encryptString(encryptionKey, encryptionKid, nestedJwt, setContentType);
+        return signEncryptClaims(signingKey, signingKid, encryptionKey, null, encryptionKid, jsonResName,
+                setContentType);
     }
 
-    private static String encryptString(Key key, String kid, String plainText, boolean setContentType)
+    /**
+     * Utility method to generate a JWT string from a JSON resource file by signing it first with the private key using
+     * RS256 algorithm and encrypting next with the public key with an option to skip setting a content-type 'cty'
+     * parameter.
+     *
+     * @param signingKey
+     *            - the private key to sign the token with
+     * @param signingKid
+     *            - the signing key identifier
+     * @param encryptionKey
+     *            - the public key to encrypt the token with
+     * @param keyEncryptionAlgorithm
+     *            - the key encryption algorithm
+     * @param encryptionKid
+     *            - the encryption key identifier
+     * @param jsonResName
+     *            - name of test resources file
+     * @param setContentType
+     *            - set a content-type 'cty' parameter if true
+     * @return the JWT string
+     * @throws Exception
+     *             on parse failure
+     */
+    public static String signEncryptClaims(PrivateKey signingKey,
+            String signingKid,
+            PublicKey encryptionKey,
+            KeyManagementAlgorithm keyAlgorithm,
+            String encryptionKid,
+            String jsonResName,
+            boolean setContentType) throws Exception {
+
+        String nestedJwt = signClaims(signingKey, signingKid, jsonResName, null, null);
+        return encryptString(encryptionKey, keyAlgorithm, encryptionKid, nestedJwt, setContentType);
+    }
+
+    private static String encryptString(Key key, KeyManagementAlgorithm keyAlgorithm, String kid, String plainText,
+            boolean setContentType)
             throws Exception {
 
         JsonWebEncryption jwe = new JsonWebEncryption();
@@ -543,10 +605,14 @@ public class TokenUtils {
         }
         jwe.setEncryptionMethodHeaderParameter("A256GCM");
 
-        if (key instanceof SecretKey) {
-            jwe.setAlgorithmHeaderValue("A128KW");
+        if (keyAlgorithm != null) {
+            jwe.setAlgorithmHeaderValue(keyAlgorithm.getAlgorithm());
         } else {
-            jwe.setAlgorithmHeaderValue("RSA-OAEP");
+            if (key instanceof SecretKey) {
+                jwe.setAlgorithmHeaderValue("A128KW");
+            } else {
+                jwe.setAlgorithmHeaderValue("RSA-OAEP");
+            }
         }
         jwe.setKey(key);
         return jwe.getCompactSerialization();

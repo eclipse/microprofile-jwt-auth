@@ -19,6 +19,7 @@
  */
 package org.eclipse.microprofile.jwt.tck.util;
 
+import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,10 +51,18 @@ public class TokenUtilsEncryptTest {
         validateToken(token);
     }
 
-    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT")
-    public void testValidToken() throws Exception {
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of an encrypted JWT with RSA-OAEP")
+    public void testValidTokenWithRSAOAEP() throws Exception {
         String token = TokenUtils.encryptClaims("/Token1.json");
         validateToken(token);
+    }
+
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of an encrypted JWT with RSA-OAEP")
+    public void testValidTokenWithRsaOaep256() throws Exception {
+        PublicKey pk = TokenUtils.readPublicKey("/publicKey.pem");
+        String token = TokenUtils.encryptClaims(pk, KeyManagementAlgorithm.RSA_OAEP_256, "/Token1.json", "/Token1.json",
+                null, null);
+        validateToken(token, KeyManagementAlgorithm.RSA_OAEP_256, null);
     }
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
@@ -109,13 +118,14 @@ public class TokenUtilsEncryptTest {
         long exp = TokenUtils.currentTimeInSecs() - 45;
         timeClaims.put(Claims.exp.name(), exp);
         String token = TokenUtils.encryptClaims("/Token1.json", null, timeClaims);
-        validateToken(token, exp);
+        validateToken(token, null, exp);
     }
 
     private void validateToken(String token) throws Exception {
-        validateToken(token, null);
+        validateToken(token, null, null);
     }
-    private void validateToken(String token, Long expectedExpValue) throws Exception {
+    private void validateToken(String token, KeyManagementAlgorithm keyAlgorithm, Long expectedExpValue)
+            throws Exception {
 
         RSAPrivateKey privateKey = (RSAPrivateKey) TokenUtils.readPrivateKey("/privateKey.pem");
         int expGracePeriodSecs = 60;
@@ -130,7 +140,8 @@ public class TokenUtilsEncryptTest {
         builder.setRequireIssuedAt();
         // 'RSA-OAEP' is required
         builder.setJwsAlgorithmConstraints(
-                new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RSA-OAEP"));
+                new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST,
+                        keyAlgorithm != null ? keyAlgorithm.getAlgorithm() : "RSA-OAEP"));
 
         // issuer must be equal to TCKConstants.TEST_ISSUER
         builder.setExpectedIssuer(true, TCKConstants.TEST_ISSUER);
