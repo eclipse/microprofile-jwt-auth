@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2016-2017 Contributors to the Eclipse Foundation
  *
  *  See the NOTICE file(s) distributed with this work for additional
  *  information regarding copyright ownership.
@@ -19,13 +19,17 @@
  */
 package org.eclipse.microprofile.jwt.tck.util;
 
-/**
- * An enum used to identify which version of the MP-JWT a TCK test war is targeting. The target version can be found by
- * loading the META-INF/MPJWTTESTVERSION resource from the test war and converting it to the MpJwtTestVersion value.
- */
-public enum MpJwtTestVersion {
-    MPJWT_V_1_0, MPJWT_V_1_1, MPJWT_V_1_2, MPJWT_V_2_1;
+public enum KeyManagementAlgorithm {
+    /**
+     * RSAES using Optimal Asymmetric Encryption Padding with SHA-1
+     */
+    RSA_OAEP,
+    /**
+     * RSAES using Optimal Asymmetric Encryption Padding with SHA-256
+     */
+    RSA_OAEP_256;
 
-    public static final String VERSION_LOCATION = "META-INF/MPJWTTESTVERSION";
-    public static final String MANIFEST_NAME = "MPJWTTESTVERSION";
+    public String getAlgorithm() {
+        return name().replace("_", "-");
+    }
 }

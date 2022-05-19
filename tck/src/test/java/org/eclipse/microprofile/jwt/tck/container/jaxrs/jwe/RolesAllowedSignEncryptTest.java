@@ -34,6 +34,7 @@ import java.util.Base64;
 import org.eclipse.microprofile.jwt.tck.TCKConstants;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesEndpoint;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
+import org.eclipse.microprofile.jwt.tck.util.KeyManagementAlgorithm;
 import org.eclipse.microprofile.jwt.tck.util.MpJwtTestVersion;
 import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -139,9 +140,9 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with MP-JWT succeeds with HTTP_OK, and replies with hello, user={token upn claim}")
-    public void callEcho() {
-        Reporter.log("callEcho, expect HTTP_OK");
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with RSA-OAEP encrypted token succeeds")
+    public void callEchoRsaOaep() {
+        Reporter.log("callEcho with RSA-OAEP encrypted token, expect HTTP_OK");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
@@ -153,6 +154,25 @@ public class RolesAllowedSignEncryptTest extends Arquillian {
         String reply = response.readEntity(String.class);
         // Must return hello, user={token upn claim}
         Assert.assertEquals(reply, "hello, user=jdoe@example.com");
+    }
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with RSA-OAEP-256 encrypted token fails with HTTP_UNAUTHORIZED")
+    public void callEchoRsaOaep256() throws Exception {
+        Reporter.log("callEcho with RSA-OAEP-356 encrypted token, expect HTTP_UNAUTHORIZED");
+
+        PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
+        PublicKey encryptionKey = TokenUtils.readPublicKey("/publicKey.pem");
+        String token =
+                TokenUtils.signEncryptClaims(signingKey, null, encryptionKey, KeyManagementAlgorithm.RSA_OAEP_256, null,
+                        "/Token1.json", true);
+        String uri = baseURL.toExternalForm() + "endp/echo";
+        WebTarget echoEndpointTarget = ClientBuilder.newClient()
+                .target(uri)
+                .queryParam("input", "hello");
+        Response response =
+                echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
+        Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @RunAsClient

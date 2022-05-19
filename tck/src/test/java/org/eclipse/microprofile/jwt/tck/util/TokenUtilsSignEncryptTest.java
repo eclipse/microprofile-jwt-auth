@@ -48,24 +48,33 @@ public class TokenUtilsSignEncryptTest {
         validateToken(token, true);
     }
 
+    @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate an encryption of the nested JWT with RSA-OAEP-256")
+    public void testEncryptSignedClaimsWithRsaOaep256() throws Exception {
+        PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey.pem");
+        PublicKey encryptionKey = TokenUtils.readPublicKey("/publicKey.pem");
+        String token = TokenUtils.signEncryptClaims(signingKey, null, encryptionKey,
+                KeyManagementAlgorithm.RSA_OAEP_256, null, "/Token1.json", true);
+        validateToken(token, SignatureAlgorithm.RS256, KeyManagementAlgorithm.RSA_OAEP_256, true);
+    }
+
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate an encryption of the nested JWT")
     public void testEncryptECSignedClaims() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.ES256);
-        validateToken(token, SignatureAlgorithm.ES256, true);
+        validateToken(token, SignatureAlgorithm.ES256, null, true);
     }
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT", expectedExceptions = {
             InvalidJwtException.class})
     public void testNestedSignedByRSKeyVerifiedByECKey() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.RS256);
-        validateToken(token, SignatureAlgorithm.ES256, true);
+        validateToken(token, SignatureAlgorithm.ES256, null, true);
     }
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, description = "Illustrate validation of a JWT", expectedExceptions = {
             InvalidJwtException.class})
     public void testNestedSignedByECKeyVerifiedByRSKey() throws Exception {
         String token = TokenUtils.signEncryptClaims("/Token1.json", SignatureAlgorithm.ES256);
-        validateToken(token, SignatureAlgorithm.RS256, true);
+        validateToken(token, SignatureAlgorithm.RS256, null, true);
     }
 
     @Test(groups = TCKConstants.TEST_GROUP_UTILS, expectedExceptions = {
@@ -93,14 +102,16 @@ public class TokenUtilsSignEncryptTest {
     }
 
     private void validateToken(String jweCompact, boolean jwtExpected) throws Exception {
-        validateToken(jweCompact, SignatureAlgorithm.RS256, jwtExpected);
+        validateToken(jweCompact, SignatureAlgorithm.RS256, null, jwtExpected);
     }
 
-    private void validateToken(String jweCompact, SignatureAlgorithm signatureAlgorithm, boolean jwtExpected)
+    private void validateToken(String jweCompact, SignatureAlgorithm signatureAlgorithm,
+            KeyManagementAlgorithm keyAlgorithm, boolean jwtExpected)
             throws Exception {
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setAlgorithmConstraints(
-                new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, "RSA-OAEP"));
+                new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST,
+                        keyAlgorithm != null ? keyAlgorithm.getAlgorithm() : "RSA-OAEP"));
         jwe.setCompactSerialization(jweCompact);
         RSAPrivateKey privateKey = (RSAPrivateKey) TokenUtils.readPrivateKey("/privateKey.pem");
         jwe.setKey(privateKey);
