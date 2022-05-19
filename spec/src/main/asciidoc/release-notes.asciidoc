@@ -21,6 +21,7 @@ A full list of changes delivered in the 2.1 release can be found at link:https:/
 
 === Spec Changes
 
+- `mp.jwt.decrypt.key.algorithm` property for supporting an `RSA-OAEP-256` key management algorithm has been introduced (link:https://github.com/eclipse/microprofile-jwt-auth/pull/292[292]).
 - `mp.jwt.verify.token.age` property for restricting a token age has been introduced (link:https://github.com/eclipse/microprofile-jwt-auth/pull/284[284]).
 - `mp.jwt.verify.clock.skew` property for configuring a leeway for the token expiry and age verification has been introduced (link:https://github.com/eclipse/microprofile-jwt-auth/pull/284[284]).
 - Remaining Java EE references have been replaced with Jakarta EE references (link:https://github.com/eclipse/microprofile-jwt-auth/pull/281[281]).
