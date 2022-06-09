@@ -430,7 +430,9 @@ public class TokenUtils {
             KeyPair keyPair = generateKeyPair(2048);
             key = keyPair.getPublic();
         } else if (invalidClaims.contains(InvalidClaims.ALG)) {
-            key = KeyGenerator.getInstance("AES").generateKey();
+            KeyGenerator aes = KeyGenerator.getInstance("AES");
+            aes.init(256);
+            key = aes.generateKey();
         } else {
             key = pk;
         }
@@ -609,7 +611,12 @@ public class TokenUtils {
             jwe.setAlgorithmHeaderValue(keyAlgorithm.getAlgorithm());
         } else {
             if (key instanceof SecretKey) {
-                jwe.setAlgorithmHeaderValue("A128KW");
+                int keyLength = ((SecretKey) key).getEncoded().length * 8;
+                if (keyLength != 256 && keyLength != 192 && keyLength != 128) {
+                    throw new IllegalStateException("Invalid AES secret key length (valid values are 256, 192 or 128): "
+                            + keyLength);
+                }
+                jwe.setAlgorithmHeaderValue("A" + keyLength + "KW");
             } else {
                 jwe.setAlgorithmHeaderValue("RSA-OAEP");
             }
