@@ -407,7 +407,7 @@ See the <<claims-verification, Verification of JWT token claims>> section how to
 
 The `mp.jwt.decrypt.key.location` config property allows for an external or internal location
 of Private Decryption Key to be specified.  The value may be a relative path or a URL.
-Please see <<verification-publickey-location, mp.jwt.publickey.location>> for all the information about the supported locations and <<encrypted-jwt-tokens, Encrypted JWT claims and nested tokens>> section for the additional recommendations.
+Please see <<verification-publickey-location, mp.jwt.verify.publickey.location>> for all the information about the supported locations and <<encrypted-jwt-tokens, Encrypted JWT claims and nested tokens>> section for the additional recommendations.
 
 #### `mp.jwt.decrypt.key.algorithm`
 
