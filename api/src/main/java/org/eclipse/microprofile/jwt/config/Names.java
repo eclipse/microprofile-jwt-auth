@@ -48,6 +48,11 @@ public interface Names {
     String DECRYPTOR_KEY_LOCATION = "mp.jwt.decrypt.key.location";
 
     /**
+     * Key Management Algorithm property which can be set to either 'RSA-OAEP' or 'RSA-OAEP-256'
+     */
+    String DECRYPTOR_KEY_ALGORITHM = "mp.jwt.decrypt.key.algorithm";
+
+    /**
      * The expected iss claim value to validate against an MP-JWT.
      */
     String ISSUER = "mp.jwt.verify.issuer";
@@ -69,8 +74,19 @@ public interface Names {
     String TOKEN_COOKIE = "mp.jwt.token.cookie";
 
     /**
+     * The number of seconds since 'iat' after which the token must be considered invalid.
+     */
+    String TOKEN_AGE = "mp.jwt.verify.token.age";
+
+    /**
      * The expected "aud" claim value(s), separated by commas. If specified, MP-JWT claim must be present and match one
      * of the values.
      */
     String AUDIENCES = "mp.jwt.verify.audiences";
+
+    /**
+     * The clock skew in seconds used during the token expiry and age verification.
+     */
+    String CLOCK_SKEW = "mp.jwt.verify.clock.skew";
+
 }
