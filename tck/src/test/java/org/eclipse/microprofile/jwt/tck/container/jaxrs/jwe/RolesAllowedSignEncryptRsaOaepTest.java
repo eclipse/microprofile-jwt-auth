@@ -42,6 +42,7 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.Assert;
 import org.testng.Reporter;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import jakarta.ws.rs.client.ClientBuilder;
@@ -50,10 +51,15 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 
 /**
- * Test that a decryption of an inner signed JWT token encrypted using RSA-OAEP-256 algorithm succeeds with
- * `RSA-OAEP-256` but fails with `RSA-OAEP` if `mp.jwt.decrypt.key.algorithm=RSA-OAEP-256` is configured.
+ * Test that decryption of an inner signed JWT token encrypted using RSA-OAEP algorithm succeeds with `RSA-OAEP` but
+ * fails with `RSA-OAEP-256` if `mp.jwt.decrypt.key.algorithm=RSA-OAEP` is configured.
  */
-public class RolesAllowedSignEncryptRsaOaep256Test extends Arquillian {
+public class RolesAllowedSignEncryptRsaOaepTest extends Arquillian {
+
+    /**
+     * The test generated JWT token string
+     */
+    private static String token;
 
     /**
      * The base URL for the container under test
@@ -70,12 +76,12 @@ public class RolesAllowedSignEncryptRsaOaep256Test extends Arquillian {
      */
     @Deployment(testable = true)
     public static WebArchive createDeployment() throws IOException {
-        URL config = RolesAllowedSignEncryptRsaOaep256Test.class
-                .getResource("/META-INF/microprofile-config-verify-decrypt-rsa-oaep-256.properties");
-        URL verifyKey = RolesAllowedSignEncryptRsaOaep256Test.class.getResource("/publicKey4k.pem");
-        URL decryptKey = RolesAllowedSignEncryptRsaOaep256Test.class.getResource("/privateKey.pem");
+        URL config = RolesAllowedSignEncryptRsaOaepTest.class
+                .getResource("/META-INF/microprofile-config-verify-decrypt-rsa-oaep.properties");
+        URL verifyKey = RolesAllowedSignEncryptRsaOaepTest.class.getResource("/publicKey4k.pem");
+        URL decryptKey = RolesAllowedSignEncryptRsaOaepTest.class.getResource("/privateKey.pem");
         WebArchive webArchive = ShrinkWrap
-                .create(WebArchive.class, "RolesAllowedSignEncryptRsaOaep256Test.war")
+                .create(WebArchive.class, "RolesAllowedSignEncryptRsaOaepTest.war")
                 .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_2_1.name()),
                         MpJwtTestVersion.MANIFEST_NAME)
                 .addAsResource(decryptKey, "/privateKey.pem")
@@ -87,16 +93,26 @@ public class RolesAllowedSignEncryptRsaOaep256Test extends Arquillian {
         return webArchive;
     }
 
-    @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with RSA-OAEP-256 encrypted token succeeds")
-    public void callEchoRsaOaep256() throws Exception {
-        Reporter.log("callEcho with RSA-OAEP-256 encrypted token, expect HTTP_OK");
+    @BeforeClass(alwaysRun = true)
+    public static void generateToken() throws Exception {
+        token = signEncryptClaims("/Token1.json");
+    }
 
+    private static String signEncryptClaims(String jsonResName) throws Exception {
+        return signEncryptClaimsWithOptionalCty(jsonResName, true);
+    }
+
+    private static String signEncryptClaimsWithOptionalCty(String jsonResName, boolean cty) throws Exception {
         PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
         PublicKey encryptionKey = TokenUtils.readPublicKey("/publicKey.pem");
-        String token =
-                TokenUtils.signEncryptClaims(signingKey, null, encryptionKey, KeyManagementAlgorithm.RSA_OAEP_256, null,
-                        "/Token1.json", true);
+        return TokenUtils.signEncryptClaims(signingKey, null, encryptionKey, null, jsonResName, cty);
+    }
+
+
+    @RunAsClient
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with RSA-OAEP encrypted token succeeds")
+    public void callEchoRsaOaep() {
+        Reporter.log("callEcho with RSA-OAEP encrypted token, expect HTTP_OK");
 
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
@@ -111,11 +127,15 @@ public class RolesAllowedSignEncryptRsaOaep256Test extends Arquillian {
     }
 
     @RunAsClient
-    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with RSA-OAEP encrypted token fails with HTTP_UNAUTHORIZED")
-    public void callEchoRsaOaep() throws Exception {
-        Reporter.log("callEcho with RSA-OAEP encrypted token, expect HTTP_UNAUTHORIZED");
+    @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with RSA-OAEP-256 encrypted token fails with HTTP_UNAUTHORIZED")
+    public void callEchoRsaOaep256() throws Exception {
+        Reporter.log("callEcho with RSA-OAEP-356 encrypted token, expect HTTP_UNAUTHORIZED");
 
-        String token = TokenUtils.signEncryptClaims("/Token1.json");
+        PrivateKey signingKey = TokenUtils.readPrivateKey("/privateKey4k.pem");
+        PublicKey encryptionKey = TokenUtils.readPublicKey("/publicKey.pem");
+        String token =
+                TokenUtils.signEncryptClaims(signingKey, null, encryptionKey, KeyManagementAlgorithm.RSA_OAEP_256, null,
+                        "/Token1.json", true);
         String uri = baseURL.toExternalForm() + "endp/echo";
         WebTarget echoEndpointTarget = ClientBuilder.newClient()
                 .target(uri)
@@ -124,5 +144,4 @@ public class RolesAllowedSignEncryptRsaOaep256Test extends Arquillian {
                 echoEndpointTarget.request(TEXT_PLAIN).header(HttpHeaders.AUTHORIZATION, "Bearer " + token).get();
         Assert.assertEquals(response.getStatus(), HttpURLConnection.HTTP_UNAUTHORIZED);
     }
-
 }
