@@ -25,6 +25,18 @@
     <artifactId>microprofile-jwt-auth-tck</artifactId>
     <name>MicroProfile JWT Auth TCK</name>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.eclipse.microprofile</groupId>
+                <artifactId>microprofile-tck-bom</artifactId>
+                <version>${version.microprofile.tck.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
     <dependencies>
         <dependency>
             <groupId>org.eclipse.microprofile.jwt</groupId>
