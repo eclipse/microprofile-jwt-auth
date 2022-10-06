@@ -108,7 +108,6 @@ public class RolesAllowedSignEncryptRsaOaepTest extends Arquillian {
         return TokenUtils.signEncryptClaims(signingKey, null, encryptionKey, null, jsonResName, cty);
     }
 
-
     @RunAsClient
     @Test(groups = TEST_GROUP_JAXRS, description = "Validate a request with RSA-OAEP encrypted token succeeds")
     public void callEchoRsaOaep() {
