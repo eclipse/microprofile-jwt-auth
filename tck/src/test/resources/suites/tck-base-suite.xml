@@ -50,6 +50,7 @@
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.ProviderInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesAllowedTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.InvalidTokenTest" />
+            <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.TokenAgeTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PrimitiveInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.PrincipalInjectionTest" />
             <class name="org.eclipse.microprofile.jwt.tck.container.jaxrs.AudValidationTest" />
