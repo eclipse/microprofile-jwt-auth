@@ -41,7 +41,7 @@ the MicroProfile services the token will be accessed with.
 
 alg:: This JOSE header parameter identifies the cryptographic algorithm used to secure the JWT.
     - RSASSA-PKCS1-v1_5 SHA-256 or ECDSA using P-256 and SHA-256 algorithm are required when the claims have to be signed and must be specified as either "RS256", https://tools.ietf.org/html/rfc7518#section-3.3[RFC7518, Section 3.3] or "ES256", https://tools.ietf.org/html/rfc7518#section-3.4[RFC7515, Section 3.4].
-    - RSAES using Optimal Asymmetric Encryption Padding algorithm is required when the claims or nested JWT tokens have to be encrypted. It is used for encrypting the content encryption key and must be specified as "RSA-OAEP", https://tools.ietf.org/html/rfc7518#section-4.3[RFC7518, Section 4.3].
+    - Support for RSAES using Optimal Asymmetric Encryption Padding algorithm and RSAES OAEP using SHA-256 and MGF1 with SHA-256 is required when the claims or nested JWT tokens have to be encrypted. These algorithms are used for encrypting the content encryption key and must be specified as either `RSA-OAEP` or `RSA-OAEP-256`, https://tools.ietf.org/html/rfc7518#section-4.3[RFC7518, Section 4.3]. Support for the other key management key algorithms such as `RSA-OAEP-384`, `RSA-OAEP-512` and others is optional.
 enc:: This JOSE header parameter is only required when the claims or nested JWT tokens have to be encrypted. It identifies the cryptographic algorithm used to encrypt the claims or nested JWT tokens. AES in Galois/Counter Mode (GCM) algorithm is required and must be specified as "A256GCM", https://tools.ietf.org/html/rfc7518#section-5.3[RFC7518, Section 5.3]
 
 #### Recommended MP-JWT headers
@@ -407,7 +407,7 @@ The MP-JWT specification requires that an MP-JWT implementation reject a JWT tok
 invalid MP-JWT token if any of the following conditions are not met:
 
 1. The JWT must have a JOSE "alg" header that indicates the token was signed using the RS256 or ES256 algorithm when the service endpoint expects signed tokens.
-2. The JWT must have the JOSE "alg" and "enc" headers that indicate that the token was encrypted using the RSA-OAEP and A256GCM algorithms when the service endpoint expects encrypted tokens.
+2. The JWT must have the JOSE "alg" and "enc" headers that indicate that the token was encrypted using the `RSA-OAEP` or `RSA-OAEP-256` key management algorithms (or other key management algorithms supported by the implementation) and `A256GCM` content encryption algorithm when the service endpoint expects encrypted tokens.
    If the encrypted content is a nested signed JWT token then it must meet the condition 1.
 3. The JWT must have an "iss" claim representing the token issuer that maps to an MP-JWT implementation container runtime configured value.
    Any issuer other than those issuers that have been whitelisted by the container configuration must be rejected with an HTTP_UNAUTHENTICATED(401) error.

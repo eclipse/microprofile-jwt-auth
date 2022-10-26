@@ -414,7 +414,7 @@ Please see <<verification-publickey-location, mp.jwt.verify.publickey.location>>
 The `mp.jwt.decrypt.key.algorithm` configuration property allows for specifying which key management key algorithm
 is supported by the MP JWT endpoint. Algorithms which must be supported are either `RSA-OAEP` or `RSA-OAEP-256`. If `mp.jwt.decryption.algorithm` is not set then both `RSA-OAEP` and `RSA-OAEP-256` must be accepted.
 
-Support for the other key management key algorithm such as `RSA-OAEP-384`, `RSA-OAEP-512` and others is optional.
+Support for the other key management key algorithms such as `RSA-OAEP-384`, `RSA-OAEP-512` and others is optional.
 
 [[claims-verification]]
 ## Verification of JWT token claims
