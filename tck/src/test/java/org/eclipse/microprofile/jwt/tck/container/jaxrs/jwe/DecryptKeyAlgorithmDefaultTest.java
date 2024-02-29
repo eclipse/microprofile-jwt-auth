@@ -19,10 +19,15 @@
  */
 package org.eclipse.microprofile.jwt.tck.container.jaxrs.jwe;
 
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.Response;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.RolesEndpoint;
 import org.eclipse.microprofile.jwt.tck.container.jaxrs.TCKApplication;
 import org.eclipse.microprofile.jwt.tck.util.KeyManagementAlgorithm;
@@ -39,14 +44,10 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-
-import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.eclipse.microprofile.jwt.tck.TCKConstants.TEST_GROUP_JAXRS;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 
 /**
  * If "mp.jwt.decryption.algorithm" is not set then both RSA-OAEP and RSA-OAEP-256 must be accepted.
