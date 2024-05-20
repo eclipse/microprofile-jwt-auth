@@ -31,8 +31,11 @@ import java.util.Set;
  */
 public interface JsonWebToken extends Principal {
     /**
-     * Returns the unique name of this principal. This either comes from the upn claim, or if that is missing, the
-     * preferred_username claim. Note that for guaranteed interoperability a upn claim should be used.
+     * Returns the unique name of this principal. The upn claim is checked first, the preferred_username claim is
+     * checked next, and finally, the sub claim is checked. Note that for guaranteed interoperability a upn claim should
+     * be used. However, the preferred_username claim is not guaranteed to be always unique. Therefore, if a truly
+     * unique principal identifier is required, prefer getting the sub claim directly by calling the
+     * {@link #getSubject()} method.
      *
      * @return the unique name of this principal.
      */
@@ -67,8 +70,8 @@ public interface JsonWebToken extends Principal {
     }
 
     /**
-     * The sub(Subject) claim identifies the principal that is the subject of the JWT. This is the token issuing IDP
-     * subject.
+     * The sub(Subject) claim uniquely identifies the principal that is the subject of the JWT. This is the token
+     * issuing IDP subject.
      *
      * @return the sub claim.
      */
