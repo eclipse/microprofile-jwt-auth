@@ -24,7 +24,7 @@ package org.eclipse.microprofile.jwt.tck.util;
  * loading the META-INF/MPJWTTESTVERSION resource from the test war and converting it to the MpJwtTestVersion value.
  */
 public enum MpJwtTestVersion {
-    MPJWT_V_1_0, MPJWT_V_1_1, MPJWT_V_1_2, MPJWT_V_2_1;
+    MPJWT_V_1_0, MPJWT_V_1_1, MPJWT_V_1_2, MPJWT_V_2_1, MPJWT_V_2_2;
 
     public static final String VERSION_LOCATION = "META-INF/MPJWTTESTVERSION";
     public static final String MANIFEST_NAME = "MPJWTTESTVERSION";

@@ -356,7 +356,8 @@ return Public Key text in one of the supported formats.
 #### `mp.jwt.verify.publickey.algorithm`
 
 The `mp.jwt.verify.publickey.algorithm` configuration property allows for specifying which Public Key Signature Algorithm
-is supported by the MP JWT endpoint. This property can be be set to either `RS256` or `ES256`. Default value is `RS256`.
+is supported by the MP JWT endpoint. This property can be be set to either `RS256` or `ES256`. If `mp.jwt.verify.publickey.algorithm` is not set then both `RS256` and `ES256` must be accepted.
+
 Support for the other asymmetric signature algorithms such as `RS512`, `ES512` and others is optional.
 
 `mp.jwt.verify.publickey.algorithm` will provide an additional hint how to read the Public Key in the PKCS#8 PEM format as both RSA and EC Public Keys in the PKCS#8 PEM format may only have a standard `-----BEGIN PUBLIC KEY-----` header and footer.
