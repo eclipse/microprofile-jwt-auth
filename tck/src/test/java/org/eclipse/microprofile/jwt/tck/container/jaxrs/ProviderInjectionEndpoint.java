@@ -235,7 +235,7 @@ public class ProviderInjectionEndpoint {
     }
     /**
      * Verify that values exist and that types match the corresponding Claims enum
-     * 
+     *
      * @return a series of pass/fail statements regarding the check for each injected claim
      */
     @GET

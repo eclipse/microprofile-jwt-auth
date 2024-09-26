@@ -85,7 +85,7 @@ public class RolesEndpoint {
 
     /**
      * Validate that the SecurityContext#getUserPrincipal is a JsonWebToken
-     * 
+     *
      * @param sec
      * @return
      */
@@ -100,7 +100,7 @@ public class RolesEndpoint {
 
     /**
      * This endpoint requires a role that is mapped to the group1 role
-     * 
+     *
      * @return principal name
      */
     @GET

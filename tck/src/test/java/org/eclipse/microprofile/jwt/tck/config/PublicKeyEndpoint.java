@@ -93,7 +93,7 @@ public class PublicKeyEndpoint {
 
     /**
      * Verify that the injected key is a PEM RSA public key
-     * 
+     *
      * @return json object for test result
      */
     @GET
@@ -198,7 +198,7 @@ public class PublicKeyEndpoint {
 
     /**
      * Check the location exists and is a URL whose contents are valid PEM public key
-     * 
+     *
      * @return result of validation test
      */
     @GET
@@ -249,7 +249,7 @@ public class PublicKeyEndpoint {
 
     /**
      * Verify that the injected key is a JWK public key
-     * 
+     *
      * @return json object for test result
      */
     @GET
@@ -280,7 +280,7 @@ public class PublicKeyEndpoint {
 
     /**
      * Verify that the injected key is a base64 encoded JWK public key
-     * 
+     *
      * @return json object for test result
      */
     @GET
@@ -315,7 +315,7 @@ public class PublicKeyEndpoint {
 
     /**
      * Verify that the injected key is a JWKS public key
-     * 
+     *
      * @return json object for test result
      */
     @GET
@@ -422,7 +422,7 @@ public class PublicKeyEndpoint {
 
     /**
      * Check the location exists and is a URL whose contents are valid JWKS public key
-     * 
+     *
      * @param kid
      *            - expected kid of JWKS
      * @return result of validation test
@@ -480,7 +480,7 @@ public class PublicKeyEndpoint {
     }
     /**
      * Check a token with an iss matches the mp.jwt.verify.issuer value
-     * 
+     *
      * @return result of validation test
      */
     @GET
@@ -516,7 +516,7 @@ public class PublicKeyEndpoint {
 
     /**
      * An endpoint that returns the contents of the bundled /publicKey4k.pem key
-     * 
+     *
      * @return the /publicKey4k.pem classpath resource contents a PEM string
      */
     @GET
@@ -528,7 +528,7 @@ public class PublicKeyEndpoint {
     }
     /**
      * An endpoint that converts the bundled /publicKey4k.pem key in the corresponding JWKS format
-     * 
+     *
      * @param kid
      *            - the kid to use in the JWKS
      * @return the /publicKey4k.pem classpath resource contents a JWKS object
@@ -575,7 +575,7 @@ public class PublicKeyEndpoint {
 
     /**
      * Verify a JWKS object string against the expected values used by the tck
-     * 
+     *
      * @param jwksJson
      *            - JSON string for JWKS
      * @param kid

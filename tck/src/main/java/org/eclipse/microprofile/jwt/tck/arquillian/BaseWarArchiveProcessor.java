@@ -56,7 +56,7 @@ public abstract class BaseWarArchiveProcessor implements ApplicationArchiveProce
 
     /**
      * Called to get names of WEB-INF resources
-     * 
+     *
      * @return names of classpath resources to add to the WEB-INF directory, empty for none
      */
     protected String[] getWebInfResources() {
@@ -66,7 +66,7 @@ public abstract class BaseWarArchiveProcessor implements ApplicationArchiveProce
 
     /**
      * groupId:artifactId:version dependencies to include in WEB-INF/lib directory
-     * 
+     *
      * @return names of mvn dependencies to include, empty for none
      */
     protected String[] getWebInfLibArtifacts() {

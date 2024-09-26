@@ -60,7 +60,7 @@ import jakarta.ws.rs.core.Response;
  *
  * Validate the aud claim against the {@linkplain Names#AUDIENCES} property is performed, and passes if the jwt aud is
  * contained in the {@linkplain Names#AUDIENCES} property.
- * 
+ *
  * This test checks against a claim containing a single values.
  */
 public class AudValidationTest extends Arquillian {
@@ -78,7 +78,7 @@ public class AudValidationTest extends Arquillian {
     /**
      * Create a CDI aware base web application archive that includes an embedded PEM public key that is included as the
      * mp.jwt.verify.publickey property. The root url is /
-     * 
+     *
      * @return the base base web application archive
      * @throws Exception
      *             - on resource failure

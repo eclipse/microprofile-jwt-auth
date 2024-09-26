@@ -71,7 +71,7 @@ public class PublicKeyAsPEMLocationURLTest extends Arquillian {
     /**
      * Create a CDI aware base web application archive that includes an embedded JWK public key that is referenced via
      * the mp.jwt.verify.publickey.location as a URL resource property. The root url is /pem
-     * 
+     *
      * @return the base base web application archive
      * @throws IOException
      *             - on resource failure

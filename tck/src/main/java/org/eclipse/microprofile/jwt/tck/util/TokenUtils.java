@@ -682,7 +682,7 @@ public class TokenUtils {
 
     /**
      * Read a classpath resource into a string and return it.
-     * 
+     *
      * @param resName
      *            - classpath resource name
      * @return the resource content as a string
@@ -705,7 +705,7 @@ public class TokenUtils {
 
     /**
      * Read a PEM encoded RSA private key from the classpath
-     * 
+     *
      * @param pemResName
      *            - key file resource name
      * @return RSAPrivateKey
@@ -721,7 +721,7 @@ public class TokenUtils {
 
     /**
      * Read a PEM encoded EC private key from the classpath
-     * 
+     *
      * @param pemResName
      *            - key file resource name
      * @return ECPrivateKey
@@ -737,7 +737,7 @@ public class TokenUtils {
 
     /**
      * Read a PEM encoded RSA public key from the classpath
-     * 
+     *
      * @param pemResName
      *            - key file resource name
      * @return RSAPublicKey
@@ -753,7 +753,7 @@ public class TokenUtils {
 
     /**
      * Read a PEM encoded EC public key from the classpath
-     * 
+     *
      * @param pemResName
      *            - key file resource name
      * @return ECPublicKey
@@ -769,7 +769,7 @@ public class TokenUtils {
 
     /**
      * Read a public key in JWK format from the classpath
-     * 
+     *
      * @param jwkResName
      *            - key file resource name
      * @return PublicKey
@@ -783,7 +783,7 @@ public class TokenUtils {
 
     /**
      * Read a private key in JWK format from the classpath
-     * 
+     *
      * @param jwkResName
      *            - key file resource name
      * @return PublicKey
@@ -797,7 +797,7 @@ public class TokenUtils {
 
     /**
      * Generate a new RSA keypair.
-     * 
+     *
      * @param keySize
      *            - the size of the key
      * @return KeyPair
@@ -812,7 +812,7 @@ public class TokenUtils {
 
     /**
      * Decode a PEM encoded private key string to an RSA PrivateKey
-     * 
+     *
      * @param pemEncoded
      *            - PEM string for private key
      * @return RSAPrivateKey
@@ -829,7 +829,7 @@ public class TokenUtils {
 
     /**
      * Decode a PEM encoded private key string to an EC PrivateKey
-     * 
+     *
      * @param pemEncoded
      *            - PEM string for private key
      * @return ECPrivateKey
@@ -846,7 +846,7 @@ public class TokenUtils {
 
     /**
      * Decode a PEM encoded public key string to an RSA PublicKey
-     * 
+     *
      * @param pemEncoded
      *            - PEM string for private key
      * @return RSAPublicKey
@@ -863,7 +863,7 @@ public class TokenUtils {
 
     /**
      * Decode a PEM encoded public key string to an EC PublicKey
-     * 
+     *
      * @param pemEncoded
      *            - PEM string for private key
      * @return ECPublicKey
