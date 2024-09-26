@@ -28,7 +28,7 @@ import org.jboss.arquillian.core.spi.LoadableExtension;
 public class BaseExtension implements LoadableExtension {
     /**
      * Called to allow for extensions of the Arquillian runtime
-     * 
+     *
      * @param extensionBuilder
      *            - extension SPI
      */
@@ -40,7 +40,7 @@ public class BaseExtension implements LoadableExtension {
 
     /**
      * Override to return your implementation of ApplicationArchiveProcessor
-     * 
+     *
      * @return vendor ApplicationArchiveProcessor implementation
      */
     protected Class<? extends ApplicationArchiveProcessor> getApplicationArchiveProcessor() {

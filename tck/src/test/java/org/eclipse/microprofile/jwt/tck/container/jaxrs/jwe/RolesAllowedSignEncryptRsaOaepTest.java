@@ -69,7 +69,7 @@ public class RolesAllowedSignEncryptRsaOaepTest extends Arquillian {
 
     /**
      * Create a CDI aware base web application archive
-     * 
+     *
      * @return the base base web application archive
      * @throws IOException
      *             - on resource failure

@@ -63,7 +63,7 @@ public class AudienceValidationEndpoint {
 
     /**
      * Check a token with an aud claim matches one of the mp.jwt.verify.audiences values
-     * 
+     *
      * @return result of validation test
      */
     @GET

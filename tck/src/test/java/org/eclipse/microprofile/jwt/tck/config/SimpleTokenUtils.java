@@ -50,7 +50,7 @@ public class SimpleTokenUtils {
 
     /**
      * Decode a PEM encoded private key string to an RSA PrivateKey
-     * 
+     *
      * @param pemEncoded
      *            - PEM string for private key
      * @return PrivateKey
@@ -67,7 +67,7 @@ public class SimpleTokenUtils {
 
     /**
      * Decode a PEM encoded public key string to an RSA PublicKey
-     * 
+     *
      * @param pemEncoded
      *            - PEM string for public key
      * @return RSAPublicKey
@@ -84,7 +84,7 @@ public class SimpleTokenUtils {
 
     /**
      * Decode a PEM encoded public key string to an EC PublicKey
-     * 
+     *
      * @param pemEncoded
      *            - PEM string for public key
      * @return ECPublicKey
@@ -101,7 +101,7 @@ public class SimpleTokenUtils {
 
     /**
      * Decode a JWK(S) encoded public key string to an RSA PublicKey
-     * 
+     *
      * @param jwksValue
      *            - JWKS string value
      * @return RSAPublicKey from RSAPublicKeySpec
@@ -129,7 +129,7 @@ public class SimpleTokenUtils {
 
     /**
      * Decode a JWK(S) encoded private key string to an RSA PrivateKey
-     * 
+     *
      * @param jwksValue
      *            - JWKS string value
      * @return PrivateKey from RSAPrivateKeySpec
@@ -168,7 +168,7 @@ public class SimpleTokenUtils {
     }
     /**
      * Read a classpath resource into a string and return it.
-     * 
+     *
      * @param resName
      *            - classpath resource name
      * @return the resource content as a string

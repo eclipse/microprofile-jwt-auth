@@ -38,7 +38,7 @@ public class ClaimLiteral extends AnnotationLiteral<Claim> implements Claim {
 
     /**
      * Construct a Claim literal from a string name of a claim
-     * 
+     *
      * @param value
      *            - the string name for claim
      */
@@ -47,7 +47,7 @@ public class ClaimLiteral extends AnnotationLiteral<Claim> implements Claim {
     }
     /**
      * Construct a Claim literal from a standard claim defined in {@linkplain Claims}
-     * 
+     *
      * @param standard
      *            - the claim enum value
      */
